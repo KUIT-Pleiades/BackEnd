@@ -1,4 +1,4 @@
-package com.pleiades.pleiades;
+package com.pleiades;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
