@@ -49,8 +49,8 @@ jobs:
           envs: GITHUB_SHA
           script: |
             echo "✋🏻Stopping existing container"
-            sudo docker stop {도커 컨테이너 이름}
-            sudo docker rm {도커 컨테이너 이름}
+            sudo docker stop pleiades-server
+            sudo docker rm pleiades-server
         
             sudo docker ps -a
             
