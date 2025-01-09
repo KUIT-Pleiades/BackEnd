@@ -15,7 +15,7 @@ public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();
 
-    public static ResponseEntity<KakaoTokenDto> getAccessToken(String code) {
+    public static ResponseEntity<KakaoTokenDto> postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);  // application/x-www-form-urlencoded;charset=utf-8
@@ -41,7 +41,7 @@ public class KakaoRequest {
         }
     }
 
-    public static ResponseEntity<KakaoUserDto> getUserEmail(String token) {
+    public static ResponseEntity<KakaoUserDto> postUserEmail(String token) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -54,13 +54,12 @@ public class KakaoRequest {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
         try {
-            // POST 요청 보내기
+            // POST 요청
             ResponseEntity<KakaoUserDto> response = restTemplate.postForEntity(KakaoUrl.USER_INFO_URL.getUrl(), entity, KakaoUserDto.class);
 
             return response;
 
         } catch (Exception e) {
-            // 에러 처리
             return null;
         }
     }
