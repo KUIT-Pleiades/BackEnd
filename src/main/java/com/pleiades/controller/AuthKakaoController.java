@@ -5,7 +5,7 @@ import com.pleiades.dto.KakaoAccountDto;
 import com.pleiades.dto.KakaoTokenDto;
 import com.pleiades.dto.KakaoUserDto;
 import com.pleiades.model.User;
-import com.pleiades.service.KakaoRequest;
+import com.pleiades.util.KakaoRequest;
 import com.pleiades.strings.KakaoUrl;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.*;
@@ -38,12 +38,11 @@ public class AuthKakaoController {
     public void getAccess(@RequestParam("code") String code, HttpServletResponse response) throws SQLException, IOException {
         Map<String, Object> result = new HashMap<>();
 
-        ResponseEntity<KakaoTokenDto> responseToken = KakaoRequest.getAccessToken(code);
+        ResponseEntity<KakaoTokenDto> responseToken = KakaoRequest.postAccessToken(code);
         ResponseEntity<KakaoUserDto> responseUser = null;
-        KakaoAccountDto account = null;
-        String email = null;
+        KakaoAccountDto account = null; String email = null;
 
-        if (responseToken != null) { responseUser = KakaoRequest.getUserEmail(responseToken.getBody().getAccessToken()); }
+        if (responseToken != null) { responseUser = KakaoRequest.postUserEmail(responseToken.getBody().getAccessToken()); }
         if (responseUser != null) { account = responseUser.getBody().getKakaoAccount(); }
         if (account != null) { email = account.getEmail(); }
 
@@ -51,13 +50,8 @@ public class AuthKakaoController {
 
         User user = userDao.findBySocialId(email);
 
-        if (user != null) {
-            String redirect = "redirect:/star?userId=" + user.getUserId();
-            response.sendRedirect(redirect);
-        }
-
-        String redirect = "redirect:/auth/signup";
-        response.sendRedirect(redirect);
+        if (user != null) { response.sendRedirect("/star?userId=" + user.getUserId()); return;}
+        response.sendRedirect("/auth/signup");
     }
 
 //    @GetMapping("/signup")
