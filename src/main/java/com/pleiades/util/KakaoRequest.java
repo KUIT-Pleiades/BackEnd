@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.util;
 
 import com.pleiades.dto.KakaoTokenDto;
 import com.pleiades.dto.KakaoUserDto;
