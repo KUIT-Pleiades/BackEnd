@@ -5,7 +5,8 @@ public enum KakaoUrl {
     KAKAO_CLIENT_ID("1c2f6bdd53dbadbd6301ef5075764d16"),
     REDIRECT_URI("http://54.252.108.194/auth/code/kakao"),
     TOKEN_URL("https://kauth.kakao.com/oauth/token"),
-    USER_INFO_URL("https://kapi.kakao.com/v2/user/me");
+    USER_INFO_URL("https://kapi.kakao.com/v2/user/me"),
+    TOKEN_INFO_URL("https://kapi.kakao.com/v1/user/access_token_info");
 
     private final String path;
 

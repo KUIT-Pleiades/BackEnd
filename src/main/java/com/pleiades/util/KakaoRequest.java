@@ -64,4 +64,22 @@ public class KakaoRequest {
         }
     }
 
+    public ResponseEntity<KakaoTokenDto> getTokenInfo(String token) {
+        // 요청 헤더
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(headers);
+
+        try {
+            // POST 요청
+            ResponseEntity<KakaoTokenDto> response = restTemplate.postForEntity(KakaoUrl.TOKEN_INFO_URL.getUrl(), entity, KakaoTokenDto.class);
+
+            return response;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

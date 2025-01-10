@@ -1,4 +1,4 @@
-package com.pleiades.model;
+package com.pleiades.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Character {
+public class Star {
     private String userId;
-    private int faceId;
-    private int clothesId;
+    private int backgroundId;
 }
