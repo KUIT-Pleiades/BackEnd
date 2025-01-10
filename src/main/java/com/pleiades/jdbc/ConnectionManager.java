@@ -8,10 +8,10 @@ import java.sql.SQLException;
 
 public class ConnectionManager {
     //todo: 비밀번호 .properties or .yml에 저장
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://pleiades.cpmukq0mgpjz.ap-southeast-2.rds.amazonaws.com:3306/pleiades?serverTimezone=Asia/Seoul";
-    private static final String DB_USERNAME = "kuit";
-    private static final String DB_PW = "kuitpleiades";
+    private static final String DB_DRIVER;
+    private static final String DB_URL;
+    private static final String DB_USERNAME;
+    private static final String DB_PW;
 
     private static BasicDataSource ds;
     public static DataSource getDataSource() {
