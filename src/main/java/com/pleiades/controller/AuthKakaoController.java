@@ -1,13 +1,15 @@
 package com.pleiades.controller;
 
-import com.pleiades.dao.UserDao;
 import com.pleiades.dto.KakaoAccountDto;
 import com.pleiades.dto.KakaoTokenDto;
 import com.pleiades.dto.KakaoUserDto;
-import com.pleiades.model.User;
+import com.pleiades.entity.User;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.util.KakaoRequest;
 import com.pleiades.strings.KakaoUrl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +20,24 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthKakaoController {
+    @Autowired
+    UserRepository userRepository;
 
     @GetMapping("/login/kakao")
-    public void loginRedirect(HttpServletResponse response) throws IOException {
+    public void loginRedirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getParameter("Authorization") != null && request.getParameter("Authorization").equals("Bearer")) {
+            String token = request.getParameter("Authorization");
+//            String issuedAt = tokenDao.find(token);
+//            유효성 검사
+
+            response.sendRedirect("/star?userId=");
+        }
+
         String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                 "?response_type=code" +
                 "&client_id=" + KakaoUrl.KAKAO_CLIENT_ID.getUrl() +
@@ -46,11 +59,9 @@ public class AuthKakaoController {
         if (responseUser != null) { account = responseUser.getBody().getKakaoAccount(); }
         if (account != null) { email = account.getEmail(); }
 
-        UserDao userDao = new UserDao();
+        Optional<User> user = userRepository.findByPhoneNumber(email);
 
-        User user = userDao.findBySocialId(email);
-
-        if (user != null) { response.sendRedirect("/star?userId=" + user.getUserId()); return;}
+        if (user != null) { response.sendRedirect("/star?userId=" + user.get().getUserId()); return;}
         response.sendRedirect("/auth/signup");
     }
 

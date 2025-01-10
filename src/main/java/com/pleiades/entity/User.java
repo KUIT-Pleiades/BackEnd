@@ -1,4 +1,4 @@
-package com.pleiades.model;
+package com.pleiades.entity;
 
 import lombok.Getter;
 import lombok.Setter;
