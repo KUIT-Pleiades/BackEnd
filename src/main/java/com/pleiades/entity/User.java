@@ -1,52 +1,29 @@
 package com.pleiades.entity;
 
-import com.pleiades.dto.SignUpDto;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
 
-@Entity
-@Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter
+@Setter
 public class User {
+    private String userId;
+    private String nickname;
+    private final Timestamp birthDate;
+    private final Timestamp signupDate;
 
-    // todo : ID user가 직접 입력
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    public User(String userId, String nickname, Timestamp birthDate, Timestamp signupDate) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.birthDate = birthDate;
+        this.signupDate = signupDate;
+    }
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String userName = "임시 사용자";
-
-    @Column(nullable = false)
-    private LocalDate birthDate= LocalDate.of(2000, 1, 1);;
-
-    @Column(nullable = false)
-    private LocalDate createdDate;
-
-    @Transient
-    private String accessToken;
-
-    @Column
-    private String refreshToken;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private NaverToken naverToken;
-
-    public void setSignUp(SignUpDto signUpDto) {
-        this.setId(signUpDto.getId());
-        this.setUserName(signUpDto.getNickname());
-        this.setBirthDate(signUpDto.getBirthDate());
-        this.setCreatedDate(LocalDate.now());
+    public User(String userId, String nickname, Timestamp birthDate) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.birthDate = birthDate;
+        this.signupDate = null;
     }
 }
