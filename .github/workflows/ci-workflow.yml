@@ -33,6 +33,9 @@ jobs:
           server-id: github
           setting-path: ${{ github.workspace }}
 
+      - name: Set JWT_SECRET_KEY
+        run: echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x ./gradlew
 
