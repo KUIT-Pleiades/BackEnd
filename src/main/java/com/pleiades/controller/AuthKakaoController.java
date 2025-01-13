@@ -1,16 +1,14 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.kakao.KakaoAccountDto;
-import com.pleiades.dto.kakao.KakaoTokenDto;
-import com.pleiades.dto.kakao.KakaoUserDto;
+import com.pleiades.dto.KakaoAccountDto;
+import com.pleiades.dto.KakaoTokenDto;
+import com.pleiades.dto.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.JwtUtil;
 import com.pleiades.service.KakaoRequest;
 import com.pleiades.service.KakaoTokenService;
-import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,9 +30,8 @@ import java.util.Optional;
 
 @Slf4j
 @Controller
-@RequestMapping("/auth/login/kakao")
+@RequestMapping("/auth")
 public class AuthKakaoController {
-
     @Autowired
     UserRepository userRepository;
 
@@ -44,36 +41,43 @@ public class AuthKakaoController {
     @Autowired
     KakaoTokenService kakaoTokenService;
 
-    @Autowired
-    JwtUtil jwtUtil;
-
 //    @Value("${KAKAO_CLIENT_ID}");
 //    String KAKAO_CLIENT_ID;
 
-    // 모든 jwt 토큰 만료 or 최초 로그인
-    @GetMapping("")
-    public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    @GetMapping("/login/kakao")
+    public void loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+        String userId = request.getParameter("userId");
+        if (session != null && userId != null) {
+            Object tokenAttribute = session.getAttribute("accessToken");
+            // 액세스 토큰이 존재
+            if (tokenAttribute != null) {
+                String accessToken = tokenAttribute.toString();
+                // 액세스 토큰이 유효
+                if (kakaoTokenService.checkAccessTokenValidation(accessToken, userId)) { response.sendRedirect("/star?userId=" + userId); return; }
+                String newAccessToken = kakaoTokenService.checkRefreshTokenValidation(userId);      // 액세스 토큰 만료
+                if (newAccessToken != null) { response.sendRedirect("/star?userId=" + userId); return; }    // 리프레시 토큰 유효
+            }
+        }
+        // 기존 사용자라면 리프레시 토큰 삭제
+        Optional<KakaoToken> token = kakaoTokenRepository.findByUser_Id(userId);
+        token.ifPresent(kakaoToken -> kakaoTokenRepository.delete(kakaoToken));
+
+        // 최초 로그인 or 리프레시 토큰 만료
         String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                 "?response_type=code" +
                 "&client_id=" + KakaoUrl.KAKAO_CLIENT_ID.getUrl() +
                 "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("Location", redirectUrl)
-                .build();
+        response.sendRedirect(redirectUrl);
     }
 
-    // 인가 코드 재발급은 불가피한가? 그럼 소셜 토큰을 쓰는 이유가 있나?
-    // 여기서 소셜 토큰 확인 해야함 - 아닌 듯?
-    @GetMapping("/callback")
+    @GetMapping("/login/kakao/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
         try {
             HttpHeaders headers = new HttpHeaders();
             Map<String, String> body = new HashMap<>();
 
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
-            log.info("Access token: " + responseToken.getAccessToken());
             String email = null;
 
             if (responseToken != null) { email = getKakaoEmail(responseToken.getAccessToken()); }
@@ -86,16 +90,8 @@ public class AuthKakaoController {
                 token.setUser(user.get()); token.setRefreshToken(responseToken.getRefreshToken());
                 kakaoTokenRepository.save(token);
 
-                String jwtAccessToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
-                String jwtRefreshToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
-
                 headers.setLocation(URI.create("/star?userId=" + user.get().getId()));
                 body.put("Authorization", responseToken.getAccessToken());
-                body.put("AccessToken", jwtAccessToken);
-                body.put("RefreshToken", jwtRefreshToken);
-
-                log.info("(a) Access token: " + jwtAccessToken);
-                log.info("(a) Refresh token: " + jwtRefreshToken);
 
                 return ResponseEntity
                         .status(HttpStatus.FOUND) // 302 Found (리다이렉트 상태 코드)
@@ -104,13 +100,13 @@ public class AuthKakaoController {
             }
 
             // 회원가입 완료 후 저장될 회원 정보
-            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken());
-            session.setAttribute("kakaoRefreshToken", responseToken.getRefreshToken());
+            session.setAttribute("accessToken", responseToken.getAccessToken());
+            session.setAttribute("refreshToken", responseToken.getRefreshToken());
             session.setAttribute("email", responseToken.getAccessToken());
 
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/signup")
+                    .header("Location", "/auth/signup") // [Content-Type:"application/json", Accept:"application/json"]
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
@@ -119,12 +115,14 @@ public class AuthKakaoController {
     }
 
     private String getKakaoEmail(String token) {
-        KakaoUserDto responseUser = KakaoRequest.postUserInfo(token);;
+        KakaoUserDto responseUser = null;
         KakaoAccountDto account = null;
         String email = null;
 
-        if (responseUser != null) { account = responseUser.getKakaoAccount(); log.info("responseUser"); }
-        if (account != null) { email = account.getEmail(); log.info("account"); }
+        responseUser = KakaoRequest.postUserEmail(token);
+
+        if (responseUser != null) { account = responseUser.getKakaoAccount(); }
+        if (account != null) { email = account.getEmail(); }
 
         return email;
     }

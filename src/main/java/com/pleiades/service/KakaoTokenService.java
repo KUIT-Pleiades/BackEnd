@@ -1,7 +1,7 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.kakao.KakaoTokenDto;
-import com.pleiades.dto.kakao.KakaoUserDto;
+import com.pleiades.dto.KakaoTokenDto;
+import com.pleiades.dto.KakaoUserDto;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class KakaoTokenService {
 
     public boolean checkAccessTokenValidation(String accessToken, String userId) {
         String foundUserId = null;
-        KakaoUserDto kakaoUserDto = KakaoRequest.postUserInfo(accessToken);
+        KakaoUserDto kakaoUserDto = KakaoRequest.postUserEmail(accessToken);
         if (kakaoUserDto != null) { foundUserId = userRepository.findByEmail(kakaoUserDto.getKakaoAccount().getEmail()).get().getId(); }
         return (userId == foundUserId);
     }

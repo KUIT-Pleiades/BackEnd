@@ -3,6 +3,7 @@ package com.pleiades.controller;
 
 import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class StarController {
 //        StarBackground background =
 
         result.put("userId", userId);
-        result.put("nickname", user.get().getUserName());
+        result.put("nickname", user.get().getNickname());
 //        result.put("backgroundName", );
 //        result.put("backgroundUrl", );
 //        result.put("character", );
