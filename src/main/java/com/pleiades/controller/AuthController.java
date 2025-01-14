@@ -1,16 +1,14 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.NaverLoginResponse;
+import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.NaverLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -28,17 +26,23 @@ public class AuthController {
 
     private String state; // CSRF 방지용 임의 값
 
-    @GetMapping("/login/naver")
-    public ResponseEntity<Void> redirectToNaverLogin(HttpServletResponse response) throws IOException {
-
-        // 네이버 로그인 인증 URL 생성
+    private void naverLogin(HttpServletResponse response) throws IOException {
         String naverLoginUrl = String.format(
                 "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s&prompt=login",
                 clientId, redirectUri, state
         );
-
-        // 네이버 로그인 페이지로 redirect
         response.sendRedirect(naverLoginUrl);
+    }
+
+    @ExceptionHandler(NaverRefreshTokenExpiredException.class)
+    public ResponseEntity<Void> handleRefreshTokenExpired(HttpServletResponse response) throws IOException {
+        naverLogin(response);
+        return ResponseEntity.status(HttpStatus.FOUND).build();
+    }
+
+    @GetMapping("/login/naver")
+    public ResponseEntity<Void> redirectToNaverLogin(HttpServletResponse response) throws IOException {
+        naverLogin(response);
         return ResponseEntity.status(HttpStatus.FOUND).build();
     }
 

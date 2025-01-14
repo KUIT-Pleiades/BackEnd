@@ -3,6 +3,7 @@ package com.pleiades.util;
 import com.pleiades.dto.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
+import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.repository.NaverTokenRepository;
 import com.pleiades.repository.UserRepository;
 import lombok.*;
@@ -83,7 +84,7 @@ public class NaverApiUtil {
         if (isAccessTokenExpired(naverToken.getLastUpdated())) {
             String newAccessToken = refreshAccessToken(naverToken.getRefreshToken());
             if (newAccessToken == null) {
-                throw new IllegalArgumentException("네이버 Refresh Token 만료 - 재로그인 필요");
+                throw new NaverRefreshTokenExpiredException("네이버 Refresh Token 만료 - 재로그인 필요");
             }
             return newAccessToken;
         }
