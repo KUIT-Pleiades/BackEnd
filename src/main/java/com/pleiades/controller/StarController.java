@@ -34,7 +34,7 @@ public class StarController {
 //        StarBackground background =
 
         result.put("userId", userId);
-        result.put("nickname", user.get().getNickname());
+        result.put("nickname", user.get().getUserName());
 //        result.put("backgroundName", );
 //        result.put("backgroundUrl", );
 //        result.put("character", );
