@@ -1,7 +1,7 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.KakaoTokenDto;
-import com.pleiades.dto.KakaoUserDto;
+import com.pleiades.dto.kakao.KakaoTokenDto;
+import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,6 +5,8 @@ import com.pleiades.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
     @Value("${JWT_SECRET_KEY}")
     private final String secretKey = null;
     private final long ACCESS_TOKEN_EXPIRATION_MS = 3600000; // 1 hour
@@ -28,11 +31,11 @@ public class JwtUtil {
                 .compact(); // JWT 문자열로 반환
     }
 
-    private String generateAccessToken(String userId, String role) {
+    public String generateAccessToken(String userId, String role) {
         return generateToken(userId, role, ACCESS_TOKEN_EXPIRATION_MS);
     }
 
-    private String generateToken(String userId, String role) {
+    public String generateToken(String userId, String role) {
         return generateToken(userId, role, REFRESH_TOKEN_EXPIRATION_MS);
     }
 
@@ -43,7 +46,9 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            CustomException customException = new CustomException(ErrorCode.INVALID_TOKEN);
+            log.error(customException.getMessage(), customException);
+            return null;
         }
     }
 }

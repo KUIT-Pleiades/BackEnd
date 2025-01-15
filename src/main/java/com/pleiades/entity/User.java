@@ -1,18 +1,22 @@
 package com.pleiades.entity;
 
+import com.pleiades.dto.SignUpDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "user")
 public class User {
@@ -20,8 +24,8 @@ public class User {
     private String id;
     private String nickname;
     private String email;
-    private Timestamp birthDate;
-    private Timestamp signupDate;
+    private LocalDate birthDate;
+    private LocalDate signupDate;
 
 //    public User(String userId, String nickname, Timestamp birthDate, Timestamp signupDate) {
 //        this.userId = userId;
@@ -36,4 +40,11 @@ public class User {
 //        this.birthDate = birthDate;
 //        this.signupDate = null;
 //    }
+
+    public void setSignUp(SignUpDto signUpDto) {
+        this.setId(signUpDto.getId());
+        this.setNickname(signUpDto.getNickname());
+        this.setBirthDate(signUpDto.getBirthDate());
+        this.setSignupDate(LocalDate.now());
+    }
 }

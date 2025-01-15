@@ -1,8 +1,8 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.KakaoAccessTokenDto;
-import com.pleiades.dto.KakaoTokenDto;
-import com.pleiades.dto.KakaoUserDto;
+import com.pleiades.dto.kakao.KakaoAccessTokenDto;
+import com.pleiades.dto.kakao.KakaoTokenDto;
+import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.strings.KakaoUrl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
