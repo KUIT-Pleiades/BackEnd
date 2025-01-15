@@ -132,7 +132,6 @@ public class AuthHomeController {
             session.removeAttribute("kakaoRefreshToken");
         }
 
-
         // 네이버 리프레시 토큰 저장
 //        if (session.getAttribute("naverRefreshToken") != null) {
 //            NaverToken nvaerToken = new NaverToken();
