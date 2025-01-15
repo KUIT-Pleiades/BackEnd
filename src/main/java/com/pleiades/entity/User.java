@@ -26,7 +26,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String userName = "임시 사용자";
+    private String userName;
 
     @Column(nullable = false)
     private LocalDate birthDate= LocalDate.of(2000, 1, 1);;
