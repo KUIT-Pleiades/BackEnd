@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -60,10 +59,10 @@ public class AuthHomeController {
 
         String accessToken = request.getParameter("AccessToken");
         String refreshToken = request.getParameter("RefreshToken");
-        if (accessToken == null) { return checkRefreshToken(accessToken, refreshToken, body); }
-        Claims token = jwtUtil.validateToken(accessToken);
+        if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
 
-        if (token == null) { return checkRefreshToken(accessToken, refreshToken, body); }
+        Claims token = jwtUtil.validateToken(accessToken);
+        if (token == null) { return checkRefreshToken(refreshToken, body); }
         String userId = token.getId();
 
         return ResponseEntity
@@ -178,7 +177,7 @@ public class AuthHomeController {
                 .body(body);
     }
 
-    private ResponseEntity<Map<String, String>> checkRefreshToken(String accessToken, String refreshToken, Map<String, String> body) {
+    private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {
         if (refreshToken == null) {
             return ResponseEntity
                     .status(HttpStatus.FOUND)
@@ -193,7 +192,7 @@ public class AuthHomeController {
                     .build();
         }
         String userId = token.getId();
-        accessToken = jwtUtil.generateAccessToken(userId, JwtRole.ROLE_USER.getRole());
+        String accessToken = jwtUtil.generateAccessToken(userId, JwtRole.ROLE_USER.getRole());
 
         body.put("AccessToken", accessToken);
 
@@ -202,5 +201,4 @@ public class AuthHomeController {
                 .header("Location", "/star?userId="+userId)
                 .body(body);
     }
-
 }
