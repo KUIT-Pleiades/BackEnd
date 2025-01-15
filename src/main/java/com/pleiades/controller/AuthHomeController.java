@@ -171,6 +171,9 @@ public class AuthHomeController {
         body.put("AccessToken", jwtAccessToken);
         body.put("RefreshToken", jwtRefreshToken);
 
+        log.info("(b) Access token: " + jwtAccessToken);
+        log.info("(b) Refresh token: " + jwtRefreshToken);
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .header("Location", "/star?userId"+signUpDto.getId())
@@ -195,6 +198,7 @@ public class AuthHomeController {
         String accessToken = jwtUtil.generateAccessToken(userId, JwtRole.ROLE_USER.getRole());
 
         body.put("AccessToken", accessToken);
+        log.info("(c) Access token: " + accessToken);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

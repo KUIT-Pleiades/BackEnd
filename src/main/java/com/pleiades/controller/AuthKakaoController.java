@@ -105,6 +105,9 @@ public class AuthKakaoController {
                 body.put("AccessToken", jwtAccessToken);
                 body.put("RefreshToken", jwtRefreshToken);
 
+                log.info("(a) Access token: " + jwtAccessToken);
+                log.info("(a) Refresh token: " + jwtRefreshToken);
+
                 return ResponseEntity
                         .status(HttpStatus.FOUND) // 302 Found (리다이렉트 상태 코드)
                         .header(headers.toString())
