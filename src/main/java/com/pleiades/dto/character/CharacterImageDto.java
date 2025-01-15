@@ -1,4 +1,4 @@
-package com.pleiades.dto;
+package com.pleiades.dto.character;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoUserDto {
-    @JsonProperty("id")
-    private String id;
+public class CharacterImageDto {
+    @JsonProperty("name")
+    private String name;
 
-    @JsonProperty("kakao_account")
-    private KakaoAccountDto kakaoAccount;
+    @JsonProperty("url")
+    private String url;
 }

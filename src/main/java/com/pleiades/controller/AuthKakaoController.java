@@ -1,15 +1,19 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.KakaoAccountDto;
-import com.pleiades.dto.KakaoTokenDto;
-import com.pleiades.dto.KakaoUserDto;
+import com.pleiades.dto.kakao.KakaoAccountDto;
+import com.pleiades.dto.kakao.KakaoTokenDto;
+import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.service.JwtUtil;
 import com.pleiades.service.KakaoRequest;
 import com.pleiades.service.KakaoTokenService;
+import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -30,7 +34,7 @@ import java.util.Optional;
 
 @Slf4j
 @Controller
-@RequestMapping("/auth")
+@RequestMapping("/auth/login/kakao")
 public class AuthKakaoController {
     @Autowired
     UserRepository userRepository;
@@ -41,14 +45,17 @@ public class AuthKakaoController {
     @Autowired
     KakaoTokenService kakaoTokenService;
 
+    @Autowired
+    JwtUtil jwtUtil;
+
 //    @Value("${KAKAO_CLIENT_ID}");
 //    String KAKAO_CLIENT_ID;
 
-    @GetMapping("/login/kakao")
+    @GetMapping("")
     public void loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         String userId = request.getParameter("userId");
         if (session != null && userId != null) {
-            Object tokenAttribute = session.getAttribute("accessToken");
+            Object tokenAttribute = session.getAttribute("kakaoAccessToken");
             // 액세스 토큰이 존재
             if (tokenAttribute != null) {
                 String accessToken = tokenAttribute.toString();
@@ -71,7 +78,7 @@ public class AuthKakaoController {
         response.sendRedirect(redirectUrl);
     }
 
-    @GetMapping("/login/kakao/callback")
+    @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -90,8 +97,13 @@ public class AuthKakaoController {
                 token.setUser(user.get()); token.setRefreshToken(responseToken.getRefreshToken());
                 kakaoTokenRepository.save(token);
 
+                String jwtAccessToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
+                String jwtRefreshToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
+
                 headers.setLocation(URI.create("/star?userId=" + user.get().getId()));
                 body.put("Authorization", responseToken.getAccessToken());
+                body.put("AccessToken", jwtAccessToken);
+                body.put("RefreshToken", jwtRefreshToken);
 
                 return ResponseEntity
                         .status(HttpStatus.FOUND) // 302 Found (리다이렉트 상태 코드)
@@ -100,13 +112,13 @@ public class AuthKakaoController {
             }
 
             // 회원가입 완료 후 저장될 회원 정보
-            session.setAttribute("accessToken", responseToken.getAccessToken());
-            session.setAttribute("refreshToken", responseToken.getRefreshToken());
+            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken());
+            session.setAttribute("kakaoRefreshToken", responseToken.getRefreshToken());
             session.setAttribute("email", responseToken.getAccessToken());
 
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/signup") // [Content-Type:"application/json", Accept:"application/json"]
+                    .header("Location", "/auth/signup")
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());

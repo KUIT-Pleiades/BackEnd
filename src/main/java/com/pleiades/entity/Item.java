@@ -8,14 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "star")
-public class Star {
+@Table(name = "character")
+public class Item {
     @Id
-    private String userId;
-    private int backgroundId;
+    private String id;
 }

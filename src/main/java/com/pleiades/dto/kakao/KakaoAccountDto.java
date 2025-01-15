@@ -1,4 +1,4 @@
-package com.pleiades.dto;
+package com.pleiades.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
