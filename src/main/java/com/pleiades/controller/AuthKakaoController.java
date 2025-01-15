@@ -55,7 +55,7 @@ public class AuthKakaoController {
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                 "?response_type=code" +
-                "&client_id=" + KakaoUrl.KAKAO_CLIENT_ID.getUrl() +
+                "&client_id=" + KAKAO_CLIENT_ID +
                 "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
 
         return ResponseEntity

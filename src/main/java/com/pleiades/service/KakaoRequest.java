@@ -6,6 +6,7 @@ import com.pleiades.dto.KakaoUserDto;
 import com.pleiades.strings.KakaoUrl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -20,6 +21,9 @@ public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();
 
+    @Value("${KAKAO_CLIENT_ID}")
+    private static String KAKAO_CLIENT_ID;
+
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
@@ -28,7 +32,7 @@ public class KakaoRequest {
         // 요청 본문
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", KakaoUrl.KAKAO_CLIENT_ID.getUrl());
+        body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getUrl());
         body.add("code", code);
 
@@ -94,7 +98,7 @@ public class KakaoRequest {
 
         Map<String, Object> body = new HashMap<>();
         body.put("grant_type", new String[]{"refresh_token"});
-        body.put("client_id", KakaoUrl.KAKAO_CLIENT_ID.getUrl());
+        body.put("client_id", KAKAO_CLIENT_ID);
         body.put("refresh_token", token);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
