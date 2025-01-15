@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class NaverApiUtil {
 
     private final String clientId = System.getenv("NAVER_CLIENT_ID");
@@ -27,7 +27,6 @@ public class NaverApiUtil {
 
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 3600000; // 1시간 (3600초)
 
     public Map<String,String> getTokens(String code, String state) {
         RestTemplate restTemplate = new RestTemplate();
@@ -75,13 +74,13 @@ public class NaverApiUtil {
 
         if (response.getBody() == null || !response.getBody().containsKey("access_token")) {
             log.error("에러 - access token 갱신 실패 : {}", response.getBody());
-            throw new IllegalStateException("네이버 access token 갱신 실패");
+            throw new NaverRefreshTokenExpiredException("네이버 access token 갱신 실패");
         }
         return (String) response.getBody().get("access_token");
     }
 
     public String getValidAccessToken(NaverToken naverToken) {
-        if (isAccessTokenExpired(naverToken.getLastUpdated())) {
+        if (naverToken.getAccessToken() == null) {
             String newAccessToken = refreshAccessToken(naverToken.getRefreshToken());
             if (newAccessToken == null) {
                 throw new NaverRefreshTokenExpiredException("네이버 Refresh Token 만료 - 재로그인 필요");
@@ -90,12 +89,6 @@ public class NaverApiUtil {
         }
         return naverToken.getAccessToken();
     }
-
-    private boolean isAccessTokenExpired(long lastUpdatedTimestamp) {
-        long currentTime = System.currentTimeMillis();
-        return (currentTime - lastUpdatedTimestamp) >= ACCESS_TOKEN_EXPIRATION_TIME;
-    }
-
 
     public NaverLoginResponse getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -112,4 +105,10 @@ public class NaverApiUtil {
                 accessToken
         );
     }
+
+    // 만료 시간 수동 계산
+//    private boolean isAccessTokenExpired(long lastUpdatedTimestamp) {
+//        long currentTime = System.currentTimeMillis();
+//        return (currentTime - lastUpdatedTimestamp) >= ACCESS_TOKEN_EXPIRATION_TIME;
+//    }
 }

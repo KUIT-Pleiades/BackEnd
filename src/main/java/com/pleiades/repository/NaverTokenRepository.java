@@ -14,5 +14,7 @@ public interface NaverTokenRepository extends JpaRepository<NaverToken, Long> {
     @Query("SELECT nt FROM NaverToken nt WHERE nt.user.email = :email")
     Optional<NaverToken> findByUserEmail(
             @Param("email") String email);
+
+    Optional<NaverToken> findByRefreshToken(String refreshToken);
 }
 

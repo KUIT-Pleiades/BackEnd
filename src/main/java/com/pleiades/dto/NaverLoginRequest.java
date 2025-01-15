@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NaverLoginRequest {
-    private String grantType;
-    private String clientId;
-    private String clientSecret;
+
     private String code;
+    private String type;
     private String state;
+
 }
