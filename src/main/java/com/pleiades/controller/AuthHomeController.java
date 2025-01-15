@@ -54,7 +54,7 @@ public class AuthHomeController {
 
     // 첫 접속 화면
     @PostMapping("")
-    public ResponseEntity<Map<String, String>> login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Map<String, String>> login(HttpServletRequest request) throws IOException {
         Map<String, String> body = new HashMap<>();
 
         String accessToken = request.getParameter("AccessToken");
@@ -122,13 +122,16 @@ public class AuthHomeController {
         user.setSignUp(signUpDto);
         user.setEmail(session.getAttribute("email").toString());
         userRepository.save(user);
+        session.removeAttribute("email");
 
         if (session.getAttribute("kakaoRefreshToken") != null) {
             KakaoToken kakaoToken = new KakaoToken();
             kakaoToken.setUser(user);
             kakaoToken.setRefreshToken(session.getAttribute("kakaoRefreshToken").toString());
             kakaoTokenRepository.save(kakaoToken);
+            session.removeAttribute("kakaoRefreshToken");
         }
+
 
         // 네이버 리프레시 토큰 저장
 //        if (session.getAttribute("naverRefreshToken") != null) {
@@ -187,6 +190,7 @@ public class AuthHomeController {
                     .header("Location", "/auth/login")
                     .build();
         }
+
         Claims token = jwtUtil.validateToken(refreshToken);
         if (token == null) {
             return ResponseEntity
