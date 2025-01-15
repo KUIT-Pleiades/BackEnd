@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,8 +47,8 @@ public class AuthKakaoController {
     @Autowired
     JwtUtil jwtUtil;
 
-//    @Value("${KAKAO_CLIENT_ID}");
-//    String KAKAO_CLIENT_ID;
+    @Value("${KAKAO_CLIENT_ID}")
+    private String KAKAO_CLIENT_ID;
 
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
