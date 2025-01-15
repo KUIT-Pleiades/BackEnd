@@ -36,6 +36,9 @@ jobs:
       - name: Set JWT_SECRET_KEY
         run: echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
 
+      - name: Set KAKAO_CLIENT_ID
+        run: echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> $GITHUB_ENV
+
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x ./gradlew
 
