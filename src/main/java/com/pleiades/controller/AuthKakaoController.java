@@ -34,6 +34,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/auth/login/kakao")
 public class AuthKakaoController {
+
     @Autowired
     UserRepository userRepository;
 
