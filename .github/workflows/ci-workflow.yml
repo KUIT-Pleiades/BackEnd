@@ -39,6 +39,15 @@ jobs:
       - name: Set KAKAO_CLIENT_ID
         run: echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> $GITHUB_ENV
 
+      - name: Set RDS_URL
+        run: echo "RDS_URL=${{ secrets.RDS_URL }}" >> $GITHUB_ENV
+
+      - name: Set RDS_USERNAME
+        run: echo "RDS_USERNAME=${{ secrets.RDS_USERNAME }}" >> $GITHUB_ENV
+
+      - name: Set RDS_PASSWORD
+        run: echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> $GITHUB_ENV
+
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x ./gradlew
 
