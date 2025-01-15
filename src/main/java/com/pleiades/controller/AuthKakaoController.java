@@ -12,8 +12,6 @@ import com.pleiades.service.KakaoRequest;
 import com.pleiades.service.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,33 +49,26 @@ public class AuthKakaoController {
 //    @Value("${KAKAO_CLIENT_ID}");
 //    String KAKAO_CLIENT_ID;
 
+    // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
-    public void loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
-        String userId = request.getParameter("userId");
-        if (session != null && userId != null) {
-            Object tokenAttribute = session.getAttribute("kakaoAccessToken");
-            // 액세스 토큰이 존재
-            if (tokenAttribute != null) {
-                String accessToken = tokenAttribute.toString();
-                // 액세스 토큰이 유효
-                if (kakaoTokenService.checkAccessTokenValidation(accessToken, userId)) { response.sendRedirect("/star?userId=" + userId); return; }
-                String newAccessToken = kakaoTokenService.checkRefreshTokenValidation(userId);      // 액세스 토큰 만료
-                if (newAccessToken != null) { response.sendRedirect("/star?userId=" + userId); return; }    // 리프레시 토큰 유효
-            }
-        }
-        // 기존 사용자라면 리프레시 토큰 삭제
-        Optional<KakaoToken> token = kakaoTokenRepository.findByUser_Id(userId);
-        token.ifPresent(kakaoToken -> kakaoTokenRepository.delete(kakaoToken));
+    public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+        ResponseEntity<Map<String, String>> responseEntity = checkKakaoToken(session);
+        if (responseEntity != null) return responseEntity;
+        log.info("responseEntity is null");
 
-        // 최초 로그인 or 리프레시 토큰 만료
         String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                 "?response_type=code" +
                 "&client_id=" + KakaoUrl.KAKAO_CLIENT_ID.getUrl() +
                 "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
 
-        response.sendRedirect(redirectUrl);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .header("Location", redirectUrl)
+                .build();
     }
 
+    // 인가 코드 재발급은 불가피한가? 그럼 소셜 토큰을 쓰는 이유가 있나?
+    // 여기서 소셜 토큰 확인 해야함
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
         try {
@@ -85,6 +76,7 @@ public class AuthKakaoController {
             Map<String, String> body = new HashMap<>();
 
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
+            log.info("Access token: " + responseToken.getAccessToken());
             String email = null;
 
             if (responseToken != null) { email = getKakaoEmail(responseToken.getAccessToken()); }
@@ -129,16 +121,87 @@ public class AuthKakaoController {
         return null;
     }
 
+    private ResponseEntity<Map<String, String>> checkKakaoToken(HttpSession session) {
+        HttpHeaders headers = new HttpHeaders();
+        Map<String, String> body = new HashMap<>();
+        String accessToken = (String) session.getAttribute("kakaoAccessToken");
+
+        if (accessToken == null) { log.info("no access token"); return null; }
+        log.info("!!AccessToken: " + accessToken);
+        String email = getKakaoEmail(accessToken);
+
+        body.put("email", email);
+
+        // 액세스 토큰이 살아있는 경우
+        // 자꾸 똑같은 얘기해서 너무너무 미안하지만 리프레시 토큰 필요없는 거 아닌가 합니다
+        if (email == null) { return null; }
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            //1번일 경우 jwt 토큰 발급 후 body에 전달
+
+            return ResponseEntity
+                    .status(HttpStatus.FOUND)
+                    .header("Location", "/star?userId="+user.get().getId())
+                    .build();   // jwt를 여기서 발급해야할까? 어디서 발급해야할까?ㅠㅠ - 1. 카카오 토큰이든 뭐든 로그인에 성공했을 때 2. 소셜 로그인에서 아이디, 비밀번호 직접 입력했을 때
+        }
+
+        // 액세스 토큰은 살아있지만 user가 없는 경우 - 있을 수 있나? 음 뭐 암튼
+        return null;
+    }
+    // 2번이면 jwt 다 죽고 카카오만 살아있는 경우도 있지 않나?
+
     private String getKakaoEmail(String token) {
-        KakaoUserDto responseUser = null;
+        KakaoUserDto responseUser = KakaoRequest.postUserInfo(token);;
         KakaoAccountDto account = null;
         String email = null;
 
-        responseUser = KakaoRequest.postUserEmail(token);
-
-        if (responseUser != null) { account = responseUser.getKakaoAccount(); }
-        if (account != null) { email = account.getEmail(); }
+        if (responseUser != null) { account = responseUser.getKakaoAccount(); log.info("responseUser"); }
+        if (account != null) { email = account.getEmail(); log.info("account"); }
 
         return email;
     }
 }
+
+//
+//// 액세스 토큰이 유효
+//            if (kakaoTokenService.checkAccessTokenValidation(accessToken, userId)) { response.sendRedirect("/star?userId=" + userId); return; }
+//String newAccessToken = kakaoTokenService.checkRefreshTokenValidation(userId);      // 액세스 토큰 만료
+//            if (newAccessToken != null) { response.sendRedirect("/star?userId=" + userId); return; }    // 리프레시 토큰 유효
+//        }
+//
+//
+//String refreshToken = request.getAttribute("request").toString();
+//
+//        if (refreshToken != null) {
+//// 카카오 리프레시 토큰이 유효한 경우
+//Claims refreshTokenClaims = jwtUtil.validateToken(refreshToken);
+//            if (refreshTokenClaims != null) {
+//String userId = refreshTokenClaims.getId();
+//
+//Optional<KakaoToken> token = kakaoTokenRepository.findByUser_Id(userId);
+//
+//                if (token.isPresent()) {
+//String accessToken = session.getAttribute("kakaoAccessToken").toString();
+//String email = getKakaoEmail(accessToken);
+//
+//Optional<User> user = userRepository.findByEmail(email);
+//                    if (user.isPresent()) {
+//String jwtAccessToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
+//String jwtRefreshToken = jwtUtil.generateAccessToken(user.get().getId(), JwtRole.ROLE_USER.getRole());
+//
+//                        headers.setLocation(URI.create("/star?userId=" + user.get().getId()));
+//        body.put("AccessToken", jwtAccessToken);
+//                        body.put("RefreshToken", jwtRefreshToken);
+//
+//                        log.info("(a) Access token: " + jwtAccessToken);
+//                        log.info("(a) Refresh token: " + jwtRefreshToken);
+//                    }
+//
+//                            return ResponseEntity
+//                            .status(HttpStatus.FOUND) // 302 Found (리다이렉트 상태 코드)
+//                            .header(headers.toString())
+//        .body(body);
+//
+//                }
+//                        token.ifPresent(kakaoToken -> kakaoTokenRepository.delete(kakaoToken));
+//        }

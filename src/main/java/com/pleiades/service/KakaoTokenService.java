@@ -16,7 +16,7 @@ public class KakaoTokenService {
 
     public boolean checkAccessTokenValidation(String accessToken, String userId) {
         String foundUserId = null;
-        KakaoUserDto kakaoUserDto = KakaoRequest.postUserEmail(accessToken);
+        KakaoUserDto kakaoUserDto = KakaoRequest.postUserInfo(accessToken);
         if (kakaoUserDto != null) { foundUserId = userRepository.findByEmail(kakaoUserDto.getKakaoAccount().getEmail()).get().getId(); }
         return (userId == foundUserId);
     }
