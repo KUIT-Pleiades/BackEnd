@@ -1,39 +1,52 @@
 package com.pleiades.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
+import com.pleiades.dto.SignUpDto;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
-    @Id
-    private String id;
-    private String nickname;
-    private String email;
-    private Timestamp birthDate;
-    private Timestamp signupDate;
 
-//    public User(String userId, String nickname, Timestamp birthDate, Timestamp signupDate) {
-//        this.userId = userId;
-//        this.nickname = nickname;
-//        this.birthDate = birthDate;
-//        this.signupDate = signupDate;
-//    }
-//
-//    public User(String userId, String nickname, Timestamp birthDate) {
-//        this.userId = userId;
-//        this.nickname = nickname;
-//        this.birthDate = birthDate;
-//        this.signupDate = null;
-//    }
+    // todo : ID user가 직접 입력
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String userName = "임시 사용자";
+
+    @Column(nullable = false)
+    private LocalDate birthDate= LocalDate.of(2000, 1, 1);;
+
+    @Column(nullable = false)
+    private LocalDate createdDate;
+
+    @Transient
+    private String accessToken;
+
+    @Column
+    private String refreshToken;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private NaverToken naverToken;
+
+    public void setSignUp(SignUpDto signUpDto) {
+        this.setId(signUpDto.getId());
+        this.setUserName(signUpDto.getNickname());
+        this.setBirthDate(signUpDto.getBirthDate());
+        this.setCreatedDate(LocalDate.now());
+    }
 }
