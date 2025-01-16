@@ -5,7 +5,7 @@ import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.Character;
+import com.pleiades.entity.Characters;
 import com.pleiades.repository.CharacterRepository;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.StarRepository;
