@@ -19,7 +19,7 @@ public class User {
 
     // todo : ID user가 직접 입력
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(unique = true, nullable = false)
