@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "character")
-public class Character {
+@Table(name = "characters")
+public class Characters {
     @Id
     @GeneratedValue
     private Long id;
