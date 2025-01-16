@@ -29,7 +29,7 @@ public class User {
     private String userName;
 
     @Column(nullable = false)
-    private LocalDate birthDate= LocalDate.of(2000, 1, 1);;
+    private LocalDate birthDate;
 
     @Column(nullable = false)
     private LocalDate createdDate;
