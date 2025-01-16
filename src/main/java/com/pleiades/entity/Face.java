@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "character")
+@Table(name = "faces")
 public class Face {
     @Id
     private String id;

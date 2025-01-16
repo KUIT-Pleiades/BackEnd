@@ -12,18 +12,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "character")
+@Table(name = "outfits")
 public class Outfit {
     @Id
     private String id;
 
-    @JoinColumn(name = "top_url")
+//    @JoinColumn(name = "top_url")
     private String top;
 
-    @JoinColumn(name = "bottom_url")
+//    @JoinColumn(name = "bottom_url")
     private String bottom;
 
-    @JoinColumn(name = "shoes_url")
+//    @JoinColumn(name = "shoes_url")
     private String shoes;
 
     public void setOutfit(CharacterOutfitDto outfitDto) {
