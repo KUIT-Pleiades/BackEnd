@@ -103,6 +103,8 @@ public class AuthKakaoController {
                         .body(body);
             }
 
+            log.info("access token", responseToken.getAccessToken());
+
             // 회원가입 완료 후 저장될 회원 정보
             session.setAttribute("kakaoAccessToken", responseToken.getAccessToken());
             session.setAttribute("kakaoRefreshToken", responseToken.getRefreshToken());

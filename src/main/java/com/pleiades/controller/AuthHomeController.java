@@ -141,6 +141,8 @@ public class AuthHomeController {
             session.removeAttribute("naverAccessToken");
         }
 
+
+
         Star star = new Star();
         star.setUserId(signUpDto.getId());
         star.setBackgroundId(signUpDto.getBackgroundId());
