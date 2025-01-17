@@ -1,5 +1,8 @@
 package com.pleiades.entity;
 
+import com.pleiades.entity.face.Face;
+import com.pleiades.entity.item.Item;
+import com.pleiades.entity.outfit.Outfit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,4 +35,7 @@ public class Characters {
     @ManyToOne
     @JoinColumn(name="item_id")
     private Item item;
+
+    public static class SkinColor {
+    }
 }

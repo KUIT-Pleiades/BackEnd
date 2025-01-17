@@ -32,8 +32,8 @@ public class SignUpDto {
     @JsonProperty("backgroundId")
     private int backgroundId;
 
-    @JsonProperty("face")
-    private CharacterFaceDto face;
+//    @JsonProperty("face")
+//    private CharacterFaceDto face;
 
     @JsonProperty("outfit")
     private CharacterOutfitDto outfit;

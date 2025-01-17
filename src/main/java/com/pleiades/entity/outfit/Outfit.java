@@ -1,4 +1,4 @@
-package com.pleiades.entity;
+package com.pleiades.entity.outfit;
 
 import com.pleiades.dto.character.CharacterOutfitDto;
 import jakarta.persistence.*;

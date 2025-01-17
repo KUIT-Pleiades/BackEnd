@@ -1,4 +1,4 @@
-package com.pleiades.entity;
+package com.pleiades.entity.item;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

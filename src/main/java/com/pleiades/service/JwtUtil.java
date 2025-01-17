@@ -16,8 +16,8 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
-    @Value("${JWT_SECRET_KEY}")
-    private final String secretKey = null;
+//    @Value("${JWT_SECRET_KEY}")
+    private String secretKey = System.getenv("JWT_SECRET_KEY");
     private final long ACCESS_TOKEN_EXPIRATION_MS = 3600000; // 1 hour
     private final long REFRESH_TOKEN_EXPIRATION_MS = 604800000L;    // 1 week
 
@@ -35,7 +35,7 @@ public class JwtUtil {
         return generateToken(userId, role, ACCESS_TOKEN_EXPIRATION_MS);
     }
 
-    public String generateToken(String userId, String role) {
+    public String generateRefreshToken(String userId, String role) {
         return generateToken(userId, role, REFRESH_TOKEN_EXPIRATION_MS);
     }
 
