@@ -4,7 +4,6 @@ import com.pleiades.dto.NaverLoginRequest;
 import com.pleiades.dto.NaverLoginResponse;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.NaverLoginService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +17,12 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
     
     @PostMapping("/login/naver/callback")
-    public ResponseEntity<NaverLoginResponse> handleNaverLogin(@RequestBody NaverLoginRequest loginRequest) {
+    public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequest loginRequest) {
         String codeOrToken = loginRequest.getCode();
         String type = loginRequest.getType();
 
@@ -34,19 +33,18 @@ public class AuthController {
         }
 
         log.info("네이버 로그인 request 받음. Type: {}, Code/Token: {}", type, codeOrToken);
-        NaverLoginResponse userInfo;
 
         if ("Auth".equalsIgnoreCase(type)) {
             log.info("Auth: 인가 코드로 네이버 로그인 진행");
-            userInfo = naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
+            return naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
         } else if ("Refresh".equalsIgnoreCase(type)) {
             log.info("Refresh: 앱 자체 refresh token으로 로그인 진행");
-            userInfo = naverLoginService.handleRefreshTokenLogin(codeOrToken);
+            NaverLoginResponse userInfo = naverLoginService.handleRefreshTokenLogin(codeOrToken);
+            return ResponseEntity.ok(userInfo);
         } else {
             log.error("에러: 로그인 타입 매치 실패 - {}", type);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.ok(userInfo);
     }
 
     @ExceptionHandler(NaverRefreshTokenExpiredException.class)

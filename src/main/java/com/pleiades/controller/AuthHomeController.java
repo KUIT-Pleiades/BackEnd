@@ -6,10 +6,7 @@ import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.Characters;
-import com.pleiades.repository.CharacterRepository;
-import com.pleiades.repository.KakaoTokenRepository;
-import com.pleiades.repository.StarRepository;
-import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.*;
 import com.pleiades.service.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,13 +42,13 @@ public class AuthHomeController {
     KakaoTokenRepository kakaoTokenRepository;
 
     @Autowired
+    NaverTokenRepository naverTokenRepository;
+
+    @Autowired
     private StarRepository starRepository;
 
     @Autowired
     private CharacterRepository characterRepository;
-
-//    @Autowired
-//    NaverTokenRespository naverTokenRespository;
 
     // 첫 접속 화면
     @PostMapping("")
@@ -132,13 +130,16 @@ public class AuthHomeController {
             session.removeAttribute("kakaoRefreshToken");
         }
 
-        // 네이버 리프레시 토큰 저장
-//        if (session.getAttribute("naverRefreshToken") != null) {
-//            NaverToken nvaerToken = new NaverToken();
-//            naverToken.setUser(user);
-//            naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
-//            naverTokenRepository.save(naverToken);
-//        }
+        if (session.getAttribute("naverRefreshToken") != null) {
+            NaverToken naverToken = new NaverToken();
+            naverToken.setUser(user);
+            naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
+            naverToken.setAccessToken(session.getAttribute("naverAccessToken").toString());
+            naverToken.setLastUpdated(System.currentTimeMillis());
+            naverTokenRepository.save(naverToken);
+            session.removeAttribute("naverRefreshToken");
+            session.removeAttribute("naverAccessToken");
+        }
 
         Star star = new Star();
         star.setUserId(signUpDto.getId());
