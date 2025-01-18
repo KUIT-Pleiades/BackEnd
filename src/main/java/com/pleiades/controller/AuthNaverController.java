@@ -17,12 +17,15 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+
 public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
-    
+
     @PostMapping("/login/naver/callback")
     public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequest loginRequest) {
+        log.info("handleNaverLogin 시작");
+
         String codeOrToken = loginRequest.getCode();
         String type = loginRequest.getType();
 

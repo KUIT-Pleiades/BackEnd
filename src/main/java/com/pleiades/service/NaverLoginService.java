@@ -29,12 +29,16 @@ public class NaverLoginService {
 
     @Transactional
     public ResponseEntity<?> handleNaverLoginCallback(String code, String state) {
+        log.info("service 계층 진입");
+
         Map<String, String> naverTokens = naverApiUtil.getTokens(code, state);
         if (naverTokens == null) {
+            log.error("에러: Naver API로부터 token들 받아오기 실패");
             throw new IllegalArgumentException("에러: Naver API로부터 token들 받아오기 실패");
         }
         log.info("Naver API Response: {}", naverTokens);
         if (naverTokens.get("access_token") == null) {
+            log.error("에러: Naver API로부터 access token 받아오기 실패");
             throw new IllegalArgumentException("에러: Naver API로부터 access token 받아오기 실패");
         }
 
