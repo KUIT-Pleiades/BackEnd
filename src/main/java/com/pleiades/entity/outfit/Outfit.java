@@ -27,8 +27,8 @@ public class Outfit {
     private String shoes;
 
     public void setOutfit(CharacterOutfitDto outfitDto) {
-        this.setTop(outfitDto.getTopImg().getUrl());
-        this.setBottom(outfitDto.getBottomImg().getUrl());
-        this.setShoes(outfitDto.getShoesImg().getUrl());
+        this.setTop(outfitDto.getTopImg());
+        this.setBottom(outfitDto.getBottomImg());
+        this.setShoes(outfitDto.getShoesImg());
     }
 }

@@ -121,13 +121,25 @@ public class AuthHomeController {
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpSession session) {
+
         User user = new User();
-        user.setSignUp(signUpDto);
-//        user.setEmail(session.getAttribute("email").toString());
+        user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
+        user.setEmail(session.getAttribute("email").toString());
         userRepository.save(user);
 //        session.removeAttribute("email");
 
-        log.info("user saved");
+        if (session.getAttribute("naverRefreshToken") != null) {
+            NaverToken naverToken = new NaverToken();
+            naverToken.setUser(user);
+            naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
+            naverToken.setAccessToken(session.getAttribute("naverAccessToken").toString());
+            naverToken.setLastUpdated(System.currentTimeMillis());
+            log.info("session - naver access token: {}", naverToken.getAccessToken());
+            log.info("session - naver refresh token: {}", naverToken.getRefreshToken());
+            naverTokenRepository.save(naverToken);
+            //session.removeAttribute("naverRefreshToken");
+            //session.removeAttribute("naverAccessToken");
+        }
 
 //        if (session.getAttribute("kakaoRefreshToken") != null) {
 //            KakaoToken kakaoToken = new KakaoToken();
@@ -137,23 +149,12 @@ public class AuthHomeController {
 //            session.removeAttribute("kakaoRefreshToken");
 //        }
 //
-//        if (session.getAttribute("naverRefreshToken") != null) {
-//            NaverToken naverToken = new NaverToken();
-//            naverToken.setUser(user);
-//            naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
-//            naverToken.setAccessToken(session.getAttribute("naverAccessToken").toString());
-//            naverToken.setLastUpdated(System.currentTimeMillis());
-//            naverTokenRepository.save(naverToken);
-//            session.removeAttribute("naverRefreshToken");
-//            session.removeAttribute("naverAccessToken");
-//        }
-
-        Star star = new Star();
-        star.setUserId(signUpDto.getId());
-        star.setBackgroundId(signUpDto.getBackgroundId());
-        starRepository.save(star);
-
-        log.info("star saved");
+//        Star star = new Star();
+//        star.setUserId(signUpDto.getId());
+//        // star.setBackgroundId(signUpDto.getBackgroundId());
+//        starRepository.save(star);
+//
+//        log.info("star saved");
 
         // todo: 윤희's 할 일
 
@@ -175,9 +176,9 @@ public class AuthHomeController {
 //        character.setFace(face);        // 얼굴을 얼굴 테이블을 만들어서 저장할지, 머리, 표정, 피부색 따로 저장할지 정해야되는데 얼굴 테이블을 만드는 건 불필요해 보임
 //        character.setOutfit(outfit);    // 옷도 사실 마찬가지
 //        character.setItem(item);        // 얜 뭐 모르겠다
-        characterRepository.save(character);
+//        characterRepository.save(character);
 
-        log.info("character saved");
+//        log.info("character saved");
 
         Map<String, String> body = new HashMap<>();
 

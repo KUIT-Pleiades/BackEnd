@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterFaceDto {
     @JsonProperty("skinColor")
-    private CharacterImageDto skinImg;
+    private String skinImg;
 
     @JsonProperty("hair")
-    private CharacterImageDto hairImg;
+    private String hairImg;
 
     @JsonProperty("expression")
-    private CharacterImageDto expressionImg;
+    private String expressionImg;
 }

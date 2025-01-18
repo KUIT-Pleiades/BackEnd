@@ -24,8 +24,8 @@ public class Face {
     private String expression;
 
     public void setFace(CharacterFaceDto faceDto) {
-        this.setSkin(faceDto.getSkinImg().getUrl());
-        this.setHair(faceDto.getHairImg().getUrl());
-        this.setExpression(faceDto.getExpressionImg().getUrl());
+        this.setSkin(faceDto.getSkinImg());
+        this.setHair(faceDto.getHairImg());
+        this.setExpression(faceDto.getExpressionImg());
     }
 }

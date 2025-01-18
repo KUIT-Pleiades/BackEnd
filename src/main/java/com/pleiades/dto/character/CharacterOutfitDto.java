@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterOutfitDto {
     @JsonProperty("top")
-    private CharacterImageDto topImg;
+    private String topImg;
 
     @JsonProperty("bottom")
-    private CharacterImageDto bottomImg;
+    private String bottomImg;
 
     @JsonProperty("shoes")
-    private CharacterImageDto shoesImg;
+    private String shoesImg;
 }
