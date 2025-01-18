@@ -10,6 +10,7 @@ import com.pleiades.util.NaverApiUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,7 @@ public class NaverLoginService {
 
         User user = userRepository.findByEmail(email).orElse(null);
         if (user != null) {
+            log.info("user 이미 존재");
             NaverToken naverToken = naverTokenRepository.findByUserEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("에러 : user의 email로 naverToken 못찾음"));
 
@@ -64,13 +66,18 @@ public class NaverLoginService {
             return ResponseEntity.ok(userInfo);
 
         } else {
+            log.info("user 새로 생성");
+
             session.setAttribute("naverRefreshToken", refreshToken);
             session.setAttribute("naverAccessToken", accessToken);
             session.setAttribute("email", email);
 
-            return ResponseEntity.status(302)
-                    .header("Location", "http://54.252.108.194/auth/signup")
-                    .build();
+            // todo : redirect
+            return ResponseEntity.ok(userInfo);
+
+//            return ResponseEntity.status(302)
+//                    .header("Location", "http://54.252.108.194/auth/signup")
+//                    .body(userInfo);
         }
     }
 

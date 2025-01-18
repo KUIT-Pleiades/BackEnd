@@ -25,7 +25,7 @@ public class AuthNaverController {
     @GetMapping("")
     public String testRequest(@RequestParam("code") String code) {
         log.info("요청 도착: {}", code);
-        System.out.println("요청 도착");
+        System.out.println("요청 시스템 프린트");
         return "요청 성공";
     }
 

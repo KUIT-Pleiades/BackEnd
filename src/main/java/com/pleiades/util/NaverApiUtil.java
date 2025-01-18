@@ -26,6 +26,8 @@ public class NaverApiUtil {
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 
     public Map<String,String> getTokens(String code, String state) {
+        log.info("Util 계층 진입");
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -39,6 +41,7 @@ public class NaverApiUtil {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
+        log.info("Naver API Util Response: {}", response);
 
         if (response.getBody() != null) {
             Map<String, String> tokens = new HashMap<>();
