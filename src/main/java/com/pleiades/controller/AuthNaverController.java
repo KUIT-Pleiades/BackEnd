@@ -22,6 +22,12 @@ public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
 
+    @GetMapping("/login/naver")
+    public String testRequest(@RequestParam("code") String code) {
+        log.info("요청 도착: {}", code);
+        return "요청 성공";
+    }
+
     @PostMapping("/callback")
     public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequest loginRequest) {
         log.info("handleNaverLogin 시작");
