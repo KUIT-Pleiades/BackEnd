@@ -15,14 +15,14 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/login/naver")
 @RequiredArgsConstructor
 
 public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
 
-    @PostMapping("/login/naver/callback")
+    @PostMapping("/callback")
     public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequest loginRequest) {
         log.info("handleNaverLogin 시작");
 
