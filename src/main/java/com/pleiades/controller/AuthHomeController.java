@@ -122,10 +122,13 @@ public class AuthHomeController {
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpSession session) {
 
+        log.info("Session email: {}", session.getAttribute("email"));
+        log.info("Session naverRefreshToken: {}", session.getAttribute("naverRefreshToken"));
+        log.info("Session naverAccessToken: {}", session.getAttribute("naverAccessToken"));
+
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
         user.setEmail(session.getAttribute("email").toString());
-        userRepository.save(user);
 //        session.removeAttribute("email");
 
         if (session.getAttribute("naverRefreshToken") != null) {
@@ -136,10 +139,11 @@ public class AuthHomeController {
             naverToken.setLastUpdated(System.currentTimeMillis());
             log.info("session - naver access token: {}", naverToken.getAccessToken());
             log.info("session - naver refresh token: {}", naverToken.getRefreshToken());
-            naverTokenRepository.save(naverToken);
             //session.removeAttribute("naverRefreshToken");
             //session.removeAttribute("naverAccessToken");
         }
+        userRepository.save(user);
+
 
 //        if (session.getAttribute("kakaoRefreshToken") != null) {
 //            KakaoToken kakaoToken = new KakaoToken();
@@ -182,7 +186,6 @@ public class AuthHomeController {
 
         Map<String, String> body = new HashMap<>();
 
-        // 토큰 생성이 안 됨
         String jwtAccessToken = jwtUtil.generateAccessToken(user.getId(), JwtRole.ROLE_USER.getRole());
         String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getId(), JwtRole.ROLE_USER.getRole());
 
@@ -192,10 +195,12 @@ public class AuthHomeController {
         log.info("(b) Access token: " + jwtAccessToken);
         log.info("(b) Refresh token: " + jwtRefreshToken);
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("Location", "/star?userId="+signUpDto.getId())
+        return ResponseEntity.status(200)
                 .body(body);
+//        return ResponseEntity
+//                .status(HttpStatus.FOUND)
+//                .header("Location", "/star?userId="+signUpDto.getId())
+//                .body(body);
     }
 
     private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {
