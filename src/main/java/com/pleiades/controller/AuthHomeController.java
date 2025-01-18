@@ -122,6 +122,7 @@ public class AuthHomeController {
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpSession session) {
 
+
         log.info("Session email: {}", session.getAttribute("email"));
         log.info("Session naverRefreshToken: {}", session.getAttribute("naverRefreshToken"));
         log.info("Session naverAccessToken: {}", session.getAttribute("naverAccessToken"));
@@ -131,12 +132,27 @@ public class AuthHomeController {
         user.setEmail(session.getAttribute("email").toString());
 //        session.removeAttribute("email");
 
+        Map<String, String> body = new HashMap<>();
+
+        String jwtAccessToken = jwtUtil.generateAccessToken(user.getId(), JwtRole.ROLE_USER.getRole());
+        String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getId(), JwtRole.ROLE_USER.getRole());
+
+        user.setRefreshToken(jwtRefreshToken);
+        user.setAccessToken(jwtAccessToken);
+
+        body.put("AccessToken", jwtAccessToken);
+        body.put("RefreshToken", jwtRefreshToken);
+
+        log.info("(b) Access token: " + jwtAccessToken);
+        log.info("(b) Refresh token: " + jwtRefreshToken);
+
         if (session.getAttribute("naverRefreshToken") != null) {
             NaverToken naverToken = new NaverToken();
             naverToken.setUser(user);
             naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
             naverToken.setAccessToken(session.getAttribute("naverAccessToken").toString());
             naverToken.setLastUpdated(System.currentTimeMillis());
+            user.setNaverToken(naverToken);
             log.info("session - naver access token: {}", naverToken.getAccessToken());
             log.info("session - naver refresh token: {}", naverToken.getRefreshToken());
             //session.removeAttribute("naverRefreshToken");
@@ -183,17 +199,6 @@ public class AuthHomeController {
 //        characterRepository.save(character);
 
 //        log.info("character saved");
-
-        Map<String, String> body = new HashMap<>();
-
-        String jwtAccessToken = jwtUtil.generateAccessToken(user.getId(), JwtRole.ROLE_USER.getRole());
-        String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getId(), JwtRole.ROLE_USER.getRole());
-
-        body.put("AccessToken", jwtAccessToken);
-        body.put("RefreshToken", jwtRefreshToken);
-
-        log.info("(b) Access token: " + jwtAccessToken);
-        log.info("(b) Refresh token: " + jwtRefreshToken);
 
         return ResponseEntity.status(200)
                 .body(body);
