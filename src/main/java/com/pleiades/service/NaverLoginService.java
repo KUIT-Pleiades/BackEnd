@@ -29,7 +29,7 @@ public class NaverLoginService {
     private final HttpSession session;
 
     @Transactional
-    public ResponseEntity<?> handleNaverLoginCallback(String code, String state) {
+    public NaverLoginResponse handleNaverLoginCallback(String code, String state) {
         log.info("service 계층 진입");
 
         Map<String, String> naverTokens = naverApiUtil.getTokens(code, state);
@@ -62,9 +62,6 @@ public class NaverLoginService {
             naverTokenRepository.save(naverToken);
 
             updateAppTokensForUser(user);
-
-            return ResponseEntity.ok(userInfo);
-
         } else {
             log.info("user 새로 생성");
 
@@ -73,12 +70,11 @@ public class NaverLoginService {
             session.setAttribute("email", email);
 
             // todo : redirect
-            return ResponseEntity.ok(userInfo);
-
 //            return ResponseEntity.status(302)
 //                    .header("Location", "http://54.252.108.194/auth/signup")
 //                    .body(userInfo);
         }
+        return userInfo;
     }
 
     @Transactional

@@ -46,7 +46,8 @@ public class AuthNaverController {
 
         if ("Auth".equalsIgnoreCase(type)) {
             log.info("Auth: 인가 코드로 네이버 로그인 진행");
-            return naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
+            NaverLoginResponse response = naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
+            return ResponseEntity.ok(response);
         } else if ("Refresh".equalsIgnoreCase(type)) {
             log.info("Refresh: 앱 자체 refresh token으로 로그인 진행");
             NaverLoginResponse userInfo = naverLoginService.handleRefreshTokenLogin(codeOrToken);
