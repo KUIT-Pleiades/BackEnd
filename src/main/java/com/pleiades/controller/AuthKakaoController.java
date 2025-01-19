@@ -56,18 +56,28 @@ public class AuthKakaoController {
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
-        log.info("kakao login start");
+        try {
+            log.info("kakao login start");
 
-        String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
-                "?response_type=code" +
-                "&client_id=" + KAKAO_CLIENT_ID +
-                "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
+            String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
+                    "?response_type=code" +
+                    "&client_id=" + KAKAO_CLIENT_ID +
+                    "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("Location", redirectUrl)
-                .build();
+            return ResponseEntity
+                    .status(HttpStatus.FOUND)
+                    .header("Location", redirectUrl)
+                    .build();
+        }
+        catch (Exception e) {
+            log.info("kakao login fail"+e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_GATEWAY)
+                    .build();
+        }
     }
+
+
 
     // 인가 코드 재발급은 불가피한가? 그럼 소셜 토큰을 쓰는 이유가 있나?
     // 여기서 소셜 토큰 확인 해야함 - 아닌 듯?
