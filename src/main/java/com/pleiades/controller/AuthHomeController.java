@@ -132,6 +132,8 @@ public class AuthHomeController {
         user.setEmail(session.getAttribute("email").toString());
 //        session.removeAttribute("email");
 
+        // 왜 여기로 옮기셧나요?!
+
         Map<String, String> body = new HashMap<>();
 
         String jwtAccessToken = jwtUtil.generateAccessToken(user.getId(), JwtRole.ROLE_USER.getRole());

@@ -50,6 +50,9 @@ public class AuthKakaoController {
     @Value("${KAKAO_CLIENT_ID}")
     private String KAKAO_CLIENT_ID;
 
+    @Value("${FRONT_ORIGIN}")
+    private String FRONT_ORIGIN;
+
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
@@ -61,6 +64,7 @@ public class AuthKakaoController {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .header("Location", redirectUrl)
+                .header("Access-Control-Expose-Headers", FRONT_ORIGIN)
                 .build();
     }
 
