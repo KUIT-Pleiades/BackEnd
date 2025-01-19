@@ -56,6 +56,8 @@ public class AuthKakaoController {
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+        log.info("kakao login start");
+
         String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                 "?response_type=code" +
                 "&client_id=" + KAKAO_CLIENT_ID +
@@ -71,6 +73,7 @@ public class AuthKakaoController {
     // 여기서 소셜 토큰 확인 해야함 - 아닌 듯?
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
+        log.info("kakao code redirected");
         try {
             HttpHeaders headers = new HttpHeaders();
             Map<String, String> body = new HashMap<>();
