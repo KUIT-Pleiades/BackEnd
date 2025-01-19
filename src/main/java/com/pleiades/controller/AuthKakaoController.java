@@ -64,7 +64,7 @@ public class AuthKakaoController {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .header("Location", redirectUrl)
-                .header("Access-Control-Expose-Headers", FRONT_ORIGIN)
+                .header("Access-Control-Allow-Origin", FRONT_ORIGIN)
                 .build();
     }
 
