@@ -56,20 +56,59 @@ public class AuthHomeController {
     // 첫 접속 화면
     @PostMapping("")
     public ResponseEntity<Map<String, String>> login(HttpServletRequest request) throws IOException {
-        Map<String, String> body = new HashMap<>();
 
-        String accessToken = request.getHeader("AccessToken");
-        String refreshToken = request.getHeader("RefreshToken");
-        if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
+        String jwtAccessToken = request.getHeader("accessToken");
+        Claims token = jwtUtil.validateToken(jwtAccessToken);
 
-        Claims token = jwtUtil.validateToken(accessToken);
-        if (token == null) {return checkRefreshToken(refreshToken, body); }
-        String userId = token.getId();
+        // access token 유효한 경우
+        if (token != null) {
+            log.info("로그인: 앱 Access token 유효 - " + jwtAccessToken);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .header("Location", "/star?userId="+userId)
-                .body(body);
+        String jwtRefreshToken = request.getHeader("refreshToken");
+        if(jwtRefreshToken == null) {
+            // 프론트한테 refresh token 요청
+            return ResponseEntity
+                    .status(HttpStatus.PRECONDITION_REQUIRED) // 428
+                    .body(Map.of("error", "Refresh Token is required"));
+        }
+        else{
+            Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
+            // 프론트한테 소셜 로그인 재요청
+            if (refreshToken == null) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN) // 403
+                        .body(Map.of("error", "Social login is required"));
+            }
+
+            // refresh token은 유효한 경우
+            else{
+                log.info("로그인: 앱 Refresh token만 유효 - " + jwtRefreshToken);
+                String email = refreshToken.getSubject();
+                // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
+                jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+                jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED) // 401
+                        .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+            }
+        }
+//        Map<String, String> body = new HashMap<>();
+//
+//        String accessToken = request.getHeader("AccessToken");
+//        String refreshToken = request.getHeader("RefreshToken");
+//        if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
+//
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        if (token == null) {return checkRefreshToken(refreshToken, body); }
+//        String userId = token.getId();
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .header("Location", "/star?userId="+userId)
+//                .body(body);
     }
 
     // 소셜 로그인 페이지
@@ -119,16 +158,16 @@ public class AuthHomeController {
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto,
-                                                      HttpServletRequest request, HttpSession session) {
+                                                      HttpServletRequest request) {
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
 
         String jwtAccessToken = request.getHeader("accessToken");
         Claims token = jwtUtil.validateToken(jwtAccessToken);
-        log.info("(b) Access token: " + jwtAccessToken);
 
         // access token 유효한 경우 -> naver / kakao 랑 user 매핑
         if (token != null) {
+            log.info("회원가입: Access token 유효 - " + jwtAccessToken);
 
             String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
@@ -143,42 +182,42 @@ public class AuthHomeController {
 
                 userRepository.save(user);
                 naverTokenRepository.save(naverToken);
-
-                return ResponseEntity.status(HttpStatus.CREATED).build();
             }
             // todo : email - kakao
         }
 
-        String jwtRefreshToken = request.getHeader("refreshToken");
-        if(jwtRefreshToken == null) {
-            // 프론트한테 refresh token 요청
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED) // 401
-                    .body(Map.of("error", "Refresh Token is required"));
-        }
-        else{
-            Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
-            // 프론트한테 소셜 로그인 재요청
-            if (refreshToken == null) {
+        // access token이 유효하지 않은 경우
+        else {
+
+            String jwtRefreshToken = request.getHeader("refreshToken");
+            if (jwtRefreshToken == null) {
+                // 프론트한테 refresh token 요청
                 return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN) // 403
-                        .body(Map.of("error", "Social login is required"));
-            }
+                        .status(HttpStatus.UNAUTHORIZED) // 401
+                        .body(Map.of("error", "Refresh Token is required"));
+            } else {
+                Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
+                // 프론트한테 소셜 로그인 재요청
+                if (refreshToken == null) {
+                    return ResponseEntity
+                            .status(HttpStatus.FORBIDDEN) // 403
+                            .body(Map.of("error", "Social login is required"));
+                }
 
-            // refresh token은 유효한 경우
-            else{
-                log.info("(b) Refresh token: " + jwtRefreshToken);
-                String email = refreshToken.getSubject();
-                // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
-                jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-                jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+                // refresh token은 유효한 경우
+                else {
+                    log.info("회원가입: Refresh token 유효 - " + jwtRefreshToken);
+                    String email = refreshToken.getSubject();
+                    // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
+                    jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+                    jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
-                return ResponseEntity
-                        .status(HttpStatus.OK) // 200
-                        .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+                    return ResponseEntity
+                            .status(HttpStatus.OK) // 200
+                            .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+                }
             }
         }
-
 //        if (session.getAttribute("kakaoRefreshToken") != null) {
 //            KakaoToken kakaoToken = new KakaoToken();
 //            kakaoToken.setUser(user);
@@ -205,7 +244,7 @@ public class AuthHomeController {
 
 //        log.info("character saved");
 
-//        return ResponseEntity.status(200).build(); // unreachable
+        return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 : 회원가입 완료
     }
 
     private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {
