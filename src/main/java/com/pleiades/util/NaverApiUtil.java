@@ -1,6 +1,6 @@
 package com.pleiades.util;
 
-import com.pleiades.dto.NaverLoginResponse;
+import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import lombok.*;
@@ -105,10 +105,4 @@ public class NaverApiUtil {
                 accessToken
         );
     }
-
-    // 만료 시간 수동 계산
-//    private boolean isAccessTokenExpired(long lastUpdatedTimestamp) {
-//        long currentTime = System.currentTimeMillis();
-//        return (currentTime - lastUpdatedTimestamp) >= ACCESS_TOKEN_EXPIRATION_TIME;
-//    }
 }

@@ -21,9 +21,9 @@ public class JwtUtil {
     private final long ACCESS_TOKEN_EXPIRATION_MS = 3600000; // 1 hour
     private final long REFRESH_TOKEN_EXPIRATION_MS = 604800000L;    // 1 week
 
-    private String generateToken(String userId, String role, long expirationMs) {
+    private String generateToken(String subject, String role, long expirationMs) {
         return Jwts.builder()
-                .setSubject(userId)   // subject = 사용자명
+                .setSubject(subject)   // subject = 사용자 이메일
                 .claim("role", role)  // role 클레임 추가
                 .setIssuedAt(new Date())    // 발행 시간 설정
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs)) // 만료 시간 설정 (1시간 후)
@@ -31,12 +31,12 @@ public class JwtUtil {
                 .compact(); // JWT 문자열로 반환
     }
 
-    public String generateAccessToken(String userId, String role) {
-        return generateToken(userId, role, ACCESS_TOKEN_EXPIRATION_MS);
+    public String generateAccessToken(String subject, String role) {
+        return generateToken(subject, role, ACCESS_TOKEN_EXPIRATION_MS);
     }
 
-    public String generateRefreshToken(String userId, String role) {
-        return generateToken(userId, role, REFRESH_TOKEN_EXPIRATION_MS);
+    public String generateRefreshToken(String subject, String role) {
+        return generateToken(subject, role, REFRESH_TOKEN_EXPIRATION_MS);
     }
 
     public Claims validateToken(String token) {

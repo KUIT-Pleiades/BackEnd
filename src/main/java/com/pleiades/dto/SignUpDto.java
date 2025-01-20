@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SignUpDto {
-    @JsonProperty("id")
-    private String id;
+    @JsonProperty("userId")
+    private String userId;
 
     @JsonProperty("nickname")
     private String nickname;

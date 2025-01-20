@@ -2,6 +2,7 @@ package com.pleiades.exception;
 
 public enum ErrorCode {
     INVALID_USERNAME_OR_PASSWORD(401, "Invalid username or password"),
+    INVALID_USER_EMAIL(401, "Invalid user email"),
     INVALID_TOKEN(401, "Invalid or expired token"),
     MISSING_AUTH_HEADER(401, "Missing or invalid Authorization header"),
     FORBIDDEN_ACCESS(403, "Access denied"),

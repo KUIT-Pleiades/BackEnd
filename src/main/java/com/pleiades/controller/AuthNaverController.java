@@ -1,7 +1,8 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.NaverLoginRequest;
-import com.pleiades.dto.NaverLoginResponse;
+import com.pleiades.dto.naver.LoginCBResponse;
+import com.pleiades.dto.naver.NaverLoginRequest;
+import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.NaverLoginService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,12 +47,12 @@ public class AuthNaverController {
 
         if ("Auth".equalsIgnoreCase(type)) {
             log.info("Auth: 인가 코드로 네이버 로그인 진행");
-            NaverLoginResponse response = naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
+            LoginCBResponse response = naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
             return ResponseEntity.ok(response);
         } else if ("Refresh".equalsIgnoreCase(type)) {
             log.info("Refresh: 앱 자체 refresh token으로 로그인 진행");
-            NaverLoginResponse userInfo = naverLoginService.handleRefreshTokenLogin(codeOrToken);
-            return ResponseEntity.ok(userInfo);
+            LoginCBResponse response = new LoginCBResponse();
+            return ResponseEntity.ok(response);
         } else {
             log.error("에러: 로그인 타입 매치 실패 - {}", type);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

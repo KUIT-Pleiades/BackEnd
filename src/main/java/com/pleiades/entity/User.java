@@ -30,23 +30,24 @@ public class User {
     @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate birthDate;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate createdDate;
 
+    // DB에 앱 자체 tokens 저장 X
     @Transient
     private String accessToken;
 
-    @Column
+    @Transient
     private String refreshToken;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private NaverToken naverToken;
 
     public void setSignUp(SignUpDto signUpDto) {
-        this.setId(signUpDto.getId());
+        this.setId(signUpDto.getUserId());
         this.setUserName(signUpDto.getNickname());
         this.setBirthDate(signUpDto.getBirthDate());
         this.setCreatedDate(LocalDate.now());

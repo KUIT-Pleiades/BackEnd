@@ -1,21 +1,23 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.NaverLoginResponse;
+import com.pleiades.dto.naver.LoginCBResponse;
+import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.repository.NaverTokenRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.strings.JwtRole;
 import com.pleiades.util.NaverApiUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 @Slf4j
@@ -27,9 +29,10 @@ public class NaverLoginService {
     private final NaverTokenRepository naverTokenRepository;
     private final UserRepository userRepository;
     private final HttpSession session;
+    private final JwtUtil jwtUtil;
 
     @Transactional
-    public NaverLoginResponse handleNaverLoginCallback(String code, String state) {
+    public LoginCBResponse handleNaverLoginCallback(String code, String state) {
         log.info("service 계층 진입");
 
         Map<String, String> naverTokens = naverApiUtil.getTokens(code, state);
@@ -50,6 +53,8 @@ public class NaverLoginService {
         String email = userInfo.getEmail();
 
         User user = userRepository.findByEmail(email).orElse(null);
+        LoginCBResponse cbResponse;
+
         if (user != null) {
             log.info("user 이미 존재");
             NaverToken naverToken = naverTokenRepository.findByUserEmail(email)
@@ -61,24 +66,39 @@ public class NaverLoginService {
             naverToken.setLastUpdated(System.currentTimeMillis());
             naverTokenRepository.save(naverToken);
 
-            updateAppTokensForUser(user);
+            cbResponse = updateAppTokensForUser(user);
         } else {
+            user = new User();
             log.info("user 새로 생성");
 
-            session.setAttribute("naverRefreshToken", refreshToken);
-            session.setAttribute("naverAccessToken", accessToken);
-            session.setAttribute("email", email);
+            NaverToken naverToken = new NaverToken();
+            naverToken.setAccessToken(accessToken);
+            naverToken.setEmail(email);
+            naverToken.setRefreshToken(refreshToken);
+            naverToken.setLastUpdated(System.currentTimeMillis());
+            naverTokenRepository.save(naverToken);
 
-            // todo : redirect
-//            return ResponseEntity.status(302)
-//                    .header("Location", "http://54.252.108.194/auth/signup")
-//                    .body(userInfo);
+            user.setEmail(email);
+            cbResponse = updateAppTokensForUser(user);
         }
-        return userInfo;
+        return cbResponse;
     }
 
+    private LoginCBResponse updateAppTokensForUser(User user) {
+
+        String jwtAccessToken = jwtUtil.generateAccessToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
+        String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
+
+        user.setRefreshToken(jwtRefreshToken);
+        user.setAccessToken(jwtAccessToken);
+
+        log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
+        return new LoginCBResponse(jwtRefreshToken, jwtAccessToken);
+    }
+
+    // todo : 일단 안씀 -> 나중에 검사 해보고 지울 것
     @Transactional
-    public NaverLoginResponse handleRefreshTokenLogin(String refreshToken) {
+    public NaverLoginResponse handleNaverRefreshTokenLogin(String refreshToken) {
 
         NaverToken naverToken = naverTokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new IllegalArgumentException("DB에 네이버 Refresh Token 존재 X"));
@@ -97,27 +117,5 @@ public class NaverLoginService {
         log.info("Refresh token으로 사용자 정보 조회 성공: {}", userInfo);
 
         return userInfo;
-    }
-
-    // session 저장으로 변경
-//    private void saveNewUserAndTokens(String email, String accessToken, String refreshToken) {
-//        User user = new User();
-//        user.setEmail(email);
-//        user.setRefreshToken(refreshToken);
-//        user.setCreatedDate(LocalDate.now());
-//
-//        NaverToken naverToken = new NaverToken();
-//        naverToken.setAccessToken(accessToken);
-//        naverToken.setRefreshToken(refreshToken);
-//        naverToken.setLastUpdated(System.currentTimeMillis());
-//
-//        naverToken.setUser(user);
-//        user.setNaverToken(naverToken);
-//
-//        userRepository.save(user);
-//    }
-
-    private void updateAppTokensForUser(User user) {
-        log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
     }
 }

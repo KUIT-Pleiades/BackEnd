@@ -65,7 +65,7 @@ public class AuthHomeController {
         if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
 
         Claims token = jwtUtil.validateToken(accessToken);
-        if (token == null) { return checkRefreshToken(refreshToken, body); }
+        if (token == null) {return checkRefreshToken(refreshToken, body); }
         String userId = token.getId();
 
         return ResponseEntity
@@ -121,11 +121,6 @@ public class AuthHomeController {
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpSession session) {
-
-
-        log.info("Session email: {}", session.getAttribute("email"));
-        log.info("Session naverRefreshToken: {}", session.getAttribute("naverRefreshToken"));
-        log.info("Session naverAccessToken: {}", session.getAttribute("naverAccessToken"));
 
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
