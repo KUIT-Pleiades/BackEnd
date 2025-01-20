@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.util;
 
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;

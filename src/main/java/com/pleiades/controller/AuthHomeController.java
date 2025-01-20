@@ -1,16 +1,12 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.Characters;
-import com.pleiades.entity.face.Face;
-import com.pleiades.entity.item.Item;
-import com.pleiades.entity.outfit.Outfit;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
-import com.pleiades.service.JwtUtil;
+import com.pleiades.util.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +26,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.pleiades.exception.ErrorCode.INVALID_USER_EMAIL;
 
 @Slf4j
 @Controller
@@ -60,8 +58,8 @@ public class AuthHomeController {
     public ResponseEntity<Map<String, String>> login(HttpServletRequest request) throws IOException {
         Map<String, String> body = new HashMap<>();
 
-        String accessToken = request.getParameter("AccessToken");
-        String refreshToken = request.getParameter("RefreshToken");
+        String accessToken = request.getHeader("AccessToken");
+        String refreshToken = request.getHeader("RefreshToken");
         if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
 
         Claims token = jwtUtil.validateToken(accessToken);
@@ -120,43 +118,66 @@ public class AuthHomeController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpSession session) {
-
+    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto,
+                                                      HttpServletRequest request, HttpSession session) {
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
-        user.setEmail(session.getAttribute("email").toString());
-//        session.removeAttribute("email");
 
-        // 왜 여기로 옮기셧나요?!
-
-        Map<String, String> body = new HashMap<>();
-
-        String jwtAccessToken = jwtUtil.generateAccessToken(user.getId(), JwtRole.ROLE_USER.getRole());
-        String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getId(), JwtRole.ROLE_USER.getRole());
-
-        user.setRefreshToken(jwtRefreshToken);
-        user.setAccessToken(jwtAccessToken);
-
-        body.put("AccessToken", jwtAccessToken);
-        body.put("RefreshToken", jwtRefreshToken);
-
+        String jwtAccessToken = request.getHeader("accessToken");
+        Claims token = jwtUtil.validateToken(jwtAccessToken);
         log.info("(b) Access token: " + jwtAccessToken);
-        log.info("(b) Refresh token: " + jwtRefreshToken);
 
-        if (session.getAttribute("naverRefreshToken") != null) {
-            NaverToken naverToken = new NaverToken();
-            naverToken.setUser(user);
-            naverToken.setRefreshToken(session.getAttribute("naverRefreshToken").toString());
-            naverToken.setAccessToken(session.getAttribute("naverAccessToken").toString());
-            naverToken.setLastUpdated(System.currentTimeMillis());
-            user.setNaverToken(naverToken);
-            log.info("session - naver access token: {}", naverToken.getAccessToken());
-            log.info("session - naver refresh token: {}", naverToken.getRefreshToken());
-            //session.removeAttribute("naverRefreshToken");
-            //session.removeAttribute("naverAccessToken");
+        // access token 유효한 경우 -> naver / kakao 랑 user 매핑
+        if (token != null) {
+
+            String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
+
+            // email - naver
+            if(email.contains("@naver.com")) {
+                user.setEmail(email);
+                NaverToken naverToken = naverTokenRepository.findByEmail(email).orElseThrow(
+                        () -> new CustomException(ErrorCode.INVALID_USER_EMAIL)
+                );
+                naverToken.setUser(user);
+                user.setNaverToken(naverToken);
+
+                userRepository.save(user);
+                naverTokenRepository.save(naverToken);
+
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }
+            // todo : email - kakao
         }
-        userRepository.save(user);
 
+        String jwtRefreshToken = request.getHeader("refreshToken");
+        if(jwtRefreshToken == null) {
+            // 프론트한테 refresh token 요청
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED) // 401
+                    .body(Map.of("error", "Refresh Token is required"));
+        }
+        else{
+            Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
+            // 프론트한테 소셜 로그인 재요청
+            if (refreshToken == null) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN) // 403
+                        .body(Map.of("error", "Social login is required"));
+            }
+
+            // refresh token은 유효한 경우
+            else{
+                log.info("(b) Refresh token: " + jwtRefreshToken);
+                String email = refreshToken.getSubject();
+                // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
+                jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+                jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+                return ResponseEntity
+                        .status(HttpStatus.OK) // 200
+                        .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+            }
+        }
 
 //        if (session.getAttribute("kakaoRefreshToken") != null) {
 //            KakaoToken kakaoToken = new KakaoToken();
@@ -175,34 +196,16 @@ public class AuthHomeController {
 
         // todo: 윤희's 할 일
 
-//        CharacterFaceDto faceDto = signUpDto.getFace();
-//        Face face = faceRepository.
-//        face.setFace(faceDto);
-//
-//        CharacterOutfitDto outfitDto = signUpDto.getOutfit();
-//        Outfit outfit = new Outfit();
-//        outfit.setOutfit(outfitDto);
-//
-//        CharacterItemDto itemDto = signUpDto.getItem();
-//        Item item = new Item();
-////        item.setId(itemDto.get);
-////        item.setItem(itemDto);
-
-        Characters character = new Characters();
-        character.setUser(user);
-//        character.setFace(face);        // 얼굴을 얼굴 테이블을 만들어서 저장할지, 머리, 표정, 피부색 따로 저장할지 정해야되는데 얼굴 테이블을 만드는 건 불필요해 보임
-//        character.setOutfit(outfit);    // 옷도 사실 마찬가지
-//        character.setItem(item);        // 얜 뭐 모르겠다
+//        Characters character = new Characters();
+//        character.setUser(user);
+//        character.setFace(face);
+//        character.setOutfit(outfit);
+//        character.setItem(item);
 //        characterRepository.save(character);
 
 //        log.info("character saved");
 
-        return ResponseEntity.status(200)
-                .body(body);
-//        return ResponseEntity
-//                .status(HttpStatus.FOUND)
-//                .header("Location", "/star?userId="+signUpDto.getId())
-//                .body(body);
+//        return ResponseEntity.status(200).build(); // unreachable
     }
 
     private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {

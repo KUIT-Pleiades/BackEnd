@@ -4,14 +4,12 @@ import com.pleiades.dto.naver.LoginCBResponse;
 import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
-import com.pleiades.exception.CustomException;
-import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.repository.NaverTokenRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.JwtRole;
+import com.pleiades.util.JwtUtil;
 import com.pleiades.util.NaverApiUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +26,6 @@ public class NaverLoginService {
     private final NaverApiUtil naverApiUtil;
     private final NaverTokenRepository naverTokenRepository;
     private final UserRepository userRepository;
-    private final HttpSession session;
     private final JwtUtil jwtUtil;
 
     @Transactional

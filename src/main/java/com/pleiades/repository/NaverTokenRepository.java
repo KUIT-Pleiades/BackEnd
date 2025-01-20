@@ -16,5 +16,6 @@ public interface NaverTokenRepository extends JpaRepository<NaverToken, Long> {
             @Param("email") String email);
 
     Optional<NaverToken> findByRefreshToken(String refreshToken);
+    Optional<NaverToken> findByEmail(String email);
 }
 

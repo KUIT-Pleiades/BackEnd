@@ -7,7 +7,7 @@ import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.JwtUtil;
+import com.pleiades.util.JwtUtil;
 import com.pleiades.service.KakaoRequest;
 import com.pleiades.service.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
