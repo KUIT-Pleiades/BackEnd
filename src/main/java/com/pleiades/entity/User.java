@@ -17,13 +17,9 @@ import java.time.LocalDate;
 @Builder
 public class User {
 
-    // todo : ID user가 직접 입력
     @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-
-//    @Column(unique = true, nullable = false)
     @Column(unique = true)
     private String email;
 
