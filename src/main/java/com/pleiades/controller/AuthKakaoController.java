@@ -50,9 +50,6 @@ public class AuthKakaoController {
     @Value("${KAKAO_CLIENT_ID}")
     private String KAKAO_CLIENT_ID;
 
-    @Value("${FRONT_ORIGIN}")
-    private String FRONT_ORIGIN;
-
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
@@ -76,8 +73,6 @@ public class AuthKakaoController {
                     .build();
         }
     }
-
-
 
     // 인가 코드 재발급은 불가피한가? 그럼 소셜 토큰을 쓰는 이유가 있나?
     // 여기서 소셜 토큰 확인 해야함 - 아닌 듯?
@@ -126,9 +121,11 @@ public class AuthKakaoController {
             session.setAttribute("kakaoRefreshToken", responseToken.getRefreshToken());
             session.setAttribute("email", responseToken.getAccessToken());
 
+
+            // 요청이 없는데 응답 본문을 보낼 순 없음
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/signup")
+                    .header("Location", "/auth/signup") // 프론트.com/kakaologin
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
