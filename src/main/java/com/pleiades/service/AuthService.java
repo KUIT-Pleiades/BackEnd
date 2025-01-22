@@ -1,4 +1,4 @@
 package com.pleiades.service;
 
-public class UserService {
+public class AuthService {
 }

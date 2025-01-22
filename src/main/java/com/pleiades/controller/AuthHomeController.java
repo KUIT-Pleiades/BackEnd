@@ -117,12 +117,11 @@ public class AuthHomeController {
 
     }
 
+    // todo : 얼굴 / 의상 / 아이템 tab 각각 이미지
     @GetMapping("/signup")
     public void setCharacter(HttpServletRequest request, HttpServletResponse response) {
         log.info("signup");
-
         // 캐릭터 이미지 전송
-
         return ;
     }
 
@@ -156,6 +155,8 @@ public class AuthHomeController {
                 .body(body);
     }
 
+    // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
+    // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto,
                                                       HttpServletRequest request) {
@@ -184,6 +185,13 @@ public class AuthHomeController {
                 naverTokenRepository.save(naverToken);
             }
             // todo : email - kakao
+//          if (session.getAttribute("kakaoRefreshToken") != null) {
+//              KakaoToken kakaoToken = new KakaoToken();
+//              kakaoToken.setUser(user);
+//              kakaoToken.setRefreshToken(session.getAttribute("kakaoRefreshToken").toString());
+//              kakaoTokenRepository.save(kakaoToken);
+//              session.removeAttribute("kakaoRefreshToken");
+//          }
         }
 
         // access token이 유효하지 않은 경우
@@ -193,7 +201,7 @@ public class AuthHomeController {
             if (jwtRefreshToken == null) {
                 // 프론트한테 refresh token 요청
                 return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED) // 401
+                        .status(HttpStatus.PRECONDITION_REQUIRED) // 428
                         .body(Map.of("error", "Refresh Token is required"));
             } else {
                 Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
@@ -213,19 +221,12 @@ public class AuthHomeController {
                     jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
                     return ResponseEntity
-                            .status(HttpStatus.OK) // 200
+                            .status(HttpStatus.UNAUTHORIZED) // 401
                             .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
                 }
             }
         }
-//        if (session.getAttribute("kakaoRefreshToken") != null) {
-//            KakaoToken kakaoToken = new KakaoToken();
-//            kakaoToken.setUser(user);
-//            kakaoToken.setRefreshToken(session.getAttribute("kakaoRefreshToken").toString());
-//            kakaoTokenRepository.save(kakaoToken);
-//            session.removeAttribute("kakaoRefreshToken");
-//        }
-//
+
 //        Star star = new Star();
 //        star.setUserId(signUpDto.getId());
 //        // star.setBackgroundId(signUpDto.getBackgroundId());

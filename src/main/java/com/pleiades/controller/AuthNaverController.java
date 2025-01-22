@@ -49,11 +49,13 @@ public class AuthNaverController {
             log.info("Auth: 인가 코드로 네이버 로그인 진행");
             LoginCBResponse response = naverLoginService.handleNaverLoginCallback(codeOrToken, loginRequest.getState());
             return ResponseEntity.ok(response);
-        } else if ("Refresh".equalsIgnoreCase(type)) {
-            log.info("Refresh: 앱 자체 refresh token으로 로그인 진행");
-            LoginCBResponse response = new LoginCBResponse();
-            return ResponseEntity.ok(response);
-        } else {
+        }
+//        else if ("Refresh".equalsIgnoreCase(type)) {
+//            log.info("Refresh: 앱 자체 refresh token으로 로그인 진행");
+//            LoginCBResponse response = new LoginCBResponse();
+//            return ResponseEntity.ok(response);
+//        }
+        else {
             log.error("에러: 로그인 타입 매치 실패 - {}", type);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

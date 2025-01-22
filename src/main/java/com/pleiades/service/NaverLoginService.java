@@ -49,6 +49,7 @@ public class NaverLoginService {
         NaverLoginResponse userInfo = naverApiUtil.getUserInfo(accessToken);
         String email = userInfo.getEmail();
 
+        // todo : naverTokenRepository.findByEmail
         User user = userRepository.findByEmail(email).orElse(null);
         LoginCBResponse cbResponse;
 
