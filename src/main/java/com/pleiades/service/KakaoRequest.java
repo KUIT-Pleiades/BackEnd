@@ -29,7 +29,7 @@ public class KakaoRequest {
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);  // application/x-www-form-urlencoded;charset=utf-8
+        headers.setContentType(new MediaType("application", "x-www-form-urlencoded;charset=utf-8"));  // application/x-www-form-urlencoded;charset=utf-8
 
         // 요청 본문
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();

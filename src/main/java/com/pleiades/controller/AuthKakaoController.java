@@ -87,8 +87,12 @@ public class AuthKakaoController {
             log.info("Access token: " + responseToken.getAccessToken());
             String email = null;
 
-            if (responseToken != null) { email = getKakaoEmail(responseToken.getAccessToken()); }
-
+            if (responseToken == null) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build();
+            }
+            email = getKakaoEmail(responseToken.getAccessToken());
             if (email == null) {
                 body.put("error", "No email found");
                 return ResponseEntity
