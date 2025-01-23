@@ -151,7 +151,8 @@ public class AuthKakaoController {
 //                    .build();
             body.put("message", "login success");
             return ResponseEntity
-                    .status(HttpStatus.OK)
+                    .status(HttpStatus.FOUND)
+                    .header("Location", FRONT_ORIGIN+"/kakaologin")
                     .body(body);
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
