@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -24,11 +26,8 @@ public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${KAKAO_CLIENT_ID}")
-    private static String KAKAO_CLIENT_ID;
-
-    @Value("${KAKAO_CLIENT_SECRET}")
-    private static String KAKAO_CLIENT_SECRET;
+    // @Value
+    private static String clientId = System.getenv("KAKAO_CLIENT_ID");
 
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
@@ -37,26 +36,20 @@ public class KakaoRequest {
         // 요청 본문
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", KAKAO_CLIENT_ID);
+        body.add("client_id", clientId);
         body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getUrl());
         body.add("code", code);
-        body.add("client_secret", KAKAO_CLIENT_SECRET);
 
         // 요청 객체
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
-        log.info("entity.header: ", entity.getHeaders());
-        log.info("entity.body: ", entity.getBody());
+
         log.info("2ed");
         try {   // POST 요청
             ResponseEntity<KakaoTokenDto> response = restTemplate.postForEntity(KakaoUrl.TOKEN_URL.getUrl(), entity, KakaoTokenDto.class);
             log.info("3ed");
             return response.getBody();
         } catch (Exception e) {
-            log.info("4ed");
             log.error(e.getMessage());
-            log.error(e.getStackTrace().toString());
-            log.error(e.getCause().toString());
-            log.error(e.getCause().getStackTrace().toString());
             return null;
         }
     }
@@ -110,7 +103,7 @@ public class KakaoRequest {
 
         Map<String, Object> body = new HashMap<>();
         body.put("grant_type", new String[]{"refresh_token"});
-        body.put("client_id", KAKAO_CLIENT_ID);
+        body.put("client_id", clientId);
         body.put("refresh_token", token);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);

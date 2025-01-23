@@ -84,6 +84,7 @@ public class AuthKakaoController {
             Map<String, String> body = new HashMap<>();
 
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
+
             log.info("Access token: " + responseToken.getAccessToken());
             String email = null;
 
