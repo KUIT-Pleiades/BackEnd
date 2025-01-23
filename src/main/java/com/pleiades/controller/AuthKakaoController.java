@@ -141,12 +141,18 @@ public class AuthKakaoController {
 
 //            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken()); - 소셜 액세스 토큰은 일화용인 걸루,,?
 
+
+
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
+//            return ResponseEntity
+//                    .status(HttpStatus.FOUND)
+//                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
+//                    .build();
+            body.put("message", "login success");
             return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
-                    .build();
+                    .status(HttpStatus.OK)
+                    .body(body);
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
             return ResponseEntity
@@ -154,6 +160,12 @@ public class AuthKakaoController {
                     .build();
         }
     }
+
+//    @GetMapping("/success")
+//    public ResponseEntity<Map<String, String>> reponseToken() {
+//        Map<String, String> body = new HashMap<>();
+//
+//    }
 
     private String getKakaoEmail(String token) {
         KakaoUserDto responseUser = KakaoRequest.postUserInfo(token);;
