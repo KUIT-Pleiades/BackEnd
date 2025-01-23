@@ -140,8 +140,10 @@ public class AuthKakaoController {
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
         }
-        return null;
     }
 
     private String getKakaoEmail(String token) {
