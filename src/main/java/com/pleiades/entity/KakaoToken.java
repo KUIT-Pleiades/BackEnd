@@ -21,6 +21,9 @@ public class KakaoToken {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private String refreshToken;
 }

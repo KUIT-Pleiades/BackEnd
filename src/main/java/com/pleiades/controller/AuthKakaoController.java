@@ -50,6 +50,9 @@ public class AuthKakaoController {
     @Value("${KAKAO_CLIENT_ID}")
     private String KAKAO_CLIENT_ID;
 
+    @Value("${FRONT_ORIGIN}")
+    private String FRONT_ORIGIN;
+
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
@@ -65,17 +68,14 @@ public class AuthKakaoController {
                     .status(HttpStatus.FOUND)
                     .header("Location", redirectUrl)
                     .build();
-        }
-        catch (Exception e) {
-            log.info("kakao login fail"+e.getMessage());
+        } catch (Exception e) {
+            log.info("kakao login fail: " + e.getMessage());
             return ResponseEntity
-                    .status(HttpStatus.BAD_GATEWAY)
+                    .status(HttpStatus.BAD_REQUEST)
                     .build();
         }
     }
 
-    // 인가 코드 재발급은 불가피한가? 그럼 소셜 토큰을 쓰는 이유가 있나?
-    // 여기서 소셜 토큰 확인 해야함 - 아닌 듯?
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
         log.info("kakao code redirected");
@@ -88,6 +88,13 @@ public class AuthKakaoController {
             String email = null;
 
             if (responseToken != null) { email = getKakaoEmail(responseToken.getAccessToken()); }
+
+            if (email == null) {
+                body.put("error", "No email found");
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(body);
+            }
 
             Optional<User> user = userRepository.findByEmail(email);
 
@@ -114,18 +121,22 @@ public class AuthKakaoController {
                         .body(body);
             }
 
+            // 새 사용자 - 회원가입 필요
             log.info("access token", responseToken.getAccessToken());
 
-            // 회원가입 완료 후 저장될 회원 정보
-            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken());
-            session.setAttribute("kakaoRefreshToken", responseToken.getRefreshToken());
-            session.setAttribute("email", responseToken.getAccessToken());
+            // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
+            KakaoToken token = new KakaoToken();
+            token.setEmail(email);
+            token.setRefreshToken(responseToken.getRefreshToken());
+            kakaoTokenRepository.save(token);
 
+//            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken()); - 소셜 액세스 토큰은 일화용인 걸루,,?
 
-            // 요청이 없는데 응답 본문을 보낼 순 없음
+            log.info("redirect to front/kakaologin");
+            // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/signup") // 프론트.com/kakaologin
+                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
