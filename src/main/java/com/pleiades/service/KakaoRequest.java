@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class KakaoRequest {
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "x-www-form-urlencoded;charset=utf-8"));  // application/x-www-form-urlencoded;charset=utf-8
+        headers.setContentType(new MediaType("application", "x-www-form-urlencoded", StandardCharsets.UTF_8));  // application/x-www-form-urlencoded;charset=utf-8
 
         // 요청 본문
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
