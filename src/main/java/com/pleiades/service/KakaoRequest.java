@@ -27,6 +27,9 @@ public class KakaoRequest {
     @Value("${KAKAO_CLIENT_ID}")
     private static String KAKAO_CLIENT_ID;
 
+    @Value("${KAKAO_CLIENT_SECRET}")
+    private static String KAKAO_CLIENT_SECRET;
+
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
@@ -38,6 +41,7 @@ public class KakaoRequest {
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getUrl());
         body.add("code", code);
+        body.add("client_secret", KAKAO_CLIENT_SECRET);
 
         // 요청 객체
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
