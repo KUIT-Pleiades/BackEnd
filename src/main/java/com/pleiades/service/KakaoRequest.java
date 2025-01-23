@@ -34,7 +34,6 @@ public class KakaoRequest {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "x-www-form-urlencoded", StandardCharsets.UTF_8));  // application/x-www-form-urlencoded;charset=utf-8
-
         // 요청 본문
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
@@ -45,6 +44,8 @@ public class KakaoRequest {
 
         // 요청 객체
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+        log.info("entity.header: ", entity.getHeaders());
+        log.info("entity.body: ", entity.getBody());
         log.info("2ed");
         try {   // POST 요청
             ResponseEntity<KakaoTokenDto> response = restTemplate.postForEntity(KakaoUrl.TOKEN_URL.getUrl(), entity, KakaoTokenDto.class);
@@ -53,6 +54,9 @@ public class KakaoRequest {
         } catch (Exception e) {
             log.info("4ed");
             log.error(e.getMessage());
+            log.error(e.getStackTrace().toString());
+            log.error(e.getCause().toString());
+            log.error(e.getCause().getStackTrace().toString());
             return null;
         }
     }
