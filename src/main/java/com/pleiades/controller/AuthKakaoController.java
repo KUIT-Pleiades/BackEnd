@@ -85,7 +85,6 @@ public class AuthKakaoController {
 
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
 
-            log.info("Access token: " + responseToken.getAccessToken());
             String email = null;
 
             if (responseToken == null) {
@@ -127,7 +126,12 @@ public class AuthKakaoController {
             }
 
             // 새 사용자 - 회원가입 필요
-            log.info("access token", responseToken.getAccessToken());
+
+            // 기존 카카오 토큰 삭제
+            Optional<KakaoToken> oldToken = kakaoTokenRepository.findByEmail(email);
+            if (oldToken.isPresent()) {
+                kakaoTokenRepository.delete(oldToken.get());
+            }
 
             // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
             KakaoToken token = new KakaoToken();
