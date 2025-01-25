@@ -116,9 +116,7 @@ public class AuthKakaoController {
                 body.put("AccessToken", jwtAccessToken);
                 body.put("RefreshToken", jwtRefreshToken);
 
-                log.info("(a) Access token: " + jwtAccessToken);
-                log.info("(a) Refresh token: " + jwtRefreshToken);
-
+                // todo: 얘도 body 전달 못 함
                 return ResponseEntity
                         .status(HttpStatus.FOUND) // 302 Found (리다이렉트 상태 코드)
                         .header(headers.toString())
@@ -141,19 +139,18 @@ public class AuthKakaoController {
 
 //            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken()); - 소셜 액세스 토큰은 일화용인 걸루,,?
 
-
+            // session으로 해도 될까
+            String signUpAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+            String signUpRefreshToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+            session.setAttribute("SignUpAccessToken", signUpAccessToken);
+            session.setAttribute("SignUpRefreshToken", signUpRefreshToken);
 
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
-//            return ResponseEntity
-//                    .status(HttpStatus.FOUND)
-//                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
-//                    .build();
-            body.put("message", "login success");
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", FRONT_ORIGIN+"/kakaologin")
-                    .body(body);
+                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
+                    .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
             return ResponseEntity
@@ -162,11 +159,27 @@ public class AuthKakaoController {
         }
     }
 
-//    @GetMapping("/success")
-//    public ResponseEntity<Map<String, String>> reponseToken() {
-//        Map<String, String> body = new HashMap<>();
-//
-//    }
+    @GetMapping("/success")
+    public ResponseEntity<Map<String, String>> reponseToken(HttpSession session) {
+        Map<String, String> body = new HashMap<>();
+        String accessToken = (String) session.getAttribute("SignUpAccessToken");
+        String refreshToken = (String) session.getAttribute("SignUpRefreshToken");
+
+        if (accessToken != null && refreshToken != null) {
+            body.put("accessToken", accessToken);
+            body.put("refreshToken", refreshToken);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(body);
+        }
+
+        // todo: redirect를 시켜줄지 메시지만 전달하고 알아서 리다이렉트하라 할지
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .header("Location", "/auth/login")
+                .build();
+    }
 
     private String getKakaoEmail(String token) {
         KakaoUserDto responseUser = KakaoRequest.postUserInfo(token);;

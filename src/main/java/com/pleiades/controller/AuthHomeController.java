@@ -53,6 +53,17 @@ public class AuthHomeController {
     @Autowired
     private FaceRepository faceRepository;
 
+//    @Autowired
+//    private OutfitRepository faceRepository;
+//
+//    @Autowired
+//    private FaceRepository faceRepository;
+//
+//    @Autowired
+//    private FaceRepository faceRepository;
+
+
+
     // 첫 접속 화면
     @PostMapping("")
     public ResponseEntity<Map<String, String>> login(HttpServletRequest request) throws IOException {
@@ -63,7 +74,7 @@ public class AuthHomeController {
         // access token 유효한 경우
         if (token != null) {
             log.info("로그인: 앱 Access token 유효 - " + jwtAccessToken);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).build();        // /star로 리다이렉트? or 프론트가 알아서?
         }
 
         String jwtRefreshToken = request.getHeader("refreshToken");
@@ -85,7 +96,7 @@ public class AuthHomeController {
             // refresh token은 유효한 경우
             else{
                 log.info("로그인: 앱 Refresh token만 유효 - " + jwtRefreshToken);
-                String email = refreshToken.getSubject();
+                String email = refreshToken.getSubject();       // email로 하기로 한 건가용
                 // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
                 jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
                 jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
@@ -95,20 +106,6 @@ public class AuthHomeController {
                         .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
             }
         }
-//        Map<String, String> body = new HashMap<>();
-//
-//        String accessToken = request.getHeader("AccessToken");
-//        String refreshToken = request.getHeader("RefreshToken");
-//        if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
-//
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        if (token == null) {return checkRefreshToken(refreshToken, body); }
-//        String userId = token.getId();
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .header("Location", "/star?userId="+userId)
-//                .body(body);
     }
 
     // 소셜 로그인 페이지
@@ -122,6 +119,7 @@ public class AuthHomeController {
     public void setCharacter(HttpServletRequest request, HttpServletResponse response) {
         log.info("signup");
         // 캐릭터 이미지 전송
+
         return ;
     }
 
@@ -158,8 +156,7 @@ public class AuthHomeController {
     // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto,
-                                                      HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpServletRequest request) {
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
 
@@ -246,32 +243,5 @@ public class AuthHomeController {
 //        log.info("character saved");
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 : 회원가입 완료
-    }
-
-    private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {
-        if (refreshToken == null) {
-            return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/login")
-                    .build();
-        }
-
-        Claims token = jwtUtil.validateToken(refreshToken);
-        if (token == null) {
-            return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/login")
-                    .build();
-        }
-        String userId = token.getId();
-        String accessToken = jwtUtil.generateAccessToken(userId, JwtRole.ROLE_USER.getRole());
-
-        body.put("AccessToken", accessToken);
-        log.info("(c) Access token: " + accessToken);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .header("Location", "/star?userId="+userId)
-                .body(body);
     }
 }
