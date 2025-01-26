@@ -70,6 +70,7 @@ jobs:
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
               -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
+              -e IPFS_URL=${{ secrets.IPFS_URL }} \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
 
             echo "🚮 Cleaning up old images"
