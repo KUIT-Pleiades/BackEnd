@@ -4,17 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Setter
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterFaceDto {
     @JsonProperty("skinColor")
-    private String skinImg;
+    private List<CharacterImageDto> skinImgs = new ArrayList<>();
 
     @JsonProperty("hair")
-    private String hairImg;
+    private List<CharacterImageDto> hairImgs = new ArrayList<>();
 
     @JsonProperty("expression")
-    private String expressionImg;
+    private List<CharacterImageDto> expressionImgs = new ArrayList<>();
 }

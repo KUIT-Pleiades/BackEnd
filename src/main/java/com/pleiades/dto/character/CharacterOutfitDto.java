@@ -5,16 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterOutfitDto {
     @JsonProperty("top")
-    private String topImg;
+    private List<CharacterImageDto> topImg = new ArrayList<>();
 
     @JsonProperty("bottom")
-    private String bottomImg;
+    private List<CharacterImageDto> bottomImg = new ArrayList<>();
 
     @JsonProperty("shoes")
-    private String shoesImg;
+    private List<CharacterImageDto> shoesImg = new ArrayList<>();
 }

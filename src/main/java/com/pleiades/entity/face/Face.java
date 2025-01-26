@@ -23,9 +23,10 @@ public class Face {
 
     private String expression;
 
+    //todo: 요청 dto랑 응답 dto랑 분리
     public void setFace(CharacterFaceDto faceDto) {
-        this.setSkin(faceDto.getSkinImg());
-        this.setHair(faceDto.getHairImg());
-        this.setExpression(faceDto.getExpressionImg());
+        this.setSkin(faceDto.getSkinImgs().toString());
+        this.setHair(faceDto.getHairImgs().toString());
+        this.setExpression(faceDto.getExpressionImgs().toString());
     }
 }

@@ -42,6 +42,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private NaverToken naverToken;
 
+    @Column(nullable = true)
+    String profileUrl;
+
     public void setSignUp(SignUpDto signUpDto) {
         this.setId(signUpDto.getUserId());
         this.setUserName(signUpDto.getNickname());

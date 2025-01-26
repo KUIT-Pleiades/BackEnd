@@ -1,11 +1,29 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.SignUpDto;
+import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.CharacterImageDto;
+import com.pleiades.dto.character.CharacterItemDto;
+import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.Characters;
+import com.pleiades.entity.face.Expression;
+import com.pleiades.entity.face.Hair;
+import com.pleiades.entity.face.Skin;
+import com.pleiades.entity.item.Item;
+import com.pleiades.entity.outfit.Bottom;
+import com.pleiades.entity.outfit.Shoes;
+import com.pleiades.entity.outfit.Top;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
+import com.pleiades.repository.face.ExpressionRepository;
+import com.pleiades.repository.face.HairRepository;
+import com.pleiades.repository.face.SkinRepository;
+import com.pleiades.repository.item.ItemRepository;
+import com.pleiades.repository.outfit.BottomRepository;
+import com.pleiades.repository.outfit.ShoesRepository;
+import com.pleiades.repository.outfit.TopRepository;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
@@ -23,9 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.pleiades.exception.ErrorCode.INVALID_USER_EMAIL;
 
@@ -51,18 +67,25 @@ public class AuthHomeController {
     private CharacterRepository characterRepository;
 
     @Autowired
-    private FaceRepository faceRepository;
+    private SkinRepository skinRepository;
 
-//    @Autowired
-//    private OutfitRepository faceRepository;
-//
-//    @Autowired
-//    private FaceRepository faceRepository;
-//
-//    @Autowired
-//    private FaceRepository faceRepository;
+    @Autowired
+    private ExpressionRepository expressionRepository;
 
+    @Autowired
+    private HairRepository hairRepository;
 
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
+    private TopRepository topRepository;
+
+    @Autowired
+    private BottomRepository bottomRepository;
+
+    @Autowired
+    private ShoesRepository shoesRepository;
 
     // 첫 접속 화면
     @PostMapping("")
@@ -116,11 +139,66 @@ public class AuthHomeController {
 
     // todo : 얼굴 / 의상 / 아이템 tab 각각 이미지
     @GetMapping("/signup")
-    public void setCharacter(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request, HttpServletResponse response) {
         log.info("signup");
-        // 캐릭터 이미지 전송
+        Map<String, Object> body = new HashMap<>();
+        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
+        CharacterItemDto characterItemDto = new CharacterItemDto();
+        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
 
-        return ;
+        // 캐릭터 이미지 전송
+        for (Skin skin : skinRepository.findAll()) {
+            CharacterImageDto skinDto = new CharacterImageDto();
+            skinDto.setName(skin.getName());
+            skinDto.setUrl(skin.getImageUrl());
+            characterFaceDto.getSkinImgs().add(skinDto);
+        }
+        for (Expression expression : expressionRepository.findAll()) {
+            CharacterImageDto expressionDto = new CharacterImageDto();
+            expressionDto.setName(expression.getName());
+            expressionDto.setUrl(expression.getImageUrl());
+            characterFaceDto.getExpressionImgs().add(expressionDto);
+        }
+        for (Hair hair : hairRepository.findAll()) {
+            CharacterImageDto hairDto = new CharacterImageDto();
+            hairDto.setName(hair.getName());
+            hairDto.setUrl(hair.getImageUrl());
+            characterFaceDto.getHairImgs().add(hairDto);
+        }
+
+        for (Item item : itemRepository.findAll()) {
+            CharacterImageDto itemDto = new CharacterImageDto();
+            itemDto.setName(item.getName());
+            itemDto.setUrl(item.getImageUrl());
+            characterItemDto.getItemImgs().add(itemDto);
+        }
+
+        for (Top top : topRepository.findAll()) {
+            CharacterImageDto topDto = new CharacterImageDto();
+            topDto.setName(top.getName());
+            topDto.setUrl(top.getImageUrl());
+            characterOutfitDto.getTopImg().add(topDto);
+        }
+        for (Bottom bottom : bottomRepository.findAll()) {
+            CharacterImageDto bottomDto = new CharacterImageDto();
+            bottomDto.setName(bottom.getName());
+            bottomDto.setUrl(bottom.getImageUrl());
+            characterOutfitDto.getBottomImg().add(bottomDto);
+        }
+        for (Shoes shoe : shoesRepository.findAll()) {
+            CharacterImageDto shoeDto = new CharacterImageDto();
+            shoeDto.setName(shoe.getName());
+            shoeDto.setUrl(shoe.getImageUrl());
+            characterOutfitDto.getShoesImg().add(shoeDto);
+        }
+
+        body.put("face", characterFaceDto);
+        body.put("item", characterItemDto);
+        body.put("outfit", characterOutfitDto);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(body);
     }
 
     @GetMapping("/checkId")

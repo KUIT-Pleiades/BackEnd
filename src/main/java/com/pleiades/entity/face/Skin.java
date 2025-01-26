@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "expression")
-public class Expression {
+@Table(name = "skin")
+public class Skin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
