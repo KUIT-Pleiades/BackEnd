@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.dto.character.CharacterFaceDto;
 import com.pleiades.dto.character.CharacterImageDto;
@@ -53,37 +54,26 @@ public class AuthHomeController {
 
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     KakaoTokenRepository kakaoTokenRepository;
-
     @Autowired
     NaverTokenRepository naverTokenRepository;
-
     @Autowired
     private StarRepository starRepository;
-
     @Autowired
     private CharacterRepository characterRepository;
-
     @Autowired
     private SkinRepository skinRepository;
-
     @Autowired
     private ExpressionRepository expressionRepository;
-
     @Autowired
     private HairRepository hairRepository;
-
     @Autowired
     private ItemRepository itemRepository;
-
     @Autowired
     private TopRepository topRepository;
-
     @Autowired
     private BottomRepository bottomRepository;
-
     @Autowired
     private ShoesRepository shoesRepository;
 
@@ -234,7 +224,7 @@ public class AuthHomeController {
     // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpDto signUpDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> signup(@RequestBody SignUpDto signUpDto, HttpServletRequest request) {
         User user = new User();
         user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
 
@@ -321,5 +311,15 @@ public class AuthHomeController {
 //        log.info("character saved");
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 : 회원가입 완료
+    }
+
+    @PostMapping("/profile")
+    public void profile(@RequestBody ProfileDto profileDto, HttpServletResponse response) {
+        Optional<User> user = userRepository.findById(profileDto.getUserId());
+        if (user.isPresent()) {
+            user.get().setProfileUrl(profileDto.getProfileUrl());
+            response.setStatus(HttpStatus.CREATED.value());
+        }
+        response.setStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value());
     }
 }
