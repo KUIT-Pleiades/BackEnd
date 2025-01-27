@@ -1,6 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.strings.JwtRole;
+import com.pleiades.strings.TokenStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -9,55 +9,40 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
+
 
 @Slf4j
 @Service
 public class AuthService {
     @Autowired
-    JwtUtil jwtUtil;
+    static JwtUtil jwtUtil;
 
-//    public ResponseEntity<Map<String, String>> checkAccessToken(String token) {
-//        Map<String, String> body = new HashMap<>();
-//
-//        String accessToken = request.getHeader("AccessToken");
-//        String refreshToken = request.getHeader("RefreshToken");
-//        if (accessToken == null) { return checkRefreshToken(refreshToken, body); }
-//
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        if (token == null) {return checkRefreshToken(refreshToken, body); }
-//        String userId = token.getId();
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .header("Location", "/star?userId="+userId)
-//                .body(body);
-//    }
+    public static TokenStatus checkToken(String token) {
+        if (token == null) { return TokenStatus.NONE; }
 
-    private ResponseEntity<Map<String, String>> checkRefreshToken(String refreshToken, Map<String, String> body) {
-        if (refreshToken == null) {
+        Claims tokenClaim = jwtUtil.validateToken(token);
+        if (tokenClaim == null) { return TokenStatus.NOT_VALID; }
+
+        return TokenStatus.VALID;
+    }
+
+    public static ResponseEntity<Map<String, String>> responseTokenStatus(String token) {
+        Map<String, String> body = new HashMap<>();
+        TokenStatus tokenStatus = checkToken(token);
+        if (tokenStatus == TokenStatus.NONE ) {
+            body.put("error", "no token found");
             return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/login")
-                    .build();
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(body);
         }
-
-        Claims token = jwtUtil.validateToken(refreshToken);
-        if (token == null) {
+        if (tokenStatus == TokenStatus.NOT_VALID) {
+            body.put("error", "invalid token");
             return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .header("Location", "/auth/login")
-                    .build();
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(body);
         }
-        String userId = token.getId();
-        String accessToken = jwtUtil.generateAccessToken(userId, JwtRole.ROLE_USER.getRole());
-
-        body.put("AccessToken", accessToken);
-        log.info("(c) Access token: " + accessToken);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .header("Location", "/star?userId="+userId)
-                .body(body);
+        return null;
     }
 }
