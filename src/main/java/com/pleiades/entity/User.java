@@ -44,11 +44,4 @@ public class User {
 
     @Column(nullable = true)
     String profileUrl;
-
-    public void setSignUp(SignUpDto signUpDto) {
-        this.setId(signUpDto.getUserId());
-        this.setUserName(signUpDto.getNickname());
-        this.setBirthDate(signUpDto.getBirthDate());
-        this.setCreatedDate(LocalDate.now());
-    }
 }

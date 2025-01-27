@@ -1,9 +1,9 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
 import com.pleiades.dto.character.CharacterImageDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
+import com.pleiades.dto.character.response.ResponseCharacterItemDto;
+import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
 import com.pleiades.entity.face.Expression;
 import com.pleiades.entity.face.Hair;
 import com.pleiades.entity.face.Skin;
@@ -20,9 +20,6 @@ import com.pleiades.repository.outfit.ShoesRepository;
 import com.pleiades.repository.outfit.TopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import java.awt.*;
 
 @Component
 public class ImageJsonCreator {
@@ -50,8 +47,8 @@ public class ImageJsonCreator {
         this.shoesRepository = shoesRepository;
     }
 
-    public CharacterFaceDto makeCharacterFaceJson() {
-        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
+    public ResponseCharacterFaceDto makeCharacterFaceJson() {
+        ResponseCharacterFaceDto characterFaceDto = new ResponseCharacterFaceDto();
         for (Skin skin : skinRepository.findAll()) {
             CharacterImageDto skinDto = new CharacterImageDto();
             skinDto.setName(skin.getName());
@@ -73,8 +70,8 @@ public class ImageJsonCreator {
         return characterFaceDto;
     }
 
-    public CharacterItemDto makeCharacterItemJson() {
-        CharacterItemDto characterItemDto = new CharacterItemDto();
+    public ResponseCharacterItemDto makeCharacterItemJson() {
+        ResponseCharacterItemDto characterItemDto = new ResponseCharacterItemDto();
         for (Item item : itemRepository.findAll()) {
             CharacterImageDto itemDto = new CharacterImageDto();
             itemDto.setName(item.getName());
@@ -84,25 +81,25 @@ public class ImageJsonCreator {
         return characterItemDto;
     }
 
-    public CharacterOutfitDto makeCharacterOutfitJson() {
-        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
+    public ResponseCharacterOutfitDto makeCharacterOutfitJson() {
+        ResponseCharacterOutfitDto characterOutfitDto = new ResponseCharacterOutfitDto();
         for (Top top : topRepository.findAll()) {
             CharacterImageDto topDto = new CharacterImageDto();
             topDto.setName(top.getName());
             topDto.setUrl(top.getImageUrl());
-            characterOutfitDto.getTopImg().add(topDto);
+            characterOutfitDto.getTopImgs().add(topDto);
         }
         for (Bottom bottom : bottomRepository.findAll()) {
             CharacterImageDto bottomDto = new CharacterImageDto();
             bottomDto.setName(bottom.getName());
             bottomDto.setUrl(bottom.getImageUrl());
-            characterOutfitDto.getBottomImg().add(bottomDto);
+            characterOutfitDto.getBottomImgs().add(bottomDto);
         }
         for (Shoes shoe : shoesRepository.findAll()) {
             CharacterImageDto shoeDto = new CharacterImageDto();
             shoeDto.setName(shoe.getName());
             shoeDto.setUrl(shoe.getImageUrl());
-            characterOutfitDto.getShoesImg().add(shoeDto);
+            characterOutfitDto.getShoesImgs().add(shoeDto);
         }
         return characterOutfitDto;
     }

@@ -1,6 +1,6 @@
 package com.pleiades.entity.outfit;
 
-import com.pleiades.dto.character.CharacterOutfitDto;
+import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,10 +25,4 @@ public class Outfit {
 
 //    @JoinColumn(name = "shoes_url")
     private String shoes;
-
-    public void setOutfit(CharacterOutfitDto outfitDto) {
-        this.setTop(outfitDto.getTopImg().toString());
-        this.setBottom(outfitDto.getBottomImg().toString());
-        this.setShoes(outfitDto.getShoesImg().toString());
-    }
 }

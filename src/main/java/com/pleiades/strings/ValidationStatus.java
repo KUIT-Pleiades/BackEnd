@@ -1,13 +1,13 @@
 package com.pleiades.strings;
 
-public enum TokenStatus {
-    NONE("no token"),
+public enum ValidationStatus {
+    NONE("no object"),
     NOT_VALID("not valid"),
     VALID("valid");
 
     private final String status;
 
-    private TokenStatus(String status) {
+    private ValidationStatus(String status) {
         this.status = status;
     }
 }

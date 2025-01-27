@@ -2,12 +2,15 @@ package com.pleiades.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
+import com.pleiades.dto.character.request.RequestCharacterItemDto;
+import com.pleiades.dto.character.request.RequestCharacterFaceDto;
+import com.pleiades.dto.character.request.RequestCharacterOutfitDto;
+import com.pleiades.entity.item.Item;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -23,20 +26,17 @@ public class SignUpDto {
     private LocalDate birthDate;
 
     @JsonProperty("face")
-    private CharacterFaceDto face;
+    private RequestCharacterFaceDto face;
 
     @JsonProperty("outfit")
-    private CharacterOutfitDto outfit;
+    private RequestCharacterOutfitDto outfit;
 
-//    @JsonProperty("item")
-//    private CharacterItemDto item;
-
-//    @JsonProperty("")
-//    private String email;
+    @JsonProperty("item")
+    private Set<Item> item;
 
 //    @JsonProperty("")
 //    private Timestamp signupDate;
 
-//    @JsonProperty("backgroundId")
-//    private int backgroundId;
+    @JsonProperty("backgroundId")
+    private int backgroundId;
 }

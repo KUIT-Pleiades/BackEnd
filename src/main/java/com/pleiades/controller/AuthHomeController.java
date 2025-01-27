@@ -2,40 +2,25 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.SignUpDto;
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterImageDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
+import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
+import com.pleiades.dto.character.response.ResponseCharacterItemDto;
+import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.Characters;
-import com.pleiades.entity.face.Expression;
-import com.pleiades.entity.face.Hair;
-import com.pleiades.entity.face.Skin;
-import com.pleiades.entity.item.Item;
-import com.pleiades.entity.outfit.Bottom;
-import com.pleiades.entity.outfit.Shoes;
-import com.pleiades.entity.outfit.Top;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
-import com.pleiades.repository.face.ExpressionRepository;
-import com.pleiades.repository.face.HairRepository;
-import com.pleiades.repository.face.SkinRepository;
-import com.pleiades.repository.item.ItemRepository;
-import com.pleiades.repository.outfit.BottomRepository;
-import com.pleiades.repository.outfit.ShoesRepository;
-import com.pleiades.repository.outfit.TopRepository;
 import com.pleiades.service.AuthService;
+import com.pleiades.service.DuplicationService;
 import com.pleiades.service.ImageJsonCreator;
-import com.pleiades.strings.TokenStatus;
+import com.pleiades.service.SignupService;
+import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,31 +32,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.io.IOException;
 import java.util.*;
 
-import static com.pleiades.exception.ErrorCode.INVALID_USER_EMAIL;
-
 @Slf4j
 @Controller
 @RequestMapping("/auth")
 public class AuthHomeController {
     private final JwtUtil jwtUtil = new JwtUtil();
 
-    @Autowired
     UserRepository userRepository;
-    @Autowired
+    StarRepository starRepository;
+
     KakaoTokenRepository kakaoTokenRepository;
-    @Autowired
     NaverTokenRepository naverTokenRepository;
-    @Autowired
-    private StarRepository starRepository;
-    @Autowired
-    private CharacterRepository characterRepository;
 
-    private final ImageJsonCreator imageJsonCreator;
+    ImageJsonCreator imageJsonCreator;
+
+    SignupService signupService;
 
     @Autowired
-    AuthHomeController(ImageJsonCreator imageJsonCreator)
+    AuthHomeController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
+                       NaverTokenRepository naverTokenRepository, ImageJsonCreator imageJsonCreator, SignupService signupService)
     {
-        this.imageJsonCreator = imageJsonCreator;
+        this.userRepository = userRepository; this.starRepository = starRepository;
+        this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
+        this.imageJsonCreator = imageJsonCreator; this.signupService = signupService;
     }
     // 첫 접속 화면
     // todo: user 존재하는지 확인 필요
@@ -117,21 +100,16 @@ public class AuthHomeController {
 //        }
     }
 
-    // todo : 얼굴 / 의상 / 아이템 tab 각각 이미지
-    // todo: token 검사 필요
+    // todo: 이미 있는 사용자에 대한 처리
     @GetMapping("/signup")
     public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request) {
-        String accessToken = request.getHeader("accessToken");
-        ResponseEntity responseEntity = AuthService.responseTokenStatus(accessToken);
-        if (responseEntity != null) { return responseEntity; }
-
         log.info("signup");
         Map<String, Object> body = new HashMap<>();
 
         // 캐릭터 이미지 전송
-        CharacterFaceDto characterFaceDto = imageJsonCreator.makeCharacterFaceJson();
-        CharacterItemDto characterItemDto = imageJsonCreator.makeCharacterItemJson();
-        CharacterOutfitDto characterOutfitDto = imageJsonCreator.makeCharacterOutfitJson();
+        ResponseCharacterFaceDto characterFaceDto = imageJsonCreator.makeCharacterFaceJson();
+        ResponseCharacterItemDto characterItemDto = imageJsonCreator.makeCharacterItemJson();
+        ResponseCharacterOutfitDto characterOutfitDto = imageJsonCreator.makeCharacterOutfitJson();
 
         body.put("face", characterFaceDto);
         body.put("item", characterItemDto);
@@ -144,24 +122,25 @@ public class AuthHomeController {
 
     @GetMapping("/checkId")
     public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
-        String id = request.getParameter("id");
         Map<String, String> body = new HashMap<>();
+        String id = request.getParameter("id");
 
-        if (id == null) {
+        if (id == null || id.isEmpty()) {
             body.put("available", "false");
-            body.put("message", "Username is required.");
+            body.put("message", "UserId is required.");
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .build();
+                    .body(body);
         }
 
-        Optional<User> user = userRepository.findById(id);
+        DuplicationService<User> duplicationService = new DuplicationService<>(userRepository);
+        ValidationStatus idValidation = duplicationService.checkIdDuplication(id);
 
-        if (user.isPresent()) {
+        if (idValidation == ValidationStatus.NOT_VALID) {
             body.put("available", "false");
             body.put("message", "The username is already taken.");
             return ResponseEntity
-                    .status(HttpStatus.OK)
+                    .status(HttpStatus.CONFLICT)
                     .body(body);
         }
 
@@ -176,101 +155,61 @@ public class AuthHomeController {
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestBody SignUpDto signUpDto, HttpServletRequest request) {
-        User user = new User();
-        user.setSignUp(signUpDto); // id, nickname, birthDate, face, outfit, item
-
         String jwtAccessToken = request.getHeader("accessToken");
-        Claims token = jwtUtil.validateToken(jwtAccessToken);
+        ValidationStatus accessTokenStatus = AuthService.checkToken(jwtAccessToken);
+
+        if (accessTokenStatus == ValidationStatus.NONE) {
+            String jwtRefreshToken = request.getHeader("refreshToken");
+            ResponseEntity<Map<String, String>> refreshTokenStatus = AuthService.responseRefreshTokenStatus(jwtRefreshToken);
+
+            if (refreshTokenStatus != null) { return refreshTokenStatus; }
+
+            // refresh token은 유효한 경우
+            log.info("회원가입: Refresh token 유효");
+            Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
+
+            String email = refreshToken.getSubject();
+
+            // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
+            jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+            jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+        }
+
+        if (accessTokenStatus == ValidationStatus.NOT_VALID) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Access Token expired - Refresh Token is required."));
+        }
 
         // access token 유효한 경우 -> naver / kakao 랑 user 매핑
-        if (token != null) {
-            log.info("회원가입: Access token 유효 - " + jwtAccessToken);
+        log.info("회원가입: Access token 유효");
 
-            String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
+        Claims token = jwtUtil.validateToken(jwtAccessToken);
+        String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
-            // email - naver
-            if(email.contains("@naver.com")) {
-                user.setEmail(email);
-                NaverToken naverToken = naverTokenRepository.findByEmail(email).orElseThrow(
-                        () -> new CustomException(ErrorCode.INVALID_USER_EMAIL)
-                );
-                naverToken.setUser(user);
-                user.setNaverToken(naverToken);
-
-                userRepository.save(user);
-                naverTokenRepository.save(naverToken);
-            }
-            // todo : email - kakao
-//          if (session.getAttribute("kakaoRefreshToken") != null) {
-//              KakaoToken kakaoToken = new KakaoToken();
-//              kakaoToken.setUser(user);
-//              kakaoToken.setRefreshToken(session.getAttribute("kakaoRefreshToken").toString());
-//              kakaoTokenRepository.save(kakaoToken);
-//              session.removeAttribute("kakaoRefreshToken");
-//          }
-        }
-
-        // access token이 유효하지 않은 경우
-        else {
-
-            String jwtRefreshToken = request.getHeader("refreshToken");
-            if (jwtRefreshToken == null) {
-                // 프론트한테 refresh token 요청
-                return ResponseEntity
-                        .status(HttpStatus.PRECONDITION_REQUIRED) // 428
-                        .body(Map.of("error", "Refresh Token is required"));
-            } else {
-                Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
-                // 프론트한테 소셜 로그인 재요청
-                if (refreshToken == null) {
-                    return ResponseEntity
-                            .status(HttpStatus.FORBIDDEN) // 403
-                            .body(Map.of("error", "Social login is required"));
-                }
-
-                // refresh token은 유효한 경우
-                else {
-                    log.info("회원가입: Refresh token 유효 - " + jwtRefreshToken);
-                    String email = refreshToken.getSubject();
-                    // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
-                    jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-                    jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
-
-                    return ResponseEntity
-                            .status(HttpStatus.UNAUTHORIZED) // 401
-                            .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
-                }
-            }
-        }
-
-//        Star star = new Star();
-//        star.setUserId(signUpDto.getId());
-//        // star.setBackgroundId(signUpDto.getBackgroundId());
-//        starRepository.save(star);
-//
-//        log.info("star saved");
-
-        // todo: 윤희's 할 일
-
-//        Characters character = new Characters();
-//        character.setUser(user);
-//        character.setFace(face);
-//        character.setOutfit(outfit);
-//        character.setItem(item);
-//        characterRepository.save(character);
-
-//        log.info("character saved");
+        signupService.signup(email, signUpDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 : 회원가입 완료
     }
 
     @PostMapping("/profile")
-    public void profile(@RequestBody ProfileDto profileDto, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> profile(@RequestBody ProfileDto profileDto) {
         Optional<User> user = userRepository.findById(profileDto.getUserId());
-        if (user.isPresent()) {
+        if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
             user.get().setProfileUrl(profileDto.getProfileUrl());
-            response.setStatus(HttpStatus.CREATED.value());
+            try {
+                userRepository.save(user.get());
+            } catch (DataIntegrityViolationException e) {
+                return ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-        response.setStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

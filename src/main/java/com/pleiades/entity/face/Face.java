@@ -1,6 +1,6 @@
 package com.pleiades.entity.face;
 
-import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class Face {
     private String expression;
 
     //todo: 요청 dto랑 응답 dto랑 분리
-    public void setFace(CharacterFaceDto faceDto) {
+    public void setFace(ResponseCharacterFaceDto faceDto) {
         this.setSkin(faceDto.getSkinImgs().toString());
         this.setHair(faceDto.getHairImgs().toString());
         this.setExpression(faceDto.getExpressionImgs().toString());

@@ -1,4 +1,4 @@
-package com.pleiades.dto.character;
+package com.pleiades.dto.character.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,20 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Setter
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CharacterFaceDto {
+public class RequestCharacterFaceDto {
     @JsonProperty("skinColor")
-    private List<CharacterImageDto> skinImgs = new ArrayList<>();
+    private String skinImg;
 
     @JsonProperty("hair")
-    private List<CharacterImageDto> hairImgs = new ArrayList<>();
+    private String hairImg;
 
     @JsonProperty("expression")
-    private List<CharacterImageDto> expressionImgs = new ArrayList<>();
+    private String expressionImg;
 }

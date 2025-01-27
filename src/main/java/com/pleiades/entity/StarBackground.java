@@ -16,5 +16,5 @@ public class StarBackground {
     @Id
     private int id;
     private String name;
-    private String url;
+    private String imageUrl;
 }

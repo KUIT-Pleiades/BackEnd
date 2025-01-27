@@ -1,5 +1,6 @@
 package com.pleiades.config;
 
+import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.face.Expression;
 import com.pleiades.entity.face.Hair;
 import com.pleiades.entity.face.Skin;
@@ -7,6 +8,7 @@ import com.pleiades.entity.item.Item;
 import com.pleiades.entity.outfit.Bottom;
 import com.pleiades.entity.outfit.Shoes;
 import com.pleiades.entity.outfit.Top;
+import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.face.ExpressionRepository;
 import com.pleiades.repository.face.HairRepository;
 import com.pleiades.repository.face.SkinRepository;
@@ -38,6 +40,9 @@ public class DataInitializer {
     @Autowired
     ShoesRepository shoesRepository;
 
+    @Autowired
+    StarBackgroundRepository starBackgroundRepository;
+
     private final String IPFS_URL = System.getenv("IPFS_URL");
 
     @PostConstruct
@@ -45,6 +50,7 @@ public class DataInitializer {
         saveSkin(); saveExpression(); saveHair();
         saveItem();
         saveTop(); saveBottom(); saveShoes();
+        saveStarBackground();
     }
 
     private void saveSkin() {
@@ -108,6 +114,15 @@ public class DataInitializer {
             shoes.setName(name);
             shoes.setImageUrl(IPFS_URL + name + ".png");
             shoesRepository.save(shoes);
+        }
+    }
+    private void saveStarBackground() {
+        String[] bgimgs = {"background_01", "background_02", "background_03", "background_04", "background_05"};
+        for (String name : bgimgs) {
+            StarBackground bgimg = new StarBackground();
+            bgimg.setName(name);
+            bgimg.setImageUrl(IPFS_URL + name + ".png");
+            starBackgroundRepository.save(bgimg);
         }
     }
     // todo: 배경

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Slf4j
 @Getter
+@Service
 public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();

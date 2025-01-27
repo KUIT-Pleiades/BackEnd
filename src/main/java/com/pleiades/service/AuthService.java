@@ -1,6 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.strings.TokenStatus;
+import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -19,26 +19,26 @@ public class AuthService {
     @Autowired
     static JwtUtil jwtUtil;
 
-    public static TokenStatus checkToken(String token) {
-        if (token == null) { return TokenStatus.NONE; }
+    public static ValidationStatus checkToken(String token) {
+        if (token == null || token.isEmpty()) { return ValidationStatus.NONE; }
 
         Claims tokenClaim = jwtUtil.validateToken(token);
-        if (tokenClaim == null) { return TokenStatus.NOT_VALID; }
+        if (tokenClaim == null) { return ValidationStatus.NOT_VALID; }
 
-        return TokenStatus.VALID;
+        return ValidationStatus.VALID;
     }
 
-    public static ResponseEntity<Map<String, String>> responseTokenStatus(String token) {
+    public static ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String token) {
         Map<String, String> body = new HashMap<>();
-        TokenStatus tokenStatus = checkToken(token);
-        if (tokenStatus == TokenStatus.NONE ) {
-            body.put("error", "no token found");
+        ValidationStatus tokenStatus = checkToken(token);
+        if (tokenStatus == ValidationStatus.NONE ) {
+            body.put("message", "refresh token required");
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.UNAUTHORIZED)
                     .body(body);
         }
-        if (tokenStatus == TokenStatus.NOT_VALID) {
-            body.put("error", "invalid token");
+        if (tokenStatus == ValidationStatus.NOT_VALID) {
+            body.put("message", "refresh token expired - social login required");
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(body);
