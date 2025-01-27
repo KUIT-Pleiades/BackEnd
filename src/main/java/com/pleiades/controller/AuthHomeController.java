@@ -5,6 +5,7 @@ import com.pleiades.dto.SignUpDto;
 import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
 import com.pleiades.dto.character.response.ResponseCharacterItemDto;
 import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
+import com.pleiades.dto.character.response.ResponseStarBackgroundDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -110,10 +111,12 @@ public class AuthHomeController {
         ResponseCharacterFaceDto characterFaceDto = imageJsonCreator.makeCharacterFaceJson();
         ResponseCharacterItemDto characterItemDto = imageJsonCreator.makeCharacterItemJson();
         ResponseCharacterOutfitDto characterOutfitDto = imageJsonCreator.makeCharacterOutfitJson();
+        ResponseStarBackgroundDto starBackgroundDto = imageJsonCreator.makeStarBackgroundJson();
 
         body.put("face", characterFaceDto);
         body.put("item", characterItemDto);
         body.put("outfit", characterOutfitDto);
+        body.put("starBackground", starBackgroundDto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -4,6 +4,8 @@ import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
 import com.pleiades.dto.character.CharacterImageDto;
 import com.pleiades.dto.character.response.ResponseCharacterItemDto;
 import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
+import com.pleiades.dto.character.response.ResponseStarBackgroundDto;
+import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.face.Expression;
 import com.pleiades.entity.face.Hair;
 import com.pleiades.entity.face.Skin;
@@ -11,6 +13,7 @@ import com.pleiades.entity.item.Item;
 import com.pleiades.entity.outfit.Bottom;
 import com.pleiades.entity.outfit.Shoes;
 import com.pleiades.entity.outfit.Top;
+import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.face.ExpressionRepository;
 import com.pleiades.repository.face.HairRepository;
 import com.pleiades.repository.face.SkinRepository;
@@ -28,23 +31,26 @@ public class ImageJsonCreator {
     private ExpressionRepository expressionRepository;
     private HairRepository hairRepository;
 
-    private ItemRepository itemRepository;
-
     private TopRepository topRepository;
     private BottomRepository bottomRepository;
     private ShoesRepository shoesRepository;
 
+    private ItemRepository itemRepository;
+
+    private StarBackgroundRepository starBackgroundRepository;
+
     @Autowired
     public ImageJsonCreator(SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
-                            ItemRepository itemRepository,
-                            TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository) {
+                            TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository,
+                            ItemRepository itemRepository, StarBackgroundRepository starBackgroundRepository) {
         this.skinRepository = skinRepository;
         this.expressionRepository = expressionRepository;
         this.hairRepository = hairRepository;
-        this.itemRepository = itemRepository;
         this.topRepository = topRepository;
         this.bottomRepository = bottomRepository;
         this.shoesRepository = shoesRepository;
+        this.itemRepository = itemRepository;
+        this.starBackgroundRepository = starBackgroundRepository;
     }
 
     public ResponseCharacterFaceDto makeCharacterFaceJson() {
@@ -102,5 +108,16 @@ public class ImageJsonCreator {
             characterOutfitDto.getShoesImgs().add(shoeDto);
         }
         return characterOutfitDto;
+    }
+
+    public ResponseStarBackgroundDto makeStarBackgroundJson() {
+        ResponseStarBackgroundDto starBgsDto = new ResponseStarBackgroundDto();
+        for (StarBackground starBackground : starBackgroundRepository.findAll()) {
+            CharacterImageDto starBgDto = new CharacterImageDto();
+            starBgDto.setName(starBackground.getName());
+            starBgDto.setUrl(starBackground.getImageUrl());
+            starBgsDto.getBgImgs().add(starBgDto);
+        }
+        return starBgsDto;
     }
 }

@@ -56,8 +56,8 @@ public class Characters {
     @JoinColumn(name="shoes_id")
     private Shoes shoes;
 
-    @ManyToMany
-    @JoinColumn(name="item_id")
-    private Set<Item> item;
+//    @ManyToMany
+//    @JoinColumn(name="item_id")
+//    private Set<Item> item;
 
 }
