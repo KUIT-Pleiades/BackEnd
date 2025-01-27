@@ -25,6 +25,9 @@ import com.pleiades.repository.item.ItemRepository;
 import com.pleiades.repository.outfit.BottomRepository;
 import com.pleiades.repository.outfit.ShoesRepository;
 import com.pleiades.repository.outfit.TopRepository;
+import com.pleiades.service.AuthService;
+import com.pleiades.service.ImageJsonCreator;
+import com.pleiades.strings.TokenStatus;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
@@ -62,32 +65,25 @@ public class AuthHomeController {
     private StarRepository starRepository;
     @Autowired
     private CharacterRepository characterRepository;
-    @Autowired
-    private SkinRepository skinRepository;
-    @Autowired
-    private ExpressionRepository expressionRepository;
-    @Autowired
-    private HairRepository hairRepository;
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private TopRepository topRepository;
-    @Autowired
-    private BottomRepository bottomRepository;
-    @Autowired
-    private ShoesRepository shoesRepository;
 
+    private final ImageJsonCreator imageJsonCreator;
+
+    @Autowired
+    AuthHomeController(ImageJsonCreator imageJsonCreator)
+    {
+        this.imageJsonCreator = imageJsonCreator;
+    }
     // 첫 접속 화면
+    // todo: user 존재하는지 확인 필요
     @PostMapping("")
     public ResponseEntity<Map<String, String>> login(HttpServletRequest request) throws IOException {
-
         String jwtAccessToken = request.getHeader("accessToken");
         Claims token = jwtUtil.validateToken(jwtAccessToken);
 
         // access token 유효한 경우
         if (token != null) {
-            log.info("로그인: 앱 Access token 유효 - " + jwtAccessToken);
-            return ResponseEntity.status(HttpStatus.OK).build();        // /star로 리다이렉트? or 프론트가 알아서?
+            log.info("로그인: 앱 Access token 유효");
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
 
         String jwtRefreshToken = request.getHeader("refreshToken");
@@ -97,90 +93,45 @@ public class AuthHomeController {
                     .status(HttpStatus.PRECONDITION_REQUIRED) // 428
                     .body(Map.of("error", "Refresh Token is required"));
         }
-        else{
-            Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
-            // 프론트한테 소셜 로그인 재요청
-            if (refreshToken == null) {
-                return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN) // 403
-                        .body(Map.of("error", "Social login is required"));
-            }
-
-            // refresh token은 유효한 경우
-            else{
-                log.info("로그인: 앱 Refresh token만 유효 - " + jwtRefreshToken);
-                String email = refreshToken.getSubject();       // email로 하기로 한 건가용
-                // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
-                jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-                jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
-
-                return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED) // 401
-                        .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
-            }
+//        else{
+        Claims refreshToken = jwtUtil.validateToken(jwtRefreshToken);
+        // 프론트한테 소셜 로그인 재요청
+        if (refreshToken == null) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN) // 403
+                    .body(Map.of("error", "Social login is required"));
         }
-    }
 
-    // 소셜 로그인 페이지
-    @GetMapping("/login")
-    public void socialLogin(HttpServletResponse response) {
+        // refresh token은 유효한 경우
+        else{
+            log.info("로그인: 앱 Refresh token만 유효 - " + jwtRefreshToken);
+            String email = refreshToken.getSubject();
+            // 새로 jwt 토큰들 생성 -> 프론트한테 넘겨줌
+            jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+            jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
+             return ResponseEntity
+                     .status(HttpStatus.UNAUTHORIZED) // 401
+                     .body(Map.of("accessToken", jwtAccessToken, "refreshToken", jwtRefreshToken));
+        }
+//        }
     }
 
     // todo : 얼굴 / 의상 / 아이템 tab 각각 이미지
+    // todo: token 검사 필요
     @GetMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request) {
+        String accessToken = request.getHeader("accessToken");
+        ResponseEntity responseEntity = AuthService.responseTokenStatus(accessToken);
+        if (responseEntity != null) { return responseEntity; }
+
         log.info("signup");
         Map<String, Object> body = new HashMap<>();
-        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
-        CharacterItemDto characterItemDto = new CharacterItemDto();
-        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
 
         // 캐릭터 이미지 전송
-        for (Skin skin : skinRepository.findAll()) {
-            CharacterImageDto skinDto = new CharacterImageDto();
-            skinDto.setName(skin.getName());
-            skinDto.setUrl(skin.getImageUrl());
-            characterFaceDto.getSkinImgs().add(skinDto);
-        }
-        for (Expression expression : expressionRepository.findAll()) {
-            CharacterImageDto expressionDto = new CharacterImageDto();
-            expressionDto.setName(expression.getName());
-            expressionDto.setUrl(expression.getImageUrl());
-            characterFaceDto.getExpressionImgs().add(expressionDto);
-        }
-        for (Hair hair : hairRepository.findAll()) {
-            CharacterImageDto hairDto = new CharacterImageDto();
-            hairDto.setName(hair.getName());
-            hairDto.setUrl(hair.getImageUrl());
-            characterFaceDto.getHairImgs().add(hairDto);
-        }
-
-        for (Item item : itemRepository.findAll()) {
-            CharacterImageDto itemDto = new CharacterImageDto();
-            itemDto.setName(item.getName());
-            itemDto.setUrl(item.getImageUrl());
-            characterItemDto.getItemImgs().add(itemDto);
-        }
-
-        for (Top top : topRepository.findAll()) {
-            CharacterImageDto topDto = new CharacterImageDto();
-            topDto.setName(top.getName());
-            topDto.setUrl(top.getImageUrl());
-            characterOutfitDto.getTopImg().add(topDto);
-        }
-        for (Bottom bottom : bottomRepository.findAll()) {
-            CharacterImageDto bottomDto = new CharacterImageDto();
-            bottomDto.setName(bottom.getName());
-            bottomDto.setUrl(bottom.getImageUrl());
-            characterOutfitDto.getBottomImg().add(bottomDto);
-        }
-        for (Shoes shoe : shoesRepository.findAll()) {
-            CharacterImageDto shoeDto = new CharacterImageDto();
-            shoeDto.setName(shoe.getName());
-            shoeDto.setUrl(shoe.getImageUrl());
-            characterOutfitDto.getShoesImg().add(shoeDto);
-        }
+        CharacterFaceDto characterFaceDto = imageJsonCreator.makeCharacterFaceJson();
+        CharacterItemDto characterItemDto = imageJsonCreator.makeCharacterItemJson();
+        CharacterOutfitDto characterOutfitDto = imageJsonCreator.makeCharacterOutfitJson();
 
         body.put("face", characterFaceDto);
         body.put("item", characterItemDto);

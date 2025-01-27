@@ -7,11 +7,14 @@ import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.service.AuthService;
+import com.pleiades.util.HashStringUtil;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.service.KakaoRequest;
 import com.pleiades.service.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -145,11 +148,13 @@ public class AuthKakaoController {
             session.setAttribute("SignUpAccessToken", signUpAccessToken);
             session.setAttribute("SignUpRefreshToken", signUpRefreshToken);
 
+            String hashedEmail = HashStringUtil.hashString(email);
+
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
             return ResponseEntity
                     .status(HttpStatus.FOUND)
-                    .header("Location", FRONT_ORIGIN+"/kakaologin") // 프론트.com/kakaologin
+                    .header("Location", FRONT_ORIGIN+"/kakaologin?hash="+hashedEmail) // 프론트.com/kakaologin
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
@@ -159,13 +164,21 @@ public class AuthKakaoController {
         }
     }
 
-    @GetMapping("/success")
-    public ResponseEntity<Map<String, String>> reponseToken(HttpSession session) {
+    @GetMapping("/temp")
+    public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpSession session) {
         Map<String, String> body = new HashMap<>();
-        String accessToken = (String) session.getAttribute("SignUpAccessToken");
-        String refreshToken = (String) session.getAttribute("SignUpRefreshToken");
+        String accessToken = (String) session.getAttribute("accessToken");
+        String refreshToken = (String) session.getAttribute("refreshToken");
 
-        if (accessToken != null && refreshToken != null) {
+        if (accessToken == null || refreshToken == null) {
+            body.put("error", "No token found - social login required");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(body);
+        }
+        Claims access = jwtUtil.validateToken(accessToken);
+        String hashedSubject = HashStringUtil.hashString(access.getSubject());
+        if (hash == hashedSubject) {
             body.put("accessToken", accessToken);
             body.put("refreshToken", refreshToken);
 
@@ -173,12 +186,10 @@ public class AuthKakaoController {
                     .status(HttpStatus.OK)
                     .body(body);
         }
-
-        // todo: redirect를 시켜줄지 메시지만 전달하고 알아서 리다이렉트하라 할지
+        body.put("error", "different email");
         return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("Location", "/auth/login")
-                .build();
+                .status(HttpStatus.BAD_REQUEST)
+                .body(body);
     }
 
     private String getKakaoEmail(String token) {
