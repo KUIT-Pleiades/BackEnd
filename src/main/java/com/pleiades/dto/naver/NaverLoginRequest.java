@@ -10,7 +10,4 @@ import lombok.NoArgsConstructor;
 public class NaverLoginRequest {
 
     private String code;
-    private String type;
-    private String state;
-
 }

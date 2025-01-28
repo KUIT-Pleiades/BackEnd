@@ -1,4 +1,4 @@
-package com.pleiades.dto.naver;
+package com.pleiades.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.naver.LoginCBResponse;
+import com.pleiades.dto.LoginCBResponse;
 import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
@@ -10,7 +10,6 @@ import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.util.NaverApiUtil;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,10 +28,10 @@ public class NaverLoginService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public LoginCBResponse handleNaverLoginCallback(String code, String state) {
+    public LoginCBResponse handleNaverLoginCallback(String code) {
         log.info("service 계층 진입");
 
-        Map<String, String> naverTokens = naverApiUtil.getTokens(code, state);
+        Map<String, String> naverTokens = naverApiUtil.getTokens(code);
         if (naverTokens == null) {
             log.error("에러: Naver API로부터 token들 받아오기 실패");
             throw new IllegalArgumentException("에러: Naver API로부터 token들 받아오기 실패");

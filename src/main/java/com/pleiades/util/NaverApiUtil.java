@@ -25,7 +25,7 @@ public class NaverApiUtil {
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 
-    public Map<String,String> getTokens(String code, String state) {
+    public Map<String,String> getTokens(String code) {
         log.info("Util 계층 진입");
 
         RestTemplate restTemplate = new RestTemplate();
@@ -37,7 +37,6 @@ public class NaverApiUtil {
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
         params.add("code", code);
-        params.add("state", state);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
