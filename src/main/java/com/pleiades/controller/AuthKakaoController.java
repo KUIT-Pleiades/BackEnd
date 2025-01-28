@@ -58,7 +58,7 @@ public class AuthKakaoController {
 
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
-    public ResponseEntity<Map<String, String>> loginRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    public ResponseEntity<Map<String, String>> loginRedirect() throws IOException {
         try {
             log.info("kakao login start");
 
@@ -80,7 +80,7 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) throws SQLException, IOException {
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) {
         log.info("kakao code redirected");
         try {
             HttpHeaders headers = new HttpHeaders();

@@ -5,15 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RequestCharacterItemDto {
     @JsonProperty("items")
-    private List<String> itemImgs = new ArrayList<>();
+    private Set<String> itemImgs = new HashSet<>();
 }
-
-// 쓸 일이 있으려나

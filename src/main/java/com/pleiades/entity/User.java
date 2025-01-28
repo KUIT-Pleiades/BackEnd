@@ -39,7 +39,8 @@ public class User {
     @Transient
     private String refreshToken;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    // todo: cascade 설정
+    @OneToOne(mappedBy = "user")
     private NaverToken naverToken;
 
     @Column(nullable = true)

@@ -1,4 +1,4 @@
-package com.pleiades.entity;
+package com.pleiades.entity.character.outfit;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,17 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "starbackground")
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class StarBackground {
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "bottom")
+public class Bottom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private String imageUrl;
+    private Long price = 0L;
 }

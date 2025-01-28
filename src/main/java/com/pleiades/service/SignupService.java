@@ -2,34 +2,37 @@ package com.pleiades.service;
 
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.face.Expression;
-import com.pleiades.entity.face.Hair;
-import com.pleiades.entity.face.Skin;
-import com.pleiades.entity.item.Item;
-import com.pleiades.entity.outfit.Bottom;
-import com.pleiades.entity.outfit.Shoes;
-import com.pleiades.entity.outfit.Top;
-import com.pleiades.exception.CustomException;
-import com.pleiades.exception.ErrorCode;
+import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.CharacterItem;
+import com.pleiades.entity.character.face.Expression;
+import com.pleiades.entity.character.face.Hair;
+import com.pleiades.entity.character.face.Skin;
+import com.pleiades.entity.character.Item;
+import com.pleiades.entity.character.outfit.Bottom;
+import com.pleiades.entity.character.outfit.Shoes;
+import com.pleiades.entity.character.outfit.Top;
 import com.pleiades.repository.*;
-import com.pleiades.repository.face.ExpressionRepository;
-import com.pleiades.repository.face.HairRepository;
-import com.pleiades.repository.face.SkinRepository;
-import com.pleiades.repository.item.ItemRepository;
-import com.pleiades.repository.outfit.BottomRepository;
-import com.pleiades.repository.outfit.ShoesRepository;
-import com.pleiades.repository.outfit.TopRepository;
+import com.pleiades.repository.character.CharacterItemRepository;
+import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.repository.character.face.ExpressionRepository;
+import com.pleiades.repository.character.face.HairRepository;
+import com.pleiades.repository.character.face.SkinRepository;
+import com.pleiades.repository.character.ItemRepository;
+import com.pleiades.repository.character.outfit.BottomRepository;
+import com.pleiades.repository.character.outfit.ShoesRepository;
+import com.pleiades.repository.character.outfit.TopRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class SignupService {
+    StarBackgroundRepository starBackgroundRepository;
     UserRepository userRepository;
     StarRepository starRepository;
     CharacterRepository characterRepository;
@@ -40,6 +43,7 @@ public class SignupService {
     BottomRepository bottomRepository;
     ShoesRepository shoesRepository;
     ItemRepository itemRepository;
+    CharacterItemRepository characterItemRepository;
 
     KakaoTokenRepository kakaoTokenRepository;
     NaverTokenRepository naverTokenRepository;
@@ -48,12 +52,14 @@ public class SignupService {
     public SignupService(UserRepository userRepository, StarRepository starRepository, CharacterRepository characterRepository,
                          SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
                          TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository, ItemRepository itemRepository,
-                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository) {
+                         CharacterItemRepository characterItemRepository,
+                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository) {
         this.userRepository = userRepository; this.starRepository = starRepository; this.characterRepository = characterRepository;
         this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
         this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
         this.itemRepository = itemRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
+        this.starBackgroundRepository = starBackgroundRepository;
     }
 
     public void signup(String email, SignUpDto signUpDto) {
@@ -71,7 +77,7 @@ public class SignupService {
             // 음 안 되는데
         }
 
-        setStar(signUpDto);
+        setStar(user, signUpDto);
 
         setCharacter(user, signUpDto);
     }
@@ -79,8 +85,8 @@ public class SignupService {
     private void setNewUser(User user, String email, SignUpDto signUpDto) {
         user.setId(signUpDto.getUserId());
         user.setEmail(email);
-        user.setUserName(signUpDto.getNickname());
-        user.setBirthDate(signUpDto.getBirthDate());
+        user.setUserName(signUpDto.getUsername());
+        user.setBirthDate(signUpDto.getBirthdate());
         user.setCreatedDate(LocalDate.now());
     }
 
@@ -101,10 +107,11 @@ public class SignupService {
         kakaoTokenRepository.save(kakaoToken);
     }
 
-    private void setStar(SignUpDto signUpDto) {
+    private void setStar(User user, SignUpDto signUpDto) {
         Star star = new Star();
-        star.setUserId(signUpDto.getUserId());
-        star.setBackgroundId(signUpDto.getBackgroundId());
+        star.setUser(user);
+        Optional<StarBackground> background = starBackgroundRepository.findById(signUpDto.getBackgroundId());
+        background.ifPresent(star::setBackground);
         starRepository.save(star);
 
         log.info("star saved");
@@ -119,8 +126,6 @@ public class SignupService {
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
-//        Optional<Item> item = itemRepository.
-
         Characters character = new Characters();
         character.setUser(user);
 
@@ -132,8 +137,18 @@ public class SignupService {
         character.setBottom(bottom.get());
         character.setShoes(shoes.get());
 
-//        character.setItem(item);
         characterRepository.save(character);
+
+        Set<String> items = signUpDto.getItem();
+        for (String name : items) {
+            Optional<Item> item = itemRepository.findByName(name);
+            if (item.isPresent()) {
+                CharacterItem characterItem = new CharacterItem();
+                characterItem.setCharacters(character);
+                characterItem.setItem(item.get());
+                characterItemRepository.save(characterItem);
+            }
+        }
 
         log.info("character saved");
     }

@@ -1,21 +1,19 @@
-package com.pleiades.entity;
+package com.pleiades.entity.character;
 
-import com.pleiades.entity.face.Expression;
-import com.pleiades.entity.face.Face;
-import com.pleiades.entity.face.Hair;
-import com.pleiades.entity.face.Skin;
-import com.pleiades.entity.item.Item;
-import com.pleiades.entity.outfit.Bottom;
-import com.pleiades.entity.outfit.Outfit;
-import com.pleiades.entity.outfit.Shoes;
-import com.pleiades.entity.outfit.Top;
+import com.pleiades.entity.User;
+import com.pleiades.entity.character.face.Expression;
+import com.pleiades.entity.character.face.Hair;
+import com.pleiades.entity.character.face.Skin;
+import com.pleiades.entity.character.outfit.Bottom;
+import com.pleiades.entity.character.outfit.Shoes;
+import com.pleiades.entity.character.outfit.Top;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -56,8 +54,7 @@ public class Characters {
     @JoinColumn(name="shoes_id")
     private Shoes shoes;
 
-//    @ManyToMany
-//    @JoinColumn(name="item_id")
-//    private Set<Item> item;
-
+    // todo: cascade 설정
+    @OneToMany(mappedBy = "characters")
+    private List<CharacterItem> characterItems;
 }

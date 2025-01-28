@@ -1,4 +1,4 @@
-package com.pleiades.entity.outfit;
+package com.pleiades.entity.character.face;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "shoes")
-public class Shoes {
+@Table(name = "skin")
+public class Skin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

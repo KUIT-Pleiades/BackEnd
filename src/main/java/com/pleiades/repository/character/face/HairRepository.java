@@ -1,7 +1,6 @@
-package com.pleiades.repository.face;
+package com.pleiades.repository.character.face;
 
-import com.pleiades.entity.User;
-import com.pleiades.entity.face.Hair;
+import com.pleiades.entity.character.face.Hair;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
