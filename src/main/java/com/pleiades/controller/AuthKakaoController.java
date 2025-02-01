@@ -38,16 +38,10 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/auth/login/kakao")
 public class AuthKakaoController {
-    @Autowired
+
     UserRepository userRepository;
-
-    @Autowired
     KakaoTokenRepository kakaoTokenRepository;
-
-    @Autowired
     KakaoTokenService kakaoTokenService;
-
-    @Autowired
     JwtUtil jwtUtil;
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -56,9 +50,18 @@ public class AuthKakaoController {
     @Value("${FRONT_ORIGIN}")
     private String FRONT_ORIGIN;
 
+    @Autowired
+    AuthKakaoController(UserRepository userRepository, KakaoTokenRepository kakaoTokenRepository,
+                        KakaoTokenService kakaoTokenService, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.kakaoTokenRepository = kakaoTokenRepository;
+        this.kakaoTokenService = kakaoTokenService;
+        this.jwtUtil = jwtUtil;
+    }
+
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")
-    public ResponseEntity<Map<String, String>> loginRedirect() throws IOException {
+    public ResponseEntity<Map<String, String>> loginRedirect() {
         try {
             log.info("kakao login start");
 
@@ -171,6 +174,7 @@ public class AuthKakaoController {
         String refreshToken = (String) session.getAttribute("refreshToken");
 
         if (accessToken == null || refreshToken == null) {
+            log.info("no tokens");
             body.put("error", "No token found - social login required");
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
@@ -179,6 +183,7 @@ public class AuthKakaoController {
         Claims access = jwtUtil.validateToken(accessToken);
         String hashedSubject = HashStringUtil.hashString(access.getSubject());
         if (hash == hashedSubject) {
+            log.info("same email");
             body.put("accessToken", accessToken);
             body.put("refreshToken", refreshToken);
 
@@ -186,6 +191,7 @@ public class AuthKakaoController {
                     .status(HttpStatus.OK)
                     .body(body);
         }
+        log.info("different email");
         body.put("error", "different email");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
