@@ -17,6 +17,7 @@ import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,7 @@ public class AuthService {
     }
 
 
-    private ValidationStatus checkToken(String token) {
+    public ValidationStatus checkToken(String token) {
         if (token == null || token.isEmpty()) { return ValidationStatus.NONE; }
 
         Claims tokenClaim = jwtUtil.validateToken(token);
@@ -56,25 +57,25 @@ public class AuthService {
         return ValidationStatus.VALID;
     }
 
-    private ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
+
+
+
+//    public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
+//
+//    }
+
+    public ResponseEntity<Map<String, String>> responseTokenStatus(String refreshToken) {
         Map<String, String> body = new HashMap<>();
         ValidationStatus tokenStatus = checkToken(refreshToken);
 
         if (tokenStatus == ValidationStatus.NONE ) {
-            body.put("message", "refresh token required");
+            body.put("message", "token required");
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(body);  // 428
         }
         if (tokenStatus == ValidationStatus.NOT_VALID) {
-            body.put("message", "refresh token expired - social login required");
+            body.put("message", "token expired");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);  // 403
         }
-        Claims claims = jwtUtil.validateToken(refreshToken);
-        String email = claims.getSubject();
-        String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-        String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
-
-        body.put("accessToken", newAccessToken);
-        body.put("refreshToken", newRefreshToken);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);   // 401
     }
@@ -83,7 +84,7 @@ public class AuthService {
         ValidationStatus accessTokenStatus = checkToken(accessToken);
 
         if (accessTokenStatus == ValidationStatus.NONE) {
-            return responseRefreshTokenStatus(refreshToken);
+            return responseTokenStatus(refreshToken);
         }
 
         if (accessTokenStatus == ValidationStatus.NOT_VALID) {
@@ -106,7 +107,7 @@ public class AuthService {
 
         Optional<User> user = userRepository.findByEmail(email);
 
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             body.put("message", "User not found");
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -114,21 +115,21 @@ public class AuthService {
         }
 
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
-        if (!star.isPresent()) {
+        if (star.isEmpty()) {
             body.put("message", "Star not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
 
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
 
-        if (!starBackground.isPresent()) {
+        if (starBackground.isEmpty()) {
             body.put("message", "Background not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
 
         Optional<Characters> character = characterRepository.findByUser(user.get());
 
-        if (!character.isPresent()) {
+        if (character.isEmpty()) {
             body.put("message", "Character not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
@@ -151,5 +152,15 @@ public class AuthService {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(body);
+    }
+
+    public Cookie setRefreshToken(String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);        // 추후 true로 변경
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+
+        return cookie;
     }
 }

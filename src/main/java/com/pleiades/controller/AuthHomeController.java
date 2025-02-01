@@ -13,9 +13,11 @@ import com.pleiades.service.DuplicationService;
 import com.pleiades.service.ImageJsonCreator;
 import com.pleiades.service.SignupService;
 import com.pleiades.strings.ValidationStatus;
+import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -35,7 +34,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/auth")
 public class AuthHomeController {
-    private final JwtUtil jwtUtil = new JwtUtil();
+    JwtUtil jwtUtil;
 
     UserRepository userRepository;
     StarRepository starRepository;
@@ -51,37 +50,79 @@ public class AuthHomeController {
     @Autowired
     AuthHomeController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
                        NaverTokenRepository naverTokenRepository,
-                       ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService)
+                       ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService,
+                       JwtUtil jwtUtil, HeaderUtil headerUtil)
     {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
         this.imageJsonCreator = imageJsonCreator; this.signupService = signupService; this.authService = authService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("")
-    public ResponseEntity<Map<String, String>> login(HttpServletRequest request) {
-        String jwtAccessToken = request.getHeader("accessToken");
-        String jwtRefreshToken = request.getHeader("refreshToken");
+    public ResponseEntity<Map<String, String>> login(@RequestHeader("Authorization") String authorization) {
+        String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        // access, refresh 검사
-        ResponseEntity<Map<String, String>> response = authService.responseTokenValidation(jwtAccessToken, jwtRefreshToken);
-        if (response != null) return response;  // null이면 access 유효
+        ValidationStatus tokenStatus = authService.checkToken(accessToken);
 
-        Claims claims = jwtUtil.validateToken(jwtAccessToken);
+        if (tokenStatus.equals(ValidationStatus.NONE)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
+        }
+
+        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
+        }
+
+        Claims claims = jwtUtil.validateToken(accessToken);
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (!user.isPresent()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
 
-        return authService.responseUserInfo(jwtAccessToken);    // user 존재: 200
+        return authService.responseUserInfo(accessToken);    // user 존재: 200
     }
 
-    // 이미 있는 사용자에 대한 처리 - 내가 이걸 왜 써놨을까 언니..
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refresh(@RequestHeader("Authorization") String authorization) {
+        Map<String, String> body = new HashMap<>();
+        String refreshToken = HeaderUtil.authorizationBearer(authorization);
+
+        ValidationStatus tokenStatus = authService.checkToken(refreshToken);
+
+        if (tokenStatus.equals(ValidationStatus.NONE)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();     // 428
+        }
+
+        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();     // 403
+        }
+
+        Claims claims = jwtUtil.validateToken(refreshToken);
+        String email = claims.getSubject();
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // 202
+
+        if (!user.get().getRefreshToken().equals(refreshToken)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }   // 403
+
+        String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+        String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+        Cookie cookie = authService.setRefreshToken(newRefreshToken);
+        body.put("accessToken", newAccessToken);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)     // 201
+                .header("Set-Cookie", cookie.toString())
+                .body(body);
+    }
+
+/*  필요 없는 거 맞져
     @GetMapping("/signup")
     public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request) {
         log.info("signup");
         return imageJsonCreator.makeAllJson();
-    }
+    }*/
 
     @GetMapping("/checkId")
     public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
