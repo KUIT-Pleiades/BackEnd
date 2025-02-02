@@ -1,8 +1,8 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
-import com.pleiades.dto.character.response.ResponseCharacterItemDto;
-import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
+import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.CharacterItemDto;
+import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.User;
@@ -13,7 +13,6 @@ import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.StarRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.CharacterRepository;
-import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -134,17 +133,16 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
 
-        ResponseCharacterFaceDto faceDto = imageJsonCreator.makeACharacterFaceJson(character.get().getSkin(), character.get().getExpression(), character.get().getHair());
-        ResponseCharacterOutfitDto outfitDto = imageJsonCreator.makeACharacterOutfitJson(character.get().getTop(), character.get().getBottom(), character.get().getShoes());
+        CharacterFaceDto faceDto = imageJsonCreator.makeCharacterFaceJson(character.get().getSkin(), character.get().getExpression(), character.get().getHair());
+        CharacterOutfitDto outfitDto = imageJsonCreator.makeCharacterOutfitJson(character.get().getTop(), character.get().getBottom(), character.get().getShoes());
 
         List<Item> items = new ArrayList<>();
         for (CharacterItem item : character.get().getCharacterItems()) { items.add(item.getItem()); }
-        ResponseCharacterItemDto itemDto = imageJsonCreator.makeACharacterItemJson(items);
+        CharacterItemDto itemDto = imageJsonCreator.makeCharacterItemJson(items);
 
         body.put("userId", user.get().getId());
         body.put("username", user.get().getUserName());
         body.put("backgroundName", starBackground.get().getName());
-        body.put("backgroundUrl", starBackground.get().getImageUrl());
         body.put("face", faceDto.toString());
         body.put("outfit", outfitDto.toString());
         body.put("items", itemDto.toString());

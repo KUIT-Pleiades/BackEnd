@@ -58,7 +58,6 @@ public class DataInitializer {
         for (String name : skins) {
             Skin skin = new Skin();
             skin.setName(name);
-            skin.setImageUrl(IPFS_URL + name + ".png");
             skinRepository.save(skin);
         }
     }
@@ -67,7 +66,6 @@ public class DataInitializer {
         for (String name : expressions) {
             Expression expression = new Expression();
             expression.setName(name);
-            expression.setImageUrl(IPFS_URL + name + ".png");
             expressionRepository.save(expression);
         }
     }
@@ -76,7 +74,6 @@ public class DataInitializer {
         for (String name : hairs) {
             Hair hair = new Hair();
             hair.setName(name);
-            hair.setImageUrl(IPFS_URL + name + ".png");
             hairRepository.save(hair);
         }
     }
@@ -85,7 +82,6 @@ public class DataInitializer {
         for (String name : items) {
             Item item = new Item();
             item.setName(name);
-            item.setImageUrl(IPFS_URL + name + ".png");
             itemRepository.save(item);
         }
     }
@@ -94,7 +90,6 @@ public class DataInitializer {
         for (String name : tops) {
             Top top = new Top();
             top.setName(name);
-            top.setImageUrl(IPFS_URL + name + ".png");
             topRepository.save(top);
         }
     }
@@ -103,7 +98,6 @@ public class DataInitializer {
         for (String name : bottoms) {
             Bottom bottom = new Bottom();
             bottom.setName(name);
-            bottom.setImageUrl(IPFS_URL + name + ".png");
             bottomRepository.save(bottom);
         }
     }
@@ -112,7 +106,6 @@ public class DataInitializer {
         for (String name : shoess) {
             Shoes shoes = new Shoes();
             shoes.setName(name);
-            shoes.setImageUrl(IPFS_URL + name + ".png");
             shoesRepository.save(shoes);
         }
     }
@@ -121,7 +114,6 @@ public class DataInitializer {
         for (String name : bgimgs) {
             StarBackground bgimg = new StarBackground();
             bgimg.setName(name);
-            bgimg.setImageUrl(IPFS_URL + name + ".png");
             starBackgroundRepository.save(bgimg);
         }
     }

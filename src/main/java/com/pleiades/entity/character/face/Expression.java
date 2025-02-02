@@ -18,6 +18,5 @@ public class Expression {
     private Long id;
 
     private String name;
-    private String imageUrl;
     private Long price = 0L;
 }

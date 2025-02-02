@@ -2,10 +2,6 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.SignUpDto;
-import com.pleiades.dto.character.response.ResponseCharacterFaceDto;
-import com.pleiades.dto.character.response.ResponseCharacterItemDto;
-import com.pleiades.dto.character.response.ResponseCharacterOutfitDto;
-import com.pleiades.dto.character.response.ResponseStarBackgroundDto;
 import com.pleiades.entity.*;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
