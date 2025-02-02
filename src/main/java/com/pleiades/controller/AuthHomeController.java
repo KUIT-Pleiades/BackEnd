@@ -54,28 +54,15 @@ public class AuthHomeController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("")
+    @GetMapping("")
     public ResponseEntity<Map<String, String>> login(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-        ResponseEntity<Map<String, String>> response = authService.responseAccessTokenStatus(accessToken);
-        if (response.getStatusCode() != HttpStatus.OK) { return response; }
 
         return authService.responseUserInfo(accessToken);    // user 존재: 200
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String refreshToken = null;
-
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refreshToken")) {
-                refreshToken = cookie.getValue();
-                break;
-            }
-        }
-
+    public ResponseEntity<Map<String, String>> refresh(@CookieValue("refreshToken") String refreshToken) {
         return authService.responseRefreshTokenStatus(refreshToken);
     }
 
@@ -107,10 +94,7 @@ public class AuthHomeController {
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody SignUpDto signUpDto) {
-        // accessToken 검사
         String accessToken = HeaderUtil.authorizationBearer(authorization);
-        ResponseEntity<Map<String, String>> response = authService.responseAccessTokenStatus(accessToken);
-        if (response.getStatusCode() != HttpStatus.OK) { return response; }
 
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
