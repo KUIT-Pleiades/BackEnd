@@ -9,14 +9,14 @@ import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
@@ -31,17 +31,21 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+        log.info("AuthInterceptor preHandle");
+
         String authorization = request.getHeader("Authorization");
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         ValidationStatus tokenStatus = authService.checkToken(accessToken);
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
+            log.info("AuthInterceptor preHandle 428");
             response.sendError(428, "Precondition Required");      // 428
             return false;
         }
 
         if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            log.info("AuthInterceptor preHandle 401");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);       // 401
             return false;
         }
@@ -51,10 +55,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
+            log.info("AuthInterceptor preHandle 202");
             response.sendError(HttpServletResponse.SC_ACCEPTED);        // user 없음: 202
             return false;
         }
 
+        log.info("AuthInterceptor preHandle 200");
         response.setStatus(HttpServletResponse.SC_OK);
         return true;
     }

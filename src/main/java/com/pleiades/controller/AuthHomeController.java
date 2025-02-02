@@ -56,6 +56,8 @@ public class AuthHomeController {
 
     @GetMapping("")
     public ResponseEntity<Map<String, String>> login(@RequestHeader("Authorization") String authorization) {
+        log.info("/auth");
+
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         return authService.responseUserInfo(accessToken);    // user 존재: 200
@@ -63,18 +65,13 @@ public class AuthHomeController {
 
     @GetMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@CookieValue("refreshToken") String refreshToken) {
+        log.info("/auth/refresh");
         return authService.responseRefreshTokenStatus(refreshToken);
     }
 
-/*  필요 없는 거 맞져
-    @GetMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signupPage(HttpServletRequest request) {
-        log.info("signup");
-        return imageJsonCreator.makeAllJson();
-    }*/
-
     @GetMapping("/checkId")
     public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
+        log.info("/auth/checkId");
         Map<String, String> body = new HashMap<>();
         String id = request.getParameter("id");
 
@@ -94,6 +91,8 @@ public class AuthHomeController {
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody SignUpDto signUpDto) {
+        log.info("/auth/signup");
+
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         Claims token = jwtUtil.validateToken(accessToken);
@@ -106,6 +105,8 @@ public class AuthHomeController {
 
     @PostMapping("/profile")
     public ResponseEntity<Map<String, String>> profile(@RequestHeader("Authorization") String authorization, @RequestBody ProfileDto profileDto) {
+        log.info("/auth/profile");
+
         Optional<User> user = userRepository.findById(profileDto.getUserId());
         if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
             user.get().setProfileUrl(profileDto.getProfileUrl());

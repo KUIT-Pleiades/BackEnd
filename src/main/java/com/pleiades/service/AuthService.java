@@ -20,6 +20,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,11 +50,13 @@ public class AuthService {
 
 
     public ValidationStatus checkToken(String token) {
-        if (token == null || token.isEmpty()) { return ValidationStatus.NONE; }
+        log.info("AuthService checkToken");
+        if (token == null || token.isEmpty()) { log.info("token is empty"); return ValidationStatus.NONE; }
 
         Claims tokenClaim = jwtUtil.validateToken(token);
-        if (tokenClaim == null) { return ValidationStatus.NOT_VALID; }
+        if (tokenClaim == null) { log.info("token is not valide"); return ValidationStatus.NOT_VALID; }
 
+        log.info("token is valid");
         return ValidationStatus.VALID;
     }
 
@@ -78,6 +81,8 @@ public class AuthService {
     }
 
     public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
+        log.info("AuthService responseRefreshTokenStatus");
+
         Map<String, String> body = new HashMap<>();
         ValidationStatus tokenStatus = checkToken(refreshToken);
 
@@ -105,31 +110,17 @@ public class AuthService {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)     // 201
-                .header("Set-Cookie", cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(body);
-    }
-
-    public ResponseEntity<Map<String, String>> responseTokenValidation(String accessToken, String refreshToken) {
-        ValidationStatus accessTokenStatus = checkToken(accessToken);
-
-        if (accessTokenStatus == ValidationStatus.NONE) {
-            return responseRefreshTokenStatus(refreshToken);
-        }
-
-        if (accessTokenStatus == ValidationStatus.NOT_VALID) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Access Token expired - Refresh Token is required."));
-        }
-
-        return null;
     }
 
     // access token 유효한 경우에만 사용
     public ResponseEntity<Map<String, String>> responseUserInfo(String accessToken) {
+        log.info("AuthService responseUserInfo");
+
         Map<String, String> body = new HashMap<>();
 
-        if (accessToken == null) { return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
+        if (accessToken == null) { log.info("no access token"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
 
         Claims claims = jwtUtil.validateToken(accessToken);
         String email = claims.getSubject();
@@ -137,6 +128,7 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
+            log.info("no user");
             body.put("message", "User not found");
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -145,6 +137,7 @@ public class AuthService {
 
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
         if (star.isEmpty()) {
+            log.info("no star");
             body.put("message", "Star not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
@@ -152,6 +145,7 @@ public class AuthService {
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
 
         if (starBackground.isEmpty()) {
+            log.info("no star background");
             body.put("message", "Background not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
@@ -159,6 +153,7 @@ public class AuthService {
         Optional<Characters> character = characterRepository.findByUser(user.get());
 
         if (character.isEmpty()) {
+            log.info("no character");
             body.put("message", "Character not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         }
@@ -180,12 +175,15 @@ public class AuthService {
         body.put("items", itemDto.toString());
         body.put("profile", profile);
 
+        log.info("body: " + body.toString());
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(body);
     }
 
     public Cookie setRefreshToken(String refreshToken) {
+        log.info("AuthService setRefreshToken");
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
