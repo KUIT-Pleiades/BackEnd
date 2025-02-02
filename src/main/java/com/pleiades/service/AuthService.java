@@ -1,6 +1,5 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.character.CharacterFaceDto;
 import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
@@ -14,6 +13,7 @@ import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.StarRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -57,34 +57,63 @@ public class AuthService {
         return ValidationStatus.VALID;
     }
 
+    public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
+        ValidationStatus tokenStatus = checkToken(accessToken);
 
+        if (tokenStatus.equals(ValidationStatus.NONE)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
+        }
 
+        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
+        }
 
-//    public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
-//
-//    }
+        Claims claims = jwtUtil.validateToken(accessToken);
+        String email = claims.getSubject();
 
-    public ResponseEntity<Map<String, String>> responseTokenStatus(String refreshToken) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
         Map<String, String> body = new HashMap<>();
         ValidationStatus tokenStatus = checkToken(refreshToken);
 
-        if (tokenStatus == ValidationStatus.NONE ) {
-            body.put("message", "token required");
-            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(body);  // 428
-        }
-        if (tokenStatus == ValidationStatus.NOT_VALID) {
-            body.put("message", "token expired");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);  // 403
+        if (tokenStatus.equals(ValidationStatus.NONE)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();     // 428
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);   // 401
+        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();     // 403
+        }
+
+        Claims claims = jwtUtil.validateToken(refreshToken);
+        String email = claims.getSubject();
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // 202
+
+        if (!user.get().getRefreshToken().equals(refreshToken)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }   // 403
+
+        String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+        String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+        Cookie cookie = setRefreshToken(newRefreshToken);
+        body.put("accessToken", newAccessToken);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)     // 201
+                .header("Set-Cookie", cookie.toString())
+                .body(body);
     }
 
     public ResponseEntity<Map<String, String>> responseTokenValidation(String accessToken, String refreshToken) {
         ValidationStatus accessTokenStatus = checkToken(accessToken);
 
         if (accessTokenStatus == ValidationStatus.NONE) {
-            return responseTokenStatus(refreshToken);
+            return responseRefreshTokenStatus(refreshToken);
         }
 
         if (accessTokenStatus == ValidationStatus.NOT_VALID) {

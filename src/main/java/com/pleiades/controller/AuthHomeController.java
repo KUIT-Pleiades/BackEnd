@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -59,58 +58,25 @@ public class AuthHomeController {
     public ResponseEntity<Map<String, String>> login(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        ValidationStatus tokenStatus = authService.checkToken(accessToken);
-
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
-        }
-
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
-        }
-
-        Claims claims = jwtUtil.validateToken(accessToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
+        ResponseEntity<Map<String, String>> response = authService.responseAccessTokenStatus(accessToken);
+        if (response.getStatusCode() != HttpStatus.OK) { return response; }
 
         return authService.responseUserInfo(accessToken);    // user 존재: 200
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(@RequestHeader("Authorization") String authorization) {
-        Map<String, String> body = new HashMap<>();
-        String refreshToken = HeaderUtil.authorizationBearer(authorization);
+    @GetMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refresh(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String refreshToken = null;
 
-        ValidationStatus tokenStatus = authService.checkToken(refreshToken);
-
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();     // 428
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                refreshToken = cookie.getValue();
+                break;
+            }
         }
 
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();     // 403
-        }
-
-        Claims claims = jwtUtil.validateToken(refreshToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // 202
-
-        if (!user.get().getRefreshToken().equals(refreshToken)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }   // 403
-
-        String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-        String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
-
-        Cookie cookie = authService.setRefreshToken(newRefreshToken);
-        body.put("accessToken", newAccessToken);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)     // 201
-                .header("Set-Cookie", cookie.toString())
-                .body(body);
+        return authService.responseRefreshTokenStatus(refreshToken);
     }
 
 /*  필요 없는 거 맞져
@@ -141,7 +107,10 @@ public class AuthHomeController {
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody SignUpDto signUpDto) {
+        // accessToken 검사
         String accessToken = HeaderUtil.authorizationBearer(authorization);
+        ResponseEntity<Map<String, String>> response = authService.responseAccessTokenStatus(accessToken);
+        if (response.getStatusCode() != HttpStatus.OK) { return response; }
 
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
@@ -152,7 +121,7 @@ public class AuthHomeController {
     }
 
     @PostMapping("/profile")
-    public ResponseEntity<Map<String, String>> profile(@RequestBody ProfileDto profileDto) {
+    public ResponseEntity<Map<String, String>> profile(@RequestHeader("Authorization") String authorization, @RequestBody ProfileDto profileDto) {
         Optional<User> user = userRepository.findById(profileDto.getUserId());
         if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
             user.get().setProfileUrl(profileDto.getProfileUrl());

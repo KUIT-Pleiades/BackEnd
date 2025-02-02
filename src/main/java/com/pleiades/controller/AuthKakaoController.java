@@ -139,8 +139,8 @@ public class AuthKakaoController {
     @GetMapping("/temp")
     public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpSession session) {
         Map<String, String> body = new HashMap<>();
-        String accessToken = (String) session.getAttribute("accessToken");
-        String refreshToken = (String) session.getAttribute("refreshToken");
+        String accessToken = session.getAttribute("accessToken").toString();
+        String refreshToken = session.getAttribute("refreshToken").toString();
 
         if (accessToken == null || refreshToken == null) {
             log.info("no tokens");
