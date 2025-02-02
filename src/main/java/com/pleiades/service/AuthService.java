@@ -1,5 +1,6 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.character.CharacterFaceDto;
 import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
@@ -140,12 +141,15 @@ public class AuthService {
         for (CharacterItem item : character.get().getCharacterItems()) { items.add(item.getItem()); }
         CharacterItemDto itemDto = imageJsonCreator.makeCharacterItemJson(items);
 
+        String profile = user.get().getProfileUrl();
+
         body.put("userId", user.get().getId());
         body.put("username", user.get().getUserName());
         body.put("backgroundName", starBackground.get().getName());
         body.put("face", faceDto.toString());
         body.put("outfit", outfitDto.toString());
         body.put("items", itemDto.toString());
+        body.put("profile", profile);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
