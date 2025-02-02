@@ -140,17 +140,10 @@ public class AuthHomeController {
     // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestBody SignUpDto signUpDto, HttpServletRequest request) {
-        String jwtAccessToken = request.getHeader("accessToken");
-        String jwtRefreshToken = request.getHeader("refreshToken");
+    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody SignUpDto signUpDto) {
+        String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        ResponseEntity<Map<String, String>> response = authService.responseTokenValidation(jwtAccessToken, jwtRefreshToken);
-        if (response != null) { return response; }
-
-        // access token 유효한 경우 -> naver / kakao 랑 user 매핑
-        log.info("회원가입: Access token 유효");
-
-        Claims token = jwtUtil.validateToken(jwtAccessToken);
+        Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
         signupService.signup(email, signUpDto);
