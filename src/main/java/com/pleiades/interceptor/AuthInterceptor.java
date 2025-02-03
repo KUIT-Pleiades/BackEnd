@@ -33,6 +33,13 @@ public class AuthInterceptor implements HandlerInterceptor {
         log.info("AuthInterceptor preHandle");
 
         String authorization = request.getHeader("Authorization");
+
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            log.info("AuthInterceptor preHandle 428");
+            response.sendError(428, "Precondition Required");      // 428
+            return false;
+        }
+
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         ValidationStatus tokenStatus = authService.checkToken(accessToken);
