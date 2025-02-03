@@ -122,6 +122,9 @@ public class AuthKakaoController {
             session.setAttribute("accessToken", accessToken);
             session.setAttribute("refreshToken", refreshToken);
 
+            log.info("accessToken: " + session.getAttribute("accessToken"));
+            log.info("refreshToken: " + session.getAttribute("refreshToken"));
+
             String hashedEmail = HashStringUtil.hashString(email);
 
             log.info("redirect to front/kakaologin");
@@ -141,6 +144,9 @@ public class AuthKakaoController {
         Map<String, String> body = new HashMap<>();
         Object signupAccessToken = session.getAttribute("accessToken");
         Object signupRefreshToken = session.getAttribute("refreshToken");
+
+        log.info("signup access token: " + signupAccessToken);
+        log.info("signup refresh token: " + signupRefreshToken);
 
         if (signupAccessToken == null || signupRefreshToken == null) {
             log.info("no tokens");
