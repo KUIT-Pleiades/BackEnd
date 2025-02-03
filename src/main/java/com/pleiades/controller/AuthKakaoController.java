@@ -89,6 +89,7 @@ public class AuthKakaoController {
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpServletRequest request) {
         log.info("kakao code redirected");
         try {
+            log.info("code: " + code);
             HttpHeaders headers = new HttpHeaders();
             Map<String, String> body = new HashMap<>();
 
@@ -116,7 +117,7 @@ public class AuthKakaoController {
 
 //            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken()); - 소셜 액세스 토큰은 일화용인 걸루,,? 아마두,,,
 
-            HttpSession session = request.getSession();
+            HttpSession session = request.getSession(true);
 
             // session으로 해도 될까
             String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
@@ -142,9 +143,13 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/temp")
-    public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> responseToken(@RequestParam("hash") String hash, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();     // 404
+        }
 
         Object signupAccessToken = session.getAttribute("accessToken");
         Object signupRefreshToken = session.getAttribute("refreshToken");
