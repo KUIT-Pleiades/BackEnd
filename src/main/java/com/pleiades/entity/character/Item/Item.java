@@ -19,6 +19,9 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(mappedBy = "item")
+    Characters characters;
+
     @OneToOne
     @JoinColumn(name = "ears_name")
     private Ears ears;
@@ -50,8 +53,5 @@ public class Item {
     @OneToOne
     @JoinColumn(name = "rightWrist_name")
     private RightWrist rightWrist;
-
-    @OneToOne(mappedBy = "face")
-    Characters characters;
 }
 

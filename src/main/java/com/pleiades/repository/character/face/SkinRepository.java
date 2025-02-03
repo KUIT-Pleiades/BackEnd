@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface SkinRepository extends JpaRepository<Skin, String> {
-    Optional<Skin> findById(Long id);
     Optional<Skin> findByName(String name);
 }

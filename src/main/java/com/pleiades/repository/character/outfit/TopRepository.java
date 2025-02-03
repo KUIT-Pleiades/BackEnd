@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TopRepository extends JpaRepository<Top, String> {
-    Optional<Top> findById(Long id);
     Optional<Top> findByName(String name);
 }

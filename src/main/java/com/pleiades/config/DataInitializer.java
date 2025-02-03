@@ -1,10 +1,10 @@
 package com.pleiades.config;
 
 import com.pleiades.entity.StarBackground;
+import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;
@@ -12,7 +12,7 @@ import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.character.face.ExpressionRepository;
 import com.pleiades.repository.character.face.HairRepository;
 import com.pleiades.repository.character.face.SkinRepository;
-import com.pleiades.repository.character.ItemRepository;
+import com.pleiades.repository.character.item.*;
 import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
@@ -23,27 +23,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataInitializer {
 
-    @Autowired
     SkinRepository skinRepository;
-    @Autowired
     ExpressionRepository expressionRepository;
-    @Autowired
     HairRepository hairRepository;
 
-    @Autowired
-    ItemRepository itemRepository;
+    HeadRepository headRepository;
+    NeckRepository neckRepository;
+    EyesRepository eyesRepository;
+    EarsRepository earsRepository;
+    LeftHandRepository leftHandRepository;
+    RightHandRepository rightHandRepository;
+    LeftWristRepository leftWristRepository;
+    RightWristRepository rightWristRepository;
 
-    @Autowired
     TopRepository topRepository;
-    @Autowired
     BottomRepository bottomRepository;
-    @Autowired
     ShoesRepository shoesRepository;
 
-    @Autowired
     StarBackgroundRepository starBackgroundRepository;
 
     private final String IPFS_URL = System.getenv("IPFS_URL");
+
+    DataInitializer(SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
+                    HeadRepository headRepository, NeckRepository neckRepository, EyesRepository eyesRepository, EarsRepository earsRepository,
+                    LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository,
+                    TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository,
+                    StarBackgroundRepository starBackgroundRepository) {
+        this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
+        this.headRepository = headRepository; this.neckRepository = neckRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository;
+        this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository; this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
+        this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
+        this.starBackgroundRepository = starBackgroundRepository;
+    }
 
     @PostConstruct
     public void initData() {
@@ -80,9 +91,51 @@ public class DataInitializer {
     private void saveItem() {
         String[] items = {"acc1_01", "acc2_01", "acc3_01", "acc4_01", "acc5_01", "acc7_01", "acc1_02", "fas1_01", "fas1_02", "fas1_03", "fas4_01"};        // acc6_01이 없음
         for (String name : items) {
-            Item item = new Item();
-            item.setName(name);
-            itemRepository.save(item);
+            String number = name.substring(name.indexOf("acc")+3, name.length()-3);
+            switch (number) {
+                case "1":
+                    Head head = new Head();
+                    head.setName(name);
+                    headRepository.save(head);
+                    break;
+                case "2":
+                    Eyes eyes = new Eyes();
+                    eyes.setName(name);
+                    eyesRepository.save(eyes);
+                    break;
+                case "3":
+                    Ears ears = new Ears();
+                    ears.setName(name);
+                    earsRepository.save(ears);
+                    break;
+                case "4":
+                    Neck neck = new Neck();
+                    neck.setName(name);
+                    neckRepository.save(neck);
+                    break;
+                case "5":
+                    LeftWrist leftWrist = new LeftWrist();
+                    leftWrist.setName(name);
+                    leftWristRepository.save(leftWrist);
+                    break;
+                case "6":
+                    RightWrist rightWrist = new RightWrist();
+                    rightWrist.setName(name);
+                    rightWristRepository.save(rightWrist);
+                    break;
+                case "7":
+                    LeftHand leftHand = new LeftHand();
+                    leftHand.setName(name);
+                    leftHandRepository.save(leftHand);
+                    break;
+                case "8":
+                    RightHand rightHand = new RightHand();
+                    rightHand.setName(name);
+                    rightHandRepository.save(rightHand);
+                    break;
+                default:
+                    break;
+            }
         }
     }
     private void saveTop() {

@@ -31,6 +31,6 @@ public class Outfit {
     @JoinColumn(name = "shoes_name")
     private Shoes shoes;
 
-    @OneToOne(mappedBy = "face")
+    @OneToOne(mappedBy = "outfit")
     Characters characters;
 }

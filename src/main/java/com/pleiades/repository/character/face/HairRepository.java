@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface HairRepository extends JpaRepository<Hair, String> {
-    Optional<Hair> findById(Long id);
     Optional<Hair> findByName(String name);
 }

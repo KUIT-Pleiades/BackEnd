@@ -1,12 +1,10 @@
-package com.pleiades;
+package com.pleiades.interceptor;
 
-import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Component

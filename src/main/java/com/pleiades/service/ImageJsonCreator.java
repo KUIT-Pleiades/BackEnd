@@ -6,24 +6,21 @@ import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.dto.character.StarBackgroundDto;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.character.face.Expression;
+import com.pleiades.entity.character.face.Face;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
 import com.pleiades.entity.character.Item.Item;
-import com.pleiades.entity.character.outfit.Bottom;
-import com.pleiades.entity.character.outfit.Shoes;
-import com.pleiades.entity.character.outfit.Top;
+import com.pleiades.entity.character.outfit.Outfit;
 import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.character.face.ExpressionRepository;
 import com.pleiades.repository.character.face.HairRepository;
 import com.pleiades.repository.character.face.SkinRepository;
-import com.pleiades.repository.character.ItemRepository;
+import com.pleiades.repository.character.item.ItemRepository;
 import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ImageJsonCreator {
@@ -55,31 +52,38 @@ public class ImageJsonCreator {
     }
 
 
-    public CharacterFaceDto makeCharacterFaceJson(Skin skin, Expression expression, Hair hair) {
+    public CharacterFaceDto makeCharacterFaceJson(Face face) {
         CharacterFaceDto characterFaceDto = new CharacterFaceDto();
 
-        characterFaceDto.setSkinImg(skin.getName());
-        characterFaceDto.setExpressionImg(expression.getName());
-        characterFaceDto.setHairImg(hair.getName());
+        characterFaceDto.setSkinImg(face.getSkin().getName());
+        characterFaceDto.setExpressionImg(face.getExpression().getName());
+        characterFaceDto.setHairImg(face.getHair().getName());
 
         return characterFaceDto;
     }
 
-    public CharacterOutfitDto makeCharacterOutfitJson(Top top, Bottom bottom, Shoes shoe) {
+    public CharacterOutfitDto makeCharacterOutfitJson(Outfit outfit) {
         CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
 
-        characterOutfitDto.setTopImg(top.getName());
-        characterOutfitDto.setBottomImg(bottom.getName());
-        characterOutfitDto.setShoesImg(shoe.getName());
+        characterOutfitDto.setTopImg(outfit.getTop().getName());
+        characterOutfitDto.setBottomImg(outfit.getBottom().getName());
+        characterOutfitDto.setShoesImg(outfit.getShoes().getName());
 
         return characterOutfitDto;
     }
 
-    public CharacterItemDto makeCharacterItemJson(List<Item> items) {
+    public CharacterItemDto makeCharacterItemJson(Item item) {
         CharacterItemDto characterItemDto = new CharacterItemDto();
-        for (Item item : items) {
-            characterItemDto.getItemImgs().add(item.getName());
-        }
+
+        characterItemDto.setHeadImg(item.getHead().getName());
+        characterItemDto.setNeckImg(item.getNeck().getName());
+        characterItemDto.setEarsImg(item.getEars().getName());
+        characterItemDto.setEyesImg(item.getEyes().getName());
+        characterItemDto.setLeftHandImg(item.getLeftHand().getName());
+        characterItemDto.setRightHandImg(item.getRightHand().getName());
+        characterItemDto.setLeftWristImg(item.getLeftWrist().getName());
+        characterItemDto.setRightWristImg(item.getRightWrist().getName());
+
         return characterItemDto;
     }
 

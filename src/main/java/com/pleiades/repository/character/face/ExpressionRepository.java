@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ExpressionRepository extends JpaRepository<Expression, String> {
-    Optional<Expression> findById(Long Id);
     Optional<Expression> findByName(String name);
 }

@@ -1,4 +1,4 @@
-package com.pleiades.repository.character;
+package com.pleiades.repository.character.item;
 
 import com.pleiades.entity.character.Item.Item;
 import org.springframework.data.jpa.repository.JpaRepository;

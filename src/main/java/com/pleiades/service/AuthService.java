@@ -179,14 +179,11 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
         }
 
-        CharacterFaceDto faceDto = imageJsonCreator.makeCharacterFaceJson(character.get().getSkin(), character.get().getExpression(), character.get().getHair());
-        CharacterOutfitDto outfitDto = imageJsonCreator.makeCharacterOutfitJson(character.get().getTop(), character.get().getBottom(), character.get().getShoes());
+        CharacterFaceDto faceDto = imageJsonCreator.makeCharacterFaceJson(character.get().getFace());
+        CharacterOutfitDto outfitDto = imageJsonCreator.makeCharacterOutfitJson(character.get().getOutfit());
+        CharacterItemDto itemDto = imageJsonCreator.makeCharacterItemJson(character.get().getItem());
 
-        List<Item> items = new ArrayList<>();
-        for (CharacterItem item : character.get().getCharacterItems()) { items.add(item.getItem()); }
-        CharacterItemDto itemDto = imageJsonCreator.makeCharacterItemJson(items);
-
-        String profile = user.get().getProfileUrl();
+        String profile = user.get().getImgPath();       // todo: profile
 
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
@@ -197,7 +194,7 @@ public class AuthService {
         body.put("items", itemDto.toString());
         body.put("profile", profile);
 
-        log.info("body: " + body.toString());
+        log.info("body: " + body);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
