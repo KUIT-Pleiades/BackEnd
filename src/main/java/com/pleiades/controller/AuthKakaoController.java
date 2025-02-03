@@ -140,8 +140,10 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/temp")
-    public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpSession session) {
+    public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
+        HttpSession session = request.getSession();
+
         Object signupAccessToken = session.getAttribute("accessToken");
         Object signupRefreshToken = session.getAttribute("refreshToken");
 
