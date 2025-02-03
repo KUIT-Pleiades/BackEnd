@@ -35,7 +35,13 @@ public class WebConfig implements WebMvcConfigurer {
         // 인터셉터 등록
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")  // 모든 경로에 대해 인터셉터 적용
-                .excludePathPatterns("/auth/refresh", "/auth/login/**", "/auth/login/*", "/auth/login", "/auth/login/");  // 제외할 경로
+                .excludePathPatterns("/auth/refresh",
+                        "/auth/login/**",
+                        "/auth/login/*",
+                        "/auth/login",
+                        "/auth/login/",
+                        "/auth/login/naver"
+                        );  // 제외할 경로
     }
 }
 
