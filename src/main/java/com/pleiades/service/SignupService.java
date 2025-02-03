@@ -3,11 +3,11 @@ package com.pleiades.service;
 import com.pleiades.dto.SignUpDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Face;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Outfit;
 import com.pleiades.entity.character.outfit.Shoes;
@@ -17,7 +17,7 @@ import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.face.ExpressionRepository;
 import com.pleiades.repository.character.face.HairRepository;
 import com.pleiades.repository.character.face.SkinRepository;
-import com.pleiades.repository.character.item.ItemRepository;
+import com.pleiades.repository.character.item.*;
 import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
@@ -31,6 +31,14 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class SignupService {
+    private final HeadRepository headRepository;
+    private final EyesRepository eyesRepository;
+    private final EarsRepository earsRepository;
+    private final NeckRepository neckRepository;
+    private final LeftWristRepository leftWristRepository;
+    private final RightWristRepository rightWristRepository;
+    private final LeftHandRepository leftHandRepository;
+    private final RightHandRepository rightHandRepository;
     StarBackgroundRepository starBackgroundRepository;
     UserRepository userRepository;
     StarRepository starRepository;
@@ -50,13 +58,16 @@ public class SignupService {
     public SignupService(UserRepository userRepository, StarRepository starRepository, CharacterRepository characterRepository,
                          SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
                          TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository, ItemRepository itemRepository,
-                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository) {
+                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository, HeadRepository headRepository, EyesRepository eyesRepository, EarsRepository earsRepository, NeckRepository neckRepository, LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository) {
         this.userRepository = userRepository; this.starRepository = starRepository; this.characterRepository = characterRepository;
         this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
         this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
         this.itemRepository = itemRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
         this.starBackgroundRepository = starBackgroundRepository;
+        this.headRepository = headRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository; this.neckRepository = neckRepository;
+        this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
+        this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository;
     }
 
     public void signup(String email, SignUpDto signUpDto) {
@@ -116,6 +127,15 @@ public class SignupService {
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
+        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
+        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
+        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
+        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
+        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
+        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
+        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
+        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
+
         Characters character = new Characters();
         Face face = new Face();
         Outfit outfit = new Outfit();
@@ -133,10 +153,20 @@ public class SignupService {
         outfit.setBottom(bottom.get());
         outfit.setShoes(shoes.get());
 
+        character.setOutfit(outfit);
+
+        item.setHead(head.get());
+        item.setEyes(eyes.get());
+        item.setEars(ears.get());
+        item.setNeck(neck.get());
+        item.setLeftWrist(leftWrist.get());
+        item.setRightWrist(rightWrist.get());
+        item.setLeftHand(leftHand.get());
+        item.setRightHand(rightHand.get());
+
+        character.setItem(item);
+
         characterRepository.save(character);
-
-//           item -> CharacterItemDto
-
 
         log.info("character saved");
     }
