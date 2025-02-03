@@ -101,7 +101,10 @@ public class AuthService {
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // 202
+        if (user.isEmpty()) {
+            body.put("message","User not found. Sign up is required");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        }   // 202
 
         if (!user.get().getRefreshToken().equals(refreshToken)) {
             body.put("message","Refresh token is not valid. Social login is required");
@@ -116,7 +119,7 @@ public class AuthService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, String.format(
-                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; Secure=%s; SameSite=Strict",
+                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; %s; SameSite=Strict",
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getPath(),
@@ -149,7 +152,7 @@ public class AuthService {
             log.info("no user");
             body.put("message", "User not found");
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(HttpStatus.ACCEPTED)
                     .body(body);
         }
 
@@ -157,7 +160,7 @@ public class AuthService {
         if (star.isEmpty()) {
             log.info("no star");
             body.put("message", "Star not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
         }
 
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
@@ -165,7 +168,7 @@ public class AuthService {
         if (starBackground.isEmpty()) {
             log.info("no star background");
             body.put("message", "Background not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
         }
 
         Optional<Characters> character = characterRepository.findByUser(user.get());
@@ -173,7 +176,7 @@ public class AuthService {
         if (character.isEmpty()) {
             log.info("no character");
             body.put("message", "Character not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
         }
 
         CharacterFaceDto faceDto = imageJsonCreator.makeCharacterFaceJson(character.get().getSkin(), character.get().getExpression(), character.get().getHair());

@@ -86,9 +86,10 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpSession session) {
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpServletRequest request) {
         log.info("kakao code redirected");
         try {
+            log.info("code: " + code);
             HttpHeaders headers = new HttpHeaders();
             Map<String, String> body = new HashMap<>();
 
@@ -114,24 +115,11 @@ public class AuthKakaoController {
             token.setRefreshToken(responseToken.getRefreshToken());
             kakaoTokenRepository.save(token);
 
-//            session.setAttribute("kakaoAccessToken", responseToken.getAccessToken()); - 소셜 액세스 토큰은 일화용인 걸루,,? 아마두,,,
-
-            // session으로 해도 될까
-            String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-            String refreshToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-            session.setAttribute("accessToken", accessToken);
-            session.setAttribute("refreshToken", refreshToken);
-
-            log.info("accessToken: " + session.getAttribute("accessToken"));
-            log.info("refreshToken: " + session.getAttribute("refreshToken"));
-
-            String hashedEmail = HashStringUtil.hashString(email);
-
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
             return ResponseEntity
                     .status(HttpStatus.FOUND)       // 302
-                    .header("Location", FRONT_ORIGIN+"/kakaologin?hash="+hashedEmail) // 프론트.com/kakaologin
+                    .header("Location", FRONT_ORIGIN+"/kakaologin?hash="+email) // 프론트.com/kakaologin
                     .build();
         } catch (Exception e) {
             log.error("Error in getAccess: " + e.getMessage());
@@ -140,32 +128,12 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/temp")
-    public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> responseToken(@RequestParam("hash") String email, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
-        HttpSession session = request.getSession();
 
-        Object signupAccessToken = session.getAttribute("accessToken");
-        Object signupRefreshToken = session.getAttribute("refreshToken");
+        String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+        String refreshToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
 
-        log.info("signup access token: " + signupAccessToken);
-        log.info("signup refresh token: " + signupRefreshToken);
-
-        if (signupAccessToken == null || signupRefreshToken == null) {
-            log.info("no tokens");
-            body.put("error", "No token found - social login required");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);   // 401
-        }
-        String accessToken = signupAccessToken.toString();
-        String refreshToken = signupRefreshToken.toString();
-
-        Claims access = jwtUtil.validateToken(accessToken);
-        String hashedSubject = HashStringUtil.hashString(access.getSubject());
-        if (!hash.equals(hashedSubject)) {
-            log.info("different email");
-            body.put("error", "different email");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);    // 400
-        }
-        log.info("same email");
         body.put("accessToken", accessToken);
         Cookie cookie = authService.setRefreshToken(refreshToken);
 
