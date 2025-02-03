@@ -88,12 +88,12 @@ public class AuthService {
         ValidationStatus tokenStatus = checkToken(refreshToken);
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
-            body.put("message","no given refresh token");
+            body.put("message","Refresh Token is required");
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();     // 428
         }
 
         if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
-            body.put("message","refresh token is not valid");
+            body.put("message","Refresh token is not valid. Social login is required");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();     // 403
         }
 
@@ -103,7 +103,10 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // 202
 
-        if (!user.get().getRefreshToken().equals(refreshToken)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); }   // 403
+        if (!user.get().getRefreshToken().equals(refreshToken)) {
+            body.put("message","Refresh token is not valid. Social login is required");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }   // 403
 
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
