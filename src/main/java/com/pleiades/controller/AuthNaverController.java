@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -39,17 +42,25 @@ public class AuthNaverController {
         String accessToken = loginResponse.getAccessToken();
         String refreshToken = loginResponse.getRefreshToken();
 
-        response.setHeader(HttpHeaders.SET_COOKIE, createRefreshTokenCookie(refreshToken));
+        addRefreshTokenCookie(response, refreshToken);
 
-        return ResponseEntity.ok(accessToken);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Map.of("access_token", accessToken));
     }
 
-    private String createRefreshTokenCookie(String refreshToken) {
-        int maxAge = 7 * 24 * 60 * 60;
-        boolean secure = false;
-        return String.format("refreshToken=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Lax; Secure=%s",
-                refreshToken, maxAge, secure ? "true" : "false");
+    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+
     @ExceptionHandler(NaverRefreshTokenExpiredException.class)
     public ResponseEntity<Void> handleRefreshTokenExpired(HttpServletResponse response) throws IOException {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); //401
