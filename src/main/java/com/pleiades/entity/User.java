@@ -36,7 +36,7 @@ public class User {
     @Transient
     private String accessToken;
 
-    @Transient
+    @Column
     private String refreshToken;
 
     // todo: cascade 설정
