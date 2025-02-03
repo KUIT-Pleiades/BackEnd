@@ -72,7 +72,7 @@ public class SignupService {
 
     public void signup(String email, SignUpDto signUpDto) {
         User user = new User();
-        setNewUser(user, email, signUpDto); // id, nickname, birthDate, face, outfit, item
+        setNewUser(user, email, signUpDto);
         userRepository.save(user);
 
         Optional<NaverToken> naverToken = naverTokenRepository.findByUserEmail(email);
@@ -96,6 +96,7 @@ public class SignupService {
         user.setUserName(signUpDto.getUserName());
         user.setBirthDate(signUpDto.getBirthDate());
         user.setCreatedDate(LocalDate.now());
+        user.setImgPath(signUpDto.getImgPath());
     }
 
     private void setNaverToken(NaverToken naverToken, User user) {
