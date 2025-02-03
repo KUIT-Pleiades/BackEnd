@@ -36,6 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")  // 모든 경로에 대해 인터셉터 적용
                 .excludePathPatterns("/auth/refresh",
+                        "auth/auth/refresh",
+                        "/error",
                         "/auth/login/**",
                         "/auth/login/*",
                         "/auth/login",
