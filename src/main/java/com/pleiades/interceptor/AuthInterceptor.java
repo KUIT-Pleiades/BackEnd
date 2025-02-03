@@ -8,6 +8,7 @@ import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -20,6 +21,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final UserRepository userRepository;
     private final AuthService authService;
 
+    @Autowired
     public AuthInterceptor(JwtUtil jwtUtil, UserRepository userRepository, AuthService authService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
