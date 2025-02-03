@@ -44,5 +44,5 @@ public class User {
     private NaverToken naverToken;
 
     @Column(nullable = true)
-    String profileUrl;
+    String imgPath;
 }

@@ -8,7 +8,7 @@ import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.Item;
+import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;

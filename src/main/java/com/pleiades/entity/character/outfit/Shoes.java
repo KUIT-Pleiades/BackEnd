@@ -14,9 +14,9 @@ import lombok.Setter;
 @Table(name = "shoes")
 public class Shoes {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String name;
     private Long price = 0L;
+
+    @OneToOne(mappedBy = "shoes")
+    private Outfit outfit;
 }

@@ -1,10 +1,13 @@
 package com.pleiades.entity.character;
 
 import com.pleiades.entity.User;
+import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.face.Expression;
+import com.pleiades.entity.character.face.Face;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
 import com.pleiades.entity.character.outfit.Bottom;
+import com.pleiades.entity.character.outfit.Outfit;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;
 import jakarta.persistence.*;
@@ -30,31 +33,16 @@ public class Characters {
     @JoinColumn(name="user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name="skin_id")
-    private Skin skin;
+    @OneToOne
+    @JoinColumn(name="face_id")
+    private Face face;
 
-    @ManyToOne
-    @JoinColumn(name="expression_id")
-    private Expression expression;
+    @OneToOne
+    @JoinColumn(name="item_id")
+    private Item item;
 
-    @ManyToOne
-    @JoinColumn(name="hair_id")
-    private Hair hair;
+    @OneToOne
+    @JoinColumn(name="outfit_id")
+    private Outfit outfit;
 
-    @ManyToOne
-    @JoinColumn(name="top_id")
-    private Top top;
-
-    @ManyToOne
-    @JoinColumn(name="bottom_id")
-    private Bottom bottom;
-
-    @ManyToOne
-    @JoinColumn(name="shoes_id")
-    private Shoes shoes;
-
-    // todo: cascade 설정
-    @OneToMany(mappedBy = "characters")
-    private List<CharacterItem> characterItems;
 }

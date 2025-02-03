@@ -1,6 +1,6 @@
 package com.pleiades.repository.character;
 
-import com.pleiades.entity.character.Item;
+import com.pleiades.entity.character.Item.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

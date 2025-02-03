@@ -1,6 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.LoginCBResponse;
+import com.pleiades.dto.LoginCBResponseDto;
 import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
@@ -28,7 +28,7 @@ public class NaverLoginService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public LoginCBResponse handleNaverLoginCallback(String code) {
+    public LoginCBResponseDto handleNaverLoginCallback(String code) {
         log.info("service 계층 진입");
 
         Map<String, String> naverTokens = naverApiUtil.getTokens(code);
@@ -50,7 +50,7 @@ public class NaverLoginService {
 
         // todo : naverTokenRepository.findByEmail
         User user = userRepository.findByEmail(email).orElse(null);
-        LoginCBResponse cbResponse;
+        LoginCBResponseDto cbResponse;
 
         if (user != null) {
             log.info("user 이미 존재");
@@ -81,7 +81,7 @@ public class NaverLoginService {
         return cbResponse;
     }
 
-    private LoginCBResponse updateAppTokensForUser(User user) {
+    private LoginCBResponseDto updateAppTokensForUser(User user) {
 
         String jwtAccessToken = jwtUtil.generateAccessToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
         String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
@@ -90,7 +90,7 @@ public class NaverLoginService {
         user.setAccessToken(jwtAccessToken);
 
         log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
-        return new LoginCBResponse(jwtRefreshToken, jwtAccessToken);
+        return new LoginCBResponseDto(jwtRefreshToken, jwtAccessToken);
     }
 
     // todo : 일단 안씀 -> 나중에 검사 해보고 지울 것

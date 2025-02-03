@@ -13,10 +13,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "skin")
 public class Skin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     private String name;
     private Long price = 0L;
+
+    @OneToOne(mappedBy = "skin")
+    private Face face;
 }

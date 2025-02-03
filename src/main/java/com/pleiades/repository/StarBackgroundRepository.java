@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface StarBackgroundRepository extends JpaRepository<StarBackground, Long> {
     Optional<StarBackground> findById(int id);
+    Optional<StarBackground> findByName(String name);
 }

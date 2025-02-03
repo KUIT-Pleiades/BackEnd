@@ -55,7 +55,7 @@ public class AuthHomeController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, String>> login(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {
         log.info("/auth");
 
         String accessToken = HeaderUtil.authorizationBearer(authorization);
@@ -113,7 +113,7 @@ public class AuthHomeController {
 
         Optional<User> user = userRepository.findById(profileDto.getUserId());
         if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
-            user.get().setProfileUrl(profileDto.getProfileUrl());
+            user.get().setImgPath(profileDto.getProfileUrl());
             try {
                 userRepository.save(user.get());
             } catch (DataIntegrityViolationException e) {

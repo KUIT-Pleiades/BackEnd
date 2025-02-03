@@ -1,5 +1,6 @@
 package com.pleiades.entity.character;
 
+import com.pleiades.entity.character.Item.Item;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -13,10 +13,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "hair")
 public class Hair {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     private String name;
     private Long price = 0L;
+
+    @OneToOne(mappedBy = "hair")
+    private Face face;
 }

@@ -1,4 +1,4 @@
-package com.pleiades.entity.character.outfit;
+package com.pleiades.entity.character.Item;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,12 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "top")
-public class Top {
+@Table(name = "right_hand")
+public class RightHand {
     @Id
     private String name;
     private Long price = 0L;
-
-    @OneToOne(mappedBy = "top")
-    private Outfit outfit;
 }

@@ -1,8 +1,7 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.LoginCBResponse;
+import com.pleiades.dto.LoginCBResponseDto;
 import com.pleiades.dto.naver.NaverLoginRequest;
-import com.pleiades.dto.naver.NaverLoginResponse;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.NaverLoginService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +35,7 @@ public class AuthNaverController {
                     .body(null);
         }
         log.info("네이버 로그인 request 받음. AuthCode: {}", authCode);
-        LoginCBResponse loginResponse = naverLoginService.handleNaverLoginCallback(authCode);
+        LoginCBResponseDto loginResponse = naverLoginService.handleNaverLoginCallback(authCode);
         String accessToken = loginResponse.getAccessToken();
         String refreshToken = loginResponse.getRefreshToken();
 

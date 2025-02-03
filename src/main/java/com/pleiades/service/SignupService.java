@@ -7,7 +7,7 @@ import com.pleiades.entity.character.CharacterItem;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Hair;
 import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.Item;
+import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;
@@ -85,8 +85,8 @@ public class SignupService {
     private void setNewUser(User user, String email, SignUpDto signUpDto) {
         user.setId(signUpDto.getUserId());
         user.setEmail(email);
-        user.setUserName(signUpDto.getUsername());
-        user.setBirthDate(signUpDto.getBirthdate());
+        user.setUserName(signUpDto.getUserName());
+        user.setBirthDate(signUpDto.getBirthDate());
         user.setCreatedDate(LocalDate.now());
     }
 
@@ -110,7 +110,7 @@ public class SignupService {
     private void setStar(User user, SignUpDto signUpDto) {
         Star star = new Star();
         star.setUser(user);
-        Optional<StarBackground> background = starBackgroundRepository.findById(signUpDto.getBackgroundId());
+        Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
         background.ifPresent(star::setBackground);
         starRepository.save(star);
 
@@ -129,26 +129,28 @@ public class SignupService {
         Characters character = new Characters();
         character.setUser(user);
 
-        character.setSkin(skin.get());
-        character.setExpression(expression.get());
-        character.setHair(hair.get());
+//        character.setSkin(skin.get());
+//        character.setExpression(expression.get());
+//        character.setHair(hair.get());
+//
+//        character.setTop(top.get());
+//        character.setBottom(bottom.get());
+//        character.setShoes(shoes.get());
+//
+//        characterRepository.save(character);
+//
+//        Set<String> items = signUpDto.getItem();
 
-        character.setTop(top.get());
-        character.setBottom(bottom.get());
-        character.setShoes(shoes.get());
-
-        characterRepository.save(character);
-
-        Set<String> items = signUpDto.getItem();
-        for (String name : items) {
-            Optional<Item> item = itemRepository.findByName(name);
-            if (item.isPresent()) {
-                CharacterItem characterItem = new CharacterItem();
-                characterItem.setCharacters(character);
-                characterItem.setItem(item.get());
-                characterItemRepository.save(characterItem);
-            }
-        }
+          // item -> CharacterItemDto
+//        for (String name : items) {
+//            Optional<Item> item = itemRepository.findByName(name);
+//            if (item.isPresent()) {
+//                CharacterItem characterItem = new CharacterItem();
+//                characterItem.setCharacters(character);
+//                characterItem.setItem(item.get());
+//                characterItemRepository.save(characterItem);
+//            }
+//        }
 
         log.info("character saved");
     }

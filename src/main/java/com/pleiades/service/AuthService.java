@@ -8,7 +8,7 @@ import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.CharacterItem;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.Item;
+import com.pleiades.entity.character.Item.Item;
 import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.StarRepository;
 import com.pleiades.repository.UserRepository;
@@ -55,7 +55,7 @@ public class AuthService {
         if (token == null || token.isEmpty()) { log.info("token is empty"); return ValidationStatus.NONE; }
 
         Claims tokenClaim = jwtUtil.validateToken(token);
-        if (tokenClaim == null) { log.info("token is not valide"); return ValidationStatus.NOT_VALID; }
+        if (tokenClaim == null) { log.info("token is not valid"); return ValidationStatus.NOT_VALID; }
 
         log.info("token is valid");
         return ValidationStatus.VALID;
@@ -132,10 +132,11 @@ public class AuthService {
     }
 
     // access token 유효한 경우에만 사용
-    public ResponseEntity<Map<String, String>> responseUserInfo(String accessToken) {
+    // Todo: 202 회원가입 안했을 시 -> star, starBG, User NOT FOUND
+    public ResponseEntity<Map<String, Object>> responseUserInfo(String accessToken) {
         log.info("AuthService responseUserInfo");
 
-        Map<String, String> body = new HashMap<>();
+        Map<String, Object> body = new HashMap<>();
 
         if (accessToken == null) { log.info("no access token"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
 
@@ -185,7 +186,8 @@ public class AuthService {
         String profile = user.get().getProfileUrl();
 
         body.put("userId", user.get().getId());
-        body.put("username", user.get().getUserName());
+        body.put("userName", user.get().getUserName());
+        body.put("birthDate", user.get().getBirthDate());
         body.put("backgroundName", starBackground.get().getName());
         body.put("face", faceDto.toString());
         body.put("outfit", outfitDto.toString());
