@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -87,10 +88,12 @@ public class AuthService {
         ValidationStatus tokenStatus = checkToken(refreshToken);
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
+            body.put("message","no given refresh token");
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();     // 428
         }
 
         if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            body.put("message","refresh token is not valid");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();     // 403
         }
 
@@ -108,9 +111,20 @@ public class AuthService {
         Cookie cookie = setRefreshToken(newRefreshToken);
         body.put("accessToken", newAccessToken);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, String.format(
+                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; Secure=%s; SameSite=Strict",
+                cookie.getName(),
+                cookie.getValue(),
+                cookie.getPath(),
+                cookie.getMaxAge(),
+                cookie.getSecure() ? "Secure" : ""
+        ));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)     // 201
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .headers(headers)
                 .body(body);
     }
 

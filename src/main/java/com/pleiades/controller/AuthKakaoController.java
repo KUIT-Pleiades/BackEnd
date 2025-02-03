@@ -139,14 +139,17 @@ public class AuthKakaoController {
     @GetMapping("/temp")
     public ResponseEntity<Map<String, String>> reponseToken(@RequestParam("hash") String hash, HttpSession session) {
         Map<String, String> body = new HashMap<>();
-        String accessToken = session.getAttribute("accessToken").toString();
-        String refreshToken = session.getAttribute("refreshToken").toString();
+        Object signupAccessToken = session.getAttribute("accessToken");
+        Object signupRefreshToken = session.getAttribute("refreshToken");
 
-        if (accessToken == null || refreshToken == null) {
+        if (signupAccessToken == null || signupRefreshToken == null) {
             log.info("no tokens");
             body.put("error", "No token found - social login required");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);   // 401
         }
+        String accessToken = signupAccessToken.toString();
+        String refreshToken = signupRefreshToken.toString();
+
         Claims access = jwtUtil.validateToken(accessToken);
         String hashedSubject = HashStringUtil.hashString(access.getSubject());
         if (!hash.equals(hashedSubject)) {
@@ -158,7 +161,18 @@ public class AuthKakaoController {
         body.put("accessToken", accessToken);
         Cookie cookie = authService.setRefreshToken(refreshToken);
 
-        return ResponseEntity.status(HttpStatus.OK).header("refreshToken", cookie.toString()).body(body);   // 200
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, String.format(
+                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; Secure=%s; SameSite=Strict",
+                cookie.getName(),
+                cookie.getValue(),
+                cookie.getPath(),
+                cookie.getMaxAge(),
+                cookie.getSecure() ? "Secure" : ""
+        ));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);   // 200
     }
 
     private String getKakaoEmail(String token) {
