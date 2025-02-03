@@ -50,16 +50,6 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        Claims claims = jwtUtil.validateToken(accessToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            log.info("AuthInterceptor preHandle 202");
-            response.sendError(HttpServletResponse.SC_ACCEPTED);        // user 없음: 202
-            return false;
-        }
-
         log.info("AuthInterceptor preHandle 200");
         response.setStatus(HttpServletResponse.SC_OK);
         return true;
