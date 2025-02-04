@@ -17,7 +17,7 @@ public class KakaoToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "kakaoToken", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
