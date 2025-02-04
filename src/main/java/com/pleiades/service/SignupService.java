@@ -88,7 +88,7 @@ public class SignupService {
 
         // 소셜 토큰 존재
         User user = new User();
-        boolean userSetted = setNewUser(user, email, refreshToken);
+        setNewUser(user, email, refreshToken);
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
@@ -99,9 +99,7 @@ public class SignupService {
         boolean starSetted = setStar(star, user);
         boolean characterSetted = setCharacter(character, user, signUpDto);
 
-        if (userSetted && starSetted && characterSetted) {
-            userRepository.save(user);
-            log.info("user saved: " + user.getId());
+        if (starSetted && characterSetted) {
             starRepository.save(star);
             log.info("star saved: " + star.getId());
             characterRepository.save(character);
@@ -109,11 +107,12 @@ public class SignupService {
 
             return ValidationStatus.VALID;
         }
+
+        userRepository.delete(user);
         return ValidationStatus.NONE;
     }
 
-    private boolean setNewUser(User user, String email, String refreshToken) {
-        try {
+    private void setNewUser(User user, String email, String refreshToken) {
             user.setId(signUpDto.getUserId());
             user.setEmail(email);
             user.setUserName(signUpDto.getUserName());
@@ -121,13 +120,9 @@ public class SignupService {
             user.setRefreshToken(refreshToken);
             user.setCreatedDate(LocalDate.now());
             user.setImgPath(signUpDto.getImgPath());
-            log.info("user setted");
 
-            return true;
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return false;
-        }
+            userRepository.save(user);
+            log.info("user saved: " + user.getId());
     }
 
     private void setNaverToken(NaverToken naverToken, User user) {
