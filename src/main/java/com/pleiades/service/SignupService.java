@@ -21,11 +21,16 @@ import com.pleiades.repository.character.item.*;
 import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
+import com.pleiades.strings.ValidationStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -54,6 +59,8 @@ public class SignupService {
     KakaoTokenRepository kakaoTokenRepository;
     NaverTokenRepository naverTokenRepository;
 
+    SignUpDto signUpDto;
+
     @Autowired
     public SignupService(UserRepository userRepository, StarRepository starRepository, CharacterRepository characterRepository,
                          SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
@@ -70,33 +77,57 @@ public class SignupService {
         this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository;
     }
 
-    public void signup(String email, SignUpDto signUpDto) {
-        User user = new User();
-        setNewUser(user, email, signUpDto);
-        userRepository.save(user);
-
+    // todo: star, character 저장에 실패하면 user도 저장 X
+    public ValidationStatus signup(String email, SignUpDto signUpDto, String refreshToken) {
+        this.signUpDto = signUpDto;
+        // 소셜 토큰 검증
         Optional<NaverToken> naverToken = naverTokenRepository.findByUserEmail(email);
         Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
+
+        if (naverToken.isEmpty() && kakaoToken.isEmpty()) { return ValidationStatus.NOT_VALID; }
+
+        // 소셜 토큰 존재
+        User user = new User();
+        boolean userSetted = setNewUser(user, email, refreshToken);
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
-        if (naverToken.isEmpty() && kakaoToken.isEmpty()) {
-            // 음 안 되는데
+        Star star = new Star();
+        Characters character = new Characters();
+
+        boolean starSetted = setStar(star, user);
+        boolean characterSetted = setCharacter(character, user, signUpDto);
+
+        if (userSetted && starSetted && characterSetted) {
+            userRepository.save(user);
+            log.info("user saved: " + user.getId());
+            starRepository.save(star);
+            log.info("star saved: " + star.getId());
+            characterRepository.save(character);
+            log.info("character saved: " + character.getId());
+
+            return ValidationStatus.VALID;
         }
-
-        setStar(user, signUpDto);
-
-        setCharacter(user, signUpDto);
+        return ValidationStatus.NONE;
     }
 
-    private void setNewUser(User user, String email, SignUpDto signUpDto) {
-        user.setId(signUpDto.getUserId());
-        user.setEmail(email);
-        user.setUserName(signUpDto.getUserName());
-        user.setBirthDate(signUpDto.getBirthDate());
-        user.setCreatedDate(LocalDate.now());
-        user.setImgPath(signUpDto.getImgPath());
+    private boolean setNewUser(User user, String email, String refreshToken) {
+        try {
+            user.setId(signUpDto.getUserId());
+            user.setEmail(email);
+            user.setUserName(signUpDto.getUserName());
+            user.setBirthDate(signUpDto.getBirthDate());
+            user.setRefreshToken(refreshToken);
+            user.setCreatedDate(LocalDate.now());
+            user.setImgPath(signUpDto.getImgPath());
+            log.info("user setted");
+
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     private void setNaverToken(NaverToken naverToken, User user) {
@@ -109,18 +140,21 @@ public class SignupService {
         kakaoTokenRepository.save(kakaoToken);
     }
 
-    private void setStar(User user, SignUpDto signUpDto) {
+    private boolean setStar(Star star, User user) {
         log.info("SingupService - setStar");
-        Star star = new Star();
-        star.setUser(user);
-        Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
-        background.ifPresent(star::setBackground);
-        starRepository.save(star);
-
-        log.info("star saved");
+        try {
+            star.setUser(user);
+            Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
+            background.ifPresent(star::setBackground);
+            log.info("star setted");
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
-    private void setCharacter(User user, SignUpDto signUpDto) {
+    private boolean setCharacter(Characters character, User user, SignUpDto signUpDto) {
         log.info("SingupService - setCharacter");
 
         log.info("get face");
@@ -133,7 +167,13 @@ public class SignupService {
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
+        if (skin.isEmpty() || expression.isEmpty() || hair.isEmpty() || top.isEmpty() || bottom.isEmpty() || shoes.isEmpty()) {
+            log.error("need to set face, outfit");
+            return false;
+        }
+
         log.info("get item");
+
         Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
         Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
         Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
@@ -143,7 +183,6 @@ public class SignupService {
         Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
         Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
 
-        Characters character = new Characters();
         Face face = new Face();
         Outfit outfit = new Outfit();
         Item item = new Item();
@@ -176,8 +215,6 @@ public class SignupService {
 
         character.setItem(item);
 
-        characterRepository.save(character);
-
-        log.info("character saved");
+        return true;
     }
 }

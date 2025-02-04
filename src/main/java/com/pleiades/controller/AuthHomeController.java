@@ -94,17 +94,25 @@ public class AuthHomeController {
     // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
     // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody SignUpDto signUpDto) {
         log.info("/auth/signup");
 
+        // access token에서 email 추출
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
-        signupService.signup(email, signUpDto);
+        ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 : 회원가입 완료
+        if (signupStatus == ValidationStatus.NOT_VALID) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","You need to login first"));      // 401
+        }
+        if (signupStatus == ValidationStatus.NONE) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "sign-up success - character created")); // 201 : 회원가입 완료
     }
 
     @PostMapping("/profile")
