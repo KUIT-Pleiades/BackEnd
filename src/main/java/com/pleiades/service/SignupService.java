@@ -29,9 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -84,6 +82,7 @@ public class SignupService {
         Optional<NaverToken> naverToken = naverTokenRepository.findByUserEmail(email);
         Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
 
+        // 소셜 토큰 없음
         if (naverToken.isEmpty() && kakaoToken.isEmpty()) { return ValidationStatus.NOT_VALID; }
 
         // 소셜 토큰 존재
@@ -96,18 +95,18 @@ public class SignupService {
         Star star = new Star();
         Characters character = new Characters();
 
-        boolean starSetted = setStar(star, user);
-        boolean characterSetted = setCharacter(character, user, signUpDto);
-
-        if (starSetted && characterSetted) {
+        // star, character 저장 모두 성공
+        if (setStar(star, user) && setCharacter(character, user, signUpDto)) {
             starRepository.save(star);
             log.info("star saved: " + star.getId());
+
             characterRepository.save(character);
             log.info("character saved: " + character.getId());
 
             return ValidationStatus.VALID;
         }
 
+        // star, character 둘 중 하나라도 저장 실패
         userRepository.delete(user);
         return ValidationStatus.NONE;
     }
@@ -167,17 +166,6 @@ public class SignupService {
             return false;
         }
 
-        log.info("get item");
-
-        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
-        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
-        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
-        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
-        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
-        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
-        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
-        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
-
         Face face = new Face();
         Outfit outfit = new Outfit();
         Item item = new Item();
@@ -196,20 +184,30 @@ public class SignupService {
         outfit.setBottom(bottom.get());
         outfit.setShoes(shoes.get());
 
+        setItem(item);
         character.setOutfit(outfit);
-
-        log.info("set item");
-        item.setHead(head.get());
-        item.setEyes(eyes.get());
-        item.setEars(ears.get());
-        item.setNeck(neck.get());
-        item.setLeftWrist(leftWrist.get());
-        item.setRightWrist(rightWrist.get());
-        item.setLeftHand(leftHand.get());
-        item.setRightHand(rightHand.get());
 
         character.setItem(item);
 
         return true;
+    }
+
+    private void setItem(Item item) {
+        log.info("SingupService - setItem");
+
+        log.info("get item");
+        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
+        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
+        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
+        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
+        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
+        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
+        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
+        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
+
+        log.info("set item");
+        head.ifPresent(item::setHead); eyes.ifPresent(item::setEyes); ears.ifPresent(item::setEars); neck.ifPresent(item::setNeck);
+        leftWrist.ifPresent(item::setLeftWrist); rightWrist.ifPresent(item::setRightWrist);
+        leftHand.ifPresent(item::setLeftHand); rightHand.ifPresent(item::setRightHand);
     }
 }
