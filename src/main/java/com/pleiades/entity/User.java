@@ -43,6 +43,11 @@ public class User {
     @OneToOne(mappedBy = "user")
     private NaverToken naverToken;
 
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    private KakaoToken kakaoToken;
+
     @Column(nullable = true)
     String imgPath;
+
+
 }
