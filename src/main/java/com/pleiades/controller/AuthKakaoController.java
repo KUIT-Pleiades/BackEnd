@@ -134,6 +134,9 @@ public class AuthKakaoController {
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String refreshToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
 
+        log.info("accessToken: " + accessToken);
+        log.info("refreshToken: " + refreshToken);
+
         body.put("accessToken", accessToken);
         Cookie cookie = authService.setRefreshToken(refreshToken);
 
