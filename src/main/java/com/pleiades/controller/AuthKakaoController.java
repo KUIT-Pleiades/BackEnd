@@ -132,7 +132,7 @@ public class AuthKakaoController {
         Map<String, String> body = new HashMap<>();
 
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-        String refreshToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
         log.info("accessToken: " + accessToken);
         log.info("refreshToken: " + refreshToken);
