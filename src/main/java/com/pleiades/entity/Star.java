@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class Star {
     @Id
-    private Long id; // User의 기본 키를 그대로 사용
+    private String id; // User의 기본 키를 그대로 사용
 
     @OneToOne
     @MapsId // User의 기본 키를 Star의 기본 키로 매핑
