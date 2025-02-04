@@ -179,20 +179,13 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
         }
 
-        CharacterFaceDto faceDto = imageJsonCreator.makeCharacterFaceJson(character.get().getFace());
-        CharacterOutfitDto outfitDto = imageJsonCreator.makeCharacterOutfitJson(character.get().getOutfit());
-        CharacterItemDto itemDto = imageJsonCreator.makeCharacterItemJson(character.get().getItem());
-
         String profile = user.get().getImgPath();       // todo: profile
 
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
         body.put("backgroundName", starBackground.get().getName());
-        body.put("face", faceDto.toString());
-        body.put("outfit", outfitDto.toString());
-        body.put("items", itemDto.toString());
-        body.put("profile", profile);
+        body.put("character", "ipfs_url.png");
 
         log.info("body: " + body);
 
