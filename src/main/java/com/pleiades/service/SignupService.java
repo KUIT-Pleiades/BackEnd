@@ -110,6 +110,7 @@ public class SignupService {
     }
 
     private void setStar(User user, SignUpDto signUpDto) {
+        log.info("SingupService - setStar");
         Star star = new Star();
         star.setUser(user);
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
@@ -120,14 +121,19 @@ public class SignupService {
     }
 
     private void setCharacter(User user, SignUpDto signUpDto) {
+        log.info("SingupService - setCharacter");
+
+        log.info("get face");
         Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
         Optional<Expression> expression = expressionRepository.findByName(signUpDto.getFace().getExpressionImg());
         Optional<Hair> hair = hairRepository.findByName(signUpDto.getFace().getHairImg());
 
+        log.info("get outfit");
         Optional<Top> top = topRepository.findByName(signUpDto.getOutfit().getTopImg());
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
+        log.info("get item");
         Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
         Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
         Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
@@ -144,18 +150,21 @@ public class SignupService {
 
         character.setUser(user);
 
+        log.info("set face");
         face.setSkin(skin.get());
         face.setExpression(expression.get());
         face.setHair(hair.get());
 
         character.setFace(face);
 
+        log.info("set outfit");
         outfit.setTop(top.get());
         outfit.setBottom(bottom.get());
         outfit.setShoes(shoes.get());
 
         character.setOutfit(outfit);
 
+        log.info("set item");
         item.setHead(head.get());
         item.setEyes(eyes.get());
         item.setEars(ears.get());
