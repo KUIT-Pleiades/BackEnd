@@ -47,10 +47,10 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     private KakaoToken kakaoToken;
 
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE, CascadeType.REFRESH})
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     private Star star;
 
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE, CascadeType.REFRESH})
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     private Characters character;
 
     @Column(nullable = true)
