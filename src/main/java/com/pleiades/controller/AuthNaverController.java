@@ -44,6 +44,7 @@ public class AuthNaverController {
 
         addRefreshTokenCookie(response, refreshToken);
 
+        log.info("네이버 로그인 access token: {}", accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Map.of("access_token", accessToken));
