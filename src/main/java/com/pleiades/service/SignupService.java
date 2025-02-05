@@ -107,12 +107,16 @@ public class SignupService {
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
         Star star = new Star();
+        star.setUser(user);
+        star.setId(user.getId());
         starRepository.save(star);
+
         Characters character = new Characters();
+        character.setUser(user);
         characterRepository.save(character);
 
-        setStar(star, user);
-        setCharacter(character, user);
+        setStar(star);
+        setCharacter(character);
 
         return ValidationStatus.VALID;
     }
@@ -151,11 +155,9 @@ public class SignupService {
         kakaoTokenRepository.save(kakaoToken);
     }
 
-    private void setStar(Star star, User user) {
+    private void setStar(Star star) {
         log.info("SignupService - setStar");
         try {
-            star.setUser(user);
-            star.setId(user.getId());
             Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
             background.ifPresent(star::setBackground);
             log.info("star setted");
@@ -169,7 +171,7 @@ public class SignupService {
         }
     }
 
-    private void setCharacter(Characters character, User user) {
+    private void setCharacter(Characters character) {
         log.info("SignupService - setCharacter");
 
         log.info("get face");
@@ -211,8 +213,6 @@ public class SignupService {
         setItem(item);
 
         log.info("set character");
-
-        character.setUser(user);
 
         character.setFace(face);
         character.setOutfit(outfit);
