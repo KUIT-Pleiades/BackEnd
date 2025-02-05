@@ -109,29 +109,80 @@ public class SignupService {
         Star star = new Star();
         star.setUser(user);
         star.setId(user.getId());
-//        starRepository.save(star);
-        entityManager.merge(star);
+        Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
+        background.ifPresent(star::setBackground);
+        starRepository.save(star);
         log.info("star saved: " + star.getId());
 
         Characters character = new Characters();
         character.setUser(user);
-//        characterRepository.save(character);
-        entityManager.merge(character);
+//
+        log.info("get face");
+        Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
+        Optional<Expression> expression = expressionRepository.findByName(signUpDto.getFace().getExpressionImg());
+        Optional<Hair> hair = hairRepository.findByName(signUpDto.getFace().getHairImg());
 
-        setStar(star);
-        setCharacter(character);
+        log.info("get outfit");
+        Optional<Top> top = topRepository.findByName(signUpDto.getOutfit().getTopImg());
+        Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
+        Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
+
+
+        Face face = new Face();
+        Outfit outfit = new Outfit();
+        Item item = new Item();
+
+        log.info("set face");
+        face.setSkin(skin.get());
+        face.setExpression(expression.get());
+        face.setHair(hair.get());
+
+        log.info("set outfit");
+        outfit.setTop(top.get());
+        outfit.setBottom(bottom.get());
+        outfit.setShoes(shoes.get());
+
+//        setItem(item);
+
+        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
+        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
+        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
+        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
+        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
+        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
+        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
+        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
+
+        log.info("set item");
+        head.ifPresent(item::setHead); eyes.ifPresent(item::setEyes); ears.ifPresent(item::setEars); neck.ifPresent(item::setNeck);
+        leftWrist.ifPresent(item::setLeftWrist); rightWrist.ifPresent(item::setRightWrist);
+        leftHand.ifPresent(item::setLeftHand); rightHand.ifPresent(item::setRightHand);
+
+        log.info("set character");
+
+        character.setFace(face);
+        character.setOutfit(outfit);
+        character.setItem(item);
+
+        characterRepository.save(character);
+        log.info("character saved: " + character.getId());
+//
+
+        characterRepository.save(character);
+
+//        setStar(star);
+//        setCharacter(character);
 
         return ValidationStatus.VALID;
     }
 
     private User setNewUser(String email, String refreshToken) {
-
-        Optional<User> existingUser = userRepository.findByEmail(email);
-
-        if (existingUser.isPresent()) {
-            log.info("Existing user found, using it: " + existingUser.get().getId());
-            return existingUser.get();
-        }
+//        Optional<User> existingUser = userRepository.findByEmail(email);
+//
+//        if (existingUser.isPresent()) {
+//            log.info("Existing user found, using it: " + existingUser.get().getId());
+//            return existingUser.get();
+//        }
 
         User user = new User();
         user.setId(signUpDto.getUserId());
@@ -143,7 +194,6 @@ public class SignupService {
         user.setImgPath(signUpDto.getImgPath());
 
         userRepository.save(user);
-        userRepository.flush();
         log.info("user saved: " + user.getId());
         return user;
     }
