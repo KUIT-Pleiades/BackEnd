@@ -3,7 +3,8 @@ package com.pleiades.strings;
 public enum ValidationStatus {
     NONE("no object"),
     NOT_VALID("not valid"),
-    VALID("valid");
+    VALID("valid"),
+    DUPLICATE("duplicate");
 
     private final String status;
 

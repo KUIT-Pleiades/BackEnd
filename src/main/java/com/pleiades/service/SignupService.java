@@ -93,7 +93,7 @@ public class SignupService {
 
         // user 중복 생성 방지
         if(userRepository.findByEmail(email).isPresent()){
-            return ValidationStatus.VALID;
+            return ValidationStatus.DUPLICATE;
         }
         // 소셜 토큰 존재
         User user = new User();
@@ -107,12 +107,14 @@ public class SignupService {
 
         // star, character 저장 모두 성공
         if (setStar(star, user) && setCharacter(character, user, signUpDto)) {
-            starRepository.save(star);
+            //starRepository.save(star);
             log.info("star saved: " + star.getId());
 
-            characterRepository.save(character);
+            //characterRepository.save(character);
             log.info("character saved: " + character.getId());
 
+            userRepository.save(user);
+            log.info("user saved: " + user.getId());
             return ValidationStatus.VALID;
         }
         return ValidationStatus.NONE;
@@ -126,9 +128,6 @@ public class SignupService {
             user.setRefreshToken(refreshToken);
             user.setCreatedDate(LocalDate.now());
             user.setImgPath(signUpDto.getImgPath());
-
-            userRepository.save(user);
-            log.info("user saved: " + user.getId());
     }
 
     private void setNaverToken(NaverToken naverToken, User user) {
