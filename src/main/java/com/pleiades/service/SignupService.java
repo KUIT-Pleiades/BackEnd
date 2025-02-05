@@ -80,6 +80,12 @@ public class SignupService {
         this.signUpDto = signUpDto;
 
         log.info("signup으로 온 email: " + email);
+
+        // user 중복 생성 방지
+        if(userRepository.findByEmail(email).isPresent()){
+            return ValidationStatus.DUPLICATE;
+        }
+
         // 소셜 토큰 검증
         Optional<NaverToken> naverToken = naverTokenRepository.findByEmail(email);
         Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
@@ -89,10 +95,6 @@ public class SignupService {
 
         log.info("social token 존재함");
 
-        // user 중복 생성 방지
-        if(userRepository.findByEmail(email).isPresent()){
-            return ValidationStatus.DUPLICATE;
-        }
         // 소셜 토큰 존재
         User user = new User();
         setNewUser(user, email, refreshToken);
@@ -156,7 +158,7 @@ public class SignupService {
     }
 
     private boolean setCharacter(Characters character, User user, SignUpDto signUpDto) {
-        log.info("SingupService - setCharacter");
+        log.info("SignupService - setCharacter");
 
         log.info("get face");
         Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
@@ -168,10 +170,17 @@ public class SignupService {
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
-        if (skin.isEmpty() || expression.isEmpty() || hair.isEmpty() || top.isEmpty() || bottom.isEmpty() || shoes.isEmpty()) {
-            log.error("need to set face, outfit");
-            return false;
-        }
+        if (skin.isEmpty()) { log.error("need to set skin"); return false; }
+        if (expression.isEmpty()) { log.error("need to set expression"); return false; }
+        if (hair.isEmpty()) { log.error("need to set hair"); return false; }
+        if (top.isEmpty()) { log.error("need to set top"); return false; }
+        if (bottom.isEmpty()) { log.error("need to set bottom"); return false; }
+        if (shoes.isEmpty()) { log.error("need to set shoes"); return false; }
+
+//        if (skin.isEmpty() || expression.isEmpty() || hair.isEmpty() || top.isEmpty() || bottom.isEmpty() || shoes.isEmpty()) {
+//            log.error("need to set face, outfit");
+//            return false;
+//        }
 
         Face face = new Face();
         Outfit outfit = new Outfit();
