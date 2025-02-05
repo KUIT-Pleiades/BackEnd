@@ -24,8 +24,6 @@ import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -185,25 +183,23 @@ public class SignupService {
         face.setExpression(expression.get());
         face.setHair(hair.get());
 
-        character.setFace(face);
-
         log.info("set outfit");
         outfit.setTop(top.get());
         outfit.setBottom(bottom.get());
         outfit.setShoes(shoes.get());
 
         setItem(item);
-        character.setOutfit(outfit);
 
+        log.info("set character");
+        character.setFace(face);
+        character.setOutfit(outfit);
         character.setItem(item);
 
         return true;
     }
 
     private void setItem(Item item) {
-        log.info("SingupService - setItem");
-
-        log.info("get item");
+        log.info("SignupService - setItem");
         Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
         Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
         Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
