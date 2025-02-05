@@ -103,6 +103,42 @@ public class AuthService {
                 .body(body);
     }
 
+    public ValidationStatus userValidation(String accessToken) {
+        log.info("AuthService userValidation");
+
+        Claims claims = jwtUtil.validateToken(accessToken);
+        String email = claims.getSubject();
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            log.info("no user");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        Optional<Star> star = starRepository.findByUserId(user.get().getId());
+        if (star.isEmpty()) {
+            log.info("no star");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+
+        if (starBackground.isEmpty()) {
+            log.info("no star background");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        Optional<Characters> character = characterRepository.findByUser(user.get());
+
+        if (character.isEmpty()) {
+            log.info("no character");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        return ValidationStatus.VALID;
+    }
+
     // access token 유효한 경우에만 사용
     // Todo: 202 회원가입 안했을 시 -> star, starBG, User NOT FOUND
     public ResponseEntity<Map<String, Object>> responseUserInfo(String accessToken) {
@@ -112,48 +148,27 @@ public class AuthService {
 
         if (accessToken == null) { log.info("no access token"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
 
+        ValidationStatus userValidation = userValidation(accessToken);
+
+        if (userValidation.equals(ValidationStatus.NOT_VALID)) {
+            body.put("message", "Need Sign-up");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
+        }
+
         Claims claims = jwtUtil.validateToken(accessToken);
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) {
-            log.info("no user");
-            body.put("message", "User not found");
-            return ResponseEntity
-                    .status(HttpStatus.ACCEPTED)
-                    .body(body);
-        }
-
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
-        if (star.isEmpty()) {
-            log.info("no star");
-            body.put("message", "Star not found");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
-        }
-
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-
-        if (starBackground.isEmpty()) {
-            log.info("no star background");
-            body.put("message", "Background not found");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
-        }
-
         Optional<Characters> character = characterRepository.findByUser(user.get());
-
-        if (character.isEmpty()) {
-            log.info("no character");
-            body.put("message", "Character not found");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
-        }
 
         String profile = user.get().getImgPath();       // todo: profile
 
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
-        body.put("backgroundName", starBackground.get().getName());
+        body.put("starBackground", starBackground.get().getName());
         body.put("character", "ipfs_url.png");
 
         log.info("body: " + body);

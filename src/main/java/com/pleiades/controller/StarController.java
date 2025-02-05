@@ -35,12 +35,10 @@ public class StarController {
     }
 
 
-    // 이러면 /auth랑 완전히 똑같지 않나?
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        return authService.responseUserInfo(accessToken);
-        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+        return authService.responseUserInfo(accessToken);
     }
 
 }

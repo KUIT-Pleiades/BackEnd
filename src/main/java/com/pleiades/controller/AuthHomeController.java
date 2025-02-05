@@ -61,7 +61,12 @@ public class AuthHomeController {
 
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        return authService.responseUserInfo(accessToken);    // user 존재: 200
+        ValidationStatus userValidation = authService.userValidation(accessToken);
+
+        if (userValidation == ValidationStatus.NOT_VALID) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();    // user 존재: 200
     }
 
     @GetMapping("/refresh")
