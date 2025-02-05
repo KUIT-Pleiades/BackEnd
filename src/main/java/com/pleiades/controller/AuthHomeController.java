@@ -106,7 +106,7 @@ public class AuthHomeController {
         ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
 
         if (signupStatus == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","You need to login first"));      // 401
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","you need to login by social"));      // 401
         }
         if (signupStatus == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
