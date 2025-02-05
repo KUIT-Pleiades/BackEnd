@@ -61,26 +61,6 @@ public class AuthService {
         return ValidationStatus.VALID;
     }
 
-    public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
-        ValidationStatus tokenStatus = checkToken(accessToken);
-
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
-        }
-
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
-        }
-
-        Claims claims = jwtUtil.validateToken(accessToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
         log.info("AuthService responseRefreshTokenStatus");
 
@@ -101,12 +81,8 @@ public class AuthService {
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(Map.of("message","User not found. Sign up is required"));
-        }   // 202
 
-        if (!user.get().getRefreshToken().equals(refreshToken)) {
+        if ((user.isEmpty())||(!user.get().getRefreshToken().equals(refreshToken))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message","Refresh token is not valid. Social login is required"));
         }   // 403
@@ -203,5 +179,25 @@ public class AuthService {
         cookie.setMaxAge(7 * 24 * 60 * 60);
 
         return cookie;
+    }
+
+    public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
+        ValidationStatus tokenStatus = checkToken(accessToken);
+
+        if (tokenStatus.equals(ValidationStatus.NONE)) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
+        }
+
+        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
+        }
+
+        Claims claims = jwtUtil.validateToken(accessToken);
+        String email = claims.getSubject();
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
