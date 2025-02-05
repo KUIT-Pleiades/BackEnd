@@ -34,8 +34,8 @@ public class User {
     private LocalDate createdDate;
 
     // DB에 앱 자체 tokens 저장 X
-    @Transient
-    private String accessToken;
+//    @Transient
+//    private String accessToken;
 
     @Column
     private String refreshToken;

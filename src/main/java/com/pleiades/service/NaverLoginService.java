@@ -87,7 +87,7 @@ public class NaverLoginService {
         String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
 
         user.setRefreshToken(jwtRefreshToken);
-        user.setAccessToken(jwtAccessToken);
+//        user.setAccessToken(jwtAccessToken);
 
         log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
         return new LoginCBResponseDto(jwtRefreshToken, jwtAccessToken);
