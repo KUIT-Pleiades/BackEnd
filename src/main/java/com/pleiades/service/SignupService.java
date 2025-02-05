@@ -107,6 +107,7 @@ public class SignupService {
 
         // star, character 저장 모두 성공
         if (setStar(star, user) && setCharacter(character, user, signUpDto)) {
+            log.info("star save 시도");
             starRepository.save(star);
             log.info("star saved: " + star.getId());
 
@@ -209,10 +210,14 @@ public class SignupService {
         log.info("set character");
 
         character.setUser(user);
+        log.info("setCharacter에서 set user 완료");
 
         character.setFace(face);
         character.setOutfit(outfit);
+        log.info("setCharacter에서 set face, outfit 완료");
+
         character.setItem(item);
+        log.info("setCharacter에서 set item 완료");
 
         return true;
     }
