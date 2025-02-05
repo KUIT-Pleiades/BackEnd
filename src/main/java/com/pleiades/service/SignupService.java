@@ -109,11 +109,14 @@ public class SignupService {
         Star star = new Star();
         star.setUser(user);
         star.setId(user.getId());
-        starRepository.save(star);
+//        starRepository.save(star);
+        entityManager.merge(star);
+        log.info("star saved: " + star.getId());
 
         Characters character = new Characters();
         character.setUser(user);
-        characterRepository.save(character);
+//        characterRepository.save(character);
+        entityManager.merge(character);
 
         setStar(star);
         setCharacter(character);
@@ -162,10 +165,6 @@ public class SignupService {
             background.ifPresent(star::setBackground);
             log.info("star setted");
             log.info("starId: " + star.getId());
-
-            starRepository.save(star);
-            log.info("star saved: " + star.getId());
-
         } catch (Exception e) {
             log.error(e.getMessage());
         }
