@@ -96,8 +96,7 @@ public class SignupService {
         log.info("social token 존재함");
 
         // 소셜 토큰 존재
-        User user = new User();
-        setNewUser(user, email, refreshToken);
+        User user = setNewUser(email, refreshToken);
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
@@ -107,7 +106,6 @@ public class SignupService {
 
         // star, character 저장 모두 성공
         if (setStar(star, user) && setCharacter(character, user, signUpDto)) {
-            log.info("star save 시도");
             starRepository.save(star);
             log.info("star saved: " + star.getId());
 
@@ -120,14 +118,16 @@ public class SignupService {
         return ValidationStatus.NONE;
     }
 
-    private void setNewUser(User user, String email, String refreshToken) {
+    private User setNewUser(String email, String refreshToken) {
 
         Optional<User> existingUser = userRepository.findByEmail(email);
 
         if (existingUser.isPresent()) {
             log.info("Existing user found, using it: " + existingUser.get().getId());
-            return;
+            return existingUser.get();
         }
+
+        User user = new User();
         user.setId(signUpDto.getUserId());
         user.setEmail(email);
         user.setUserName(signUpDto.getUserName());
@@ -139,6 +139,7 @@ public class SignupService {
         userRepository.save(user);
         userRepository.flush();
         log.info("user saved: " + user.getId());
+        return user;
     }
 
     private void setNaverToken(NaverToken naverToken, User user) {
@@ -155,6 +156,7 @@ public class SignupService {
         log.info("SingupService - setStar");
         try {
             star.setUser(user);
+            star.setId(user.getId());
             Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
             background.ifPresent(star::setBackground);
             log.info("star setted");
@@ -210,14 +212,10 @@ public class SignupService {
         log.info("set character");
 
         character.setUser(user);
-        log.info("setCharacter에서 set user 완료");
 
         character.setFace(face);
         character.setOutfit(outfit);
-        log.info("setCharacter에서 set face, outfit 완료");
-
         character.setItem(item);
-        log.info("setCharacter에서 set item 완료");
 
         return true;
     }
