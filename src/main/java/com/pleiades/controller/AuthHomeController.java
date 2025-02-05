@@ -91,8 +91,7 @@ public class AuthHomeController {
         return duplicationService.responseIdDuplication(id);
     }
 
-    // todo: id 중복 체크, 별 배경 선택 추가, 캐릭터 & 별 연결
-    // todo: 앱 token 프론트와 통신 기능 -> 메소드 따로 추출
+
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody SignUpDto signUpDto) {
         log.info("/auth/signup");
@@ -103,6 +102,7 @@ public class AuthHomeController {
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
+        // TODO: user entity 이미 존재할 때 예외 처리
         ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
 
         if (signupStatus == ValidationStatus.NOT_VALID) {

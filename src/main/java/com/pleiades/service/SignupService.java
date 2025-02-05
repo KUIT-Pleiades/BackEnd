@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -76,6 +77,7 @@ public class SignupService {
     }
 
     // todo: star, character 저장에 실패하면 user도 저장 X
+    @Transactional
     public ValidationStatus signup(String email, SignUpDto signUpDto, String refreshToken) {
         this.signUpDto = signUpDto;
 
@@ -88,6 +90,11 @@ public class SignupService {
         if (naverToken.isEmpty() && kakaoToken.isEmpty()) { return ValidationStatus.NOT_VALID; }
 
         log.info("social token 존재함");
+
+        // user 중복 생성 방지
+        if(userRepository.findByEmail(email).isPresent()){
+            return ValidationStatus.VALID;
+        }
         // 소셜 토큰 존재
         User user = new User();
         setNewUser(user, email, refreshToken);
@@ -108,9 +115,6 @@ public class SignupService {
 
             return ValidationStatus.VALID;
         }
-
-        // star, character 둘 중 하나라도 저장 실패
-        userRepository.delete(user);
         return ValidationStatus.NONE;
     }
 
