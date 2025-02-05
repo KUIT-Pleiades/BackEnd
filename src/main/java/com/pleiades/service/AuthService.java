@@ -79,7 +79,7 @@ public class AuthService {
 
         Claims claims = jwtUtil.validateToken(refreshToken);
         String email = claims.getSubject();
-        
+
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
