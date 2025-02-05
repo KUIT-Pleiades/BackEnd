@@ -29,7 +29,7 @@ public class Characters {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="user_id")
     private User user;
 

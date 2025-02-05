@@ -101,7 +101,21 @@ public class SignupService {
         log.info("social token 존재함");
 
         // 소셜 토큰 존재
-        User user = setNewUser(email, refreshToken);
+//        User user = setNewUser(email, refreshToken);
+
+        //
+        User user = new User();
+        user.setId(signUpDto.getUserId());
+        user.setEmail(email);
+        user.setUserName(signUpDto.getUserName());
+        user.setBirthDate(signUpDto.getBirthDate());
+        user.setRefreshToken(refreshToken);
+        user.setCreatedDate(LocalDate.now());
+        user.setImgPath(signUpDto.getImgPath());
+
+        userRepository.save(user);
+        log.info("user saved: " + user.getId());
+        //
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
@@ -126,7 +140,6 @@ public class SignupService {
         Optional<Top> top = topRepository.findByName(signUpDto.getOutfit().getTopImg());
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
-
 
         Face face = new Face();
         Outfit outfit = new Outfit();
