@@ -39,7 +39,8 @@ public class StarController {
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
-        return authService.responseUserInfo(accessToken);
+//        return authService.responseUserInfo(accessToken);
+        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
     }
 
 }

@@ -54,6 +54,7 @@ public class AuthHomeController {
         this.jwtUtil = jwtUtil;
     }
 
+    // todo: user 정보가 존재하는지 검증 - 200, 202
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {
         log.info("/auth");

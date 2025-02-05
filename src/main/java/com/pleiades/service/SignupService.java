@@ -129,7 +129,6 @@ public class SignupService {
             user.setImgPath(signUpDto.getImgPath());
 
             userRepository.save(user);
-            userRepository.flush();
             log.info("user saved: " + user.getId());
     }
 
@@ -150,6 +149,7 @@ public class SignupService {
             Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
             background.ifPresent(star::setBackground);
             log.info("star setted");
+            log.info("starId: " + star.getId());
             return true;
         } catch (Exception e) {
             log.error(e.getMessage());
