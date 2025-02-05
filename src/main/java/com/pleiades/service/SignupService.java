@@ -81,13 +81,13 @@ public class SignupService {
 
         log.info("signup으로 온 email: " + email);
         // 소셜 토큰 검증
-        Optional<NaverToken> naverToken = naverTokenRepository.findByUserEmail(email);
+        Optional<NaverToken> naverToken = naverTokenRepository.findByEmail(email);
         Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
-
 
         // 소셜 토큰 없음
         if (naverToken.isEmpty() && kakaoToken.isEmpty()) { return ValidationStatus.NOT_VALID; }
 
+        log.info("social token 존재함");
         // 소셜 토큰 존재
         User user = new User();
         setNewUser(user, email, refreshToken);
