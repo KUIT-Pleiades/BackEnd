@@ -107,7 +107,9 @@ public class SignupService {
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
         Star star = new Star();
+        starRepository.save(star);
         Characters character = new Characters();
+        characterRepository.save(character);
 
         setStar(star, user);
         setCharacter(character, user);
