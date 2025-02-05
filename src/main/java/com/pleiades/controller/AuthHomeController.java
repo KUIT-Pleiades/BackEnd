@@ -102,25 +102,29 @@ public class AuthHomeController {
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody SignUpDto signUpDto) {
         log.info("/auth/signup");
 
-        // access token에서 email 추출
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
+        try {
+            // access token에서 email 추출
+            String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
+            Claims token = jwtUtil.validateToken(accessToken);
+            String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
-        ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
+            ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
 
-        if (signupStatus == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","you need to login by social"));      // 401
-        }
-        if (signupStatus == ValidationStatus.NONE) {
+            if (signupStatus == ValidationStatus.NOT_VALID) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","you need to login by social"));      // 401
+            }
+            if (signupStatus == ValidationStatus.DUPLICATE) {
+                return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(Map.of("message","duplicate user"));     // 208
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "sign-up success - character created")); // 201 : 회원가입 완료
+        } catch (Exception e) {
+            log.info("sign-up failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
         }
-        if (signupStatus == ValidationStatus.DUPLICATE) {
-            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(Map.of("message","duplicate user"));     // 208
-        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "sign-up success - character created")); // 201 : 회원가입 완료
+
     }
 
     @PostMapping("/profile")

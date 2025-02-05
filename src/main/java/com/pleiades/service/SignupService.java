@@ -22,6 +22,7 @@ import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,11 +59,16 @@ public class SignupService {
 
     SignUpDto signUpDto;
 
+    EntityManager entityManager;
+
     @Autowired
     public SignupService(UserRepository userRepository, StarRepository starRepository, CharacterRepository characterRepository,
                          SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
                          TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository, ItemRepository itemRepository,
-                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository, HeadRepository headRepository, EyesRepository eyesRepository, EarsRepository earsRepository, NeckRepository neckRepository, LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository) {
+                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository,
+                         HeadRepository headRepository, EyesRepository eyesRepository, EarsRepository earsRepository, NeckRepository neckRepository,
+                         LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository,
+                         EntityManager entityManager) {
         this.userRepository = userRepository; this.starRepository = starRepository; this.characterRepository = characterRepository;
         this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
         this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
@@ -72,6 +78,7 @@ public class SignupService {
         this.headRepository = headRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository; this.neckRepository = neckRepository;
         this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
         this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository;
+        this.entityManager = entityManager;
     }
 
     // todo: star, character 저장에 실패하면 user도 저장 X
@@ -82,9 +89,7 @@ public class SignupService {
         log.info("signup으로 온 email: " + email);
 
         // user 중복 생성 방지
-        if(userRepository.findByEmail(email).isPresent()){
-            return ValidationStatus.DUPLICATE;
-        }
+        if(userRepository.findByEmail(email).isPresent()){ return ValidationStatus.DUPLICATE; }
 
         // 소셜 토큰 검증
         Optional<NaverToken> naverToken = naverTokenRepository.findByEmail(email);
@@ -104,18 +109,10 @@ public class SignupService {
         Star star = new Star();
         Characters character = new Characters();
 
-        // star, character 저장 모두 성공
-        if (setStar(star, user) && setCharacter(character, user, signUpDto)) {
-            starRepository.save(star);
-            log.info("star saved: " + star.getId());
+        setStar(star, user);
+        setCharacter(character, user);
 
-            characterRepository.save(character);
-            log.info("character saved: " + character.getId());
-
-            return ValidationStatus.VALID;
-        }
-
-        return ValidationStatus.NONE;
+        return ValidationStatus.VALID;
     }
 
     private User setNewUser(String email, String refreshToken) {
@@ -152,8 +149,8 @@ public class SignupService {
         kakaoTokenRepository.save(kakaoToken);
     }
 
-    private boolean setStar(Star star, User user) {
-        log.info("SingupService - setStar");
+    private void setStar(Star star, User user) {
+        log.info("SignupService - setStar");
         try {
             star.setUser(user);
             star.setId(user.getId());
@@ -161,14 +158,16 @@ public class SignupService {
             background.ifPresent(star::setBackground);
             log.info("star setted");
             log.info("starId: " + star.getId());
-            return true;
+
+            starRepository.save(star);
+            log.info("star saved: " + star.getId());
+
         } catch (Exception e) {
             log.error(e.getMessage());
-            return false;
         }
     }
 
-    private boolean setCharacter(Characters character, User user, SignUpDto signUpDto) {
+    private void setCharacter(Characters character, User user) {
         log.info("SignupService - setCharacter");
 
         log.info("get face");
@@ -181,12 +180,12 @@ public class SignupService {
         Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
         Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
 
-        if (skin.isEmpty()) { log.error("need to set skin"); return false; }
-        if (expression.isEmpty()) { log.error("need to set expression"); return false; }
-        if (hair.isEmpty()) { log.error("need to set hair"); return false; }
-        if (top.isEmpty()) { log.error("need to set top"); return false; }
-        if (bottom.isEmpty()) { log.error("need to set bottom"); return false; }
-        if (shoes.isEmpty()) { log.error("need to set shoes"); return false; }
+        if (skin.isEmpty()) { log.error("need to set skin"); return; }
+        if (expression.isEmpty()) { log.error("need to set expression"); return; }
+        if (hair.isEmpty()) { log.error("need to set hair"); return; }
+        if (top.isEmpty()) { log.error("need to set top"); return; }
+        if (bottom.isEmpty()) { log.error("need to set bottom"); return; }
+        if (shoes.isEmpty()) { log.error("need to set shoes"); return; }
 
 //        if (skin.isEmpty() || expression.isEmpty() || hair.isEmpty() || top.isEmpty() || bottom.isEmpty() || shoes.isEmpty()) {
 //            log.error("need to set face, outfit");
@@ -217,7 +216,9 @@ public class SignupService {
         character.setOutfit(outfit);
         character.setItem(item);
 
-        return true;
+        characterRepository.save(character);
+        log.info("character saved: " + character.getId());
+
     }
 
     private void setItem(Item item) {
