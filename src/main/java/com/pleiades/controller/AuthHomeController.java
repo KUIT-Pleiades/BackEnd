@@ -111,6 +111,9 @@ public class AuthHomeController {
         if (signupStatus == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
         }
+        if (signupStatus == ValidationStatus.DUPLICATE) {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(Map.of("message","duplicate user"));     // 208
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "sign-up success - character created")); // 201 : 회원가입 완료
     }

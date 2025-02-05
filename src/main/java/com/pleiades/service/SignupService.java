@@ -114,7 +114,6 @@ public class SignupService {
             return ValidationStatus.VALID;
         }
 
-
         return ValidationStatus.NONE;
     }
 
@@ -178,8 +177,6 @@ public class SignupService {
         Outfit outfit = new Outfit();
         Item item = new Item();
 
-        character.setUser(user);
-
         log.info("set face");
         face.setSkin(skin.get());
         face.setExpression(expression.get());
@@ -193,6 +190,9 @@ public class SignupService {
         setItem(item);
 
         log.info("set character");
+
+        character.setUser(user);
+
         character.setFace(face);
         character.setOutfit(outfit);
         character.setItem(item);
