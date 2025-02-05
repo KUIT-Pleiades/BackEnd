@@ -78,9 +78,12 @@ public class SignupService {
     // todo: star, character 저장에 실패하면 user도 저장 X
     public ValidationStatus signup(String email, SignUpDto signUpDto, String refreshToken) {
         this.signUpDto = signUpDto;
+
+        log.info("signup으로 온 email: " + email);
         // 소셜 토큰 검증
         Optional<NaverToken> naverToken = naverTokenRepository.findByUserEmail(email);
         Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
+
 
         // 소셜 토큰 없음
         if (naverToken.isEmpty() && kakaoToken.isEmpty()) { return ValidationStatus.NOT_VALID; }
