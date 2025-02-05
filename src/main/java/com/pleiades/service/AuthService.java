@@ -79,14 +79,7 @@ public class AuthService {
 
         Claims claims = jwtUtil.validateToken(refreshToken);
         String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-
-        if ((user.isEmpty())||(!user.get().getRefreshToken().equals(refreshToken))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message","Refresh token is not valid. Social login is required"));
-        }   // 403
-
+        
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 

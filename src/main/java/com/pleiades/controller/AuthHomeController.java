@@ -103,7 +103,6 @@ public class AuthHomeController {
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
-        // TODO: user entity 이미 존재할 때 예외 처리
         ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
 
         if (signupStatus == ValidationStatus.NOT_VALID) {
