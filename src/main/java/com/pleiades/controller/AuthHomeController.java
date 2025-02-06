@@ -63,6 +63,7 @@ public class AuthHomeController {
 
         ValidationStatus userValidation = authService.userValidation(accessToken);
 
+        // todo: message
         if (userValidation == ValidationStatus.NOT_VALID) {
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }

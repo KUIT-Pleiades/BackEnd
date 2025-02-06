@@ -122,9 +122,11 @@ public class SignupService {
 
         Star star = new Star();
         star.setUser(user);
+        log.info("set user");
         // star.setId(user.getId());
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
         background.ifPresent(star::setBackground);
+        log.info("background: "+background.get().getName());
         starRepository.save(star);
         log.info("star saved: " + star.getId());
 
@@ -189,30 +191,31 @@ public class SignupService {
         return ValidationStatus.VALID;
     }
 
-    private User setNewUser(String email, String refreshToken) {
-//        Optional<User> existingUser = userRepository.findByEmail(email);
+//    private User setNewUser(String email, String refreshToken) {
+////        Optional<User> existingUser = userRepository.findByEmail(email);
+////
+////        if (existingUser.isPresent()) {
+////            log.info("Existing user found, using it: " + existingUser.get().getId());
+////            return existingUser.get();
+////        }
 //
-//        if (existingUser.isPresent()) {
-//            log.info("Existing user found, using it: " + existingUser.get().getId());
-//            return existingUser.get();
-//        }
-
-        User user = new User();
-        user.setId(signUpDto.getUserId());
-        user.setEmail(email);
-        user.setUserName(signUpDto.getUserName());
-        user.setBirthDate(signUpDto.getBirthDate());
-        user.setRefreshToken(refreshToken);
-        user.setCreatedDate(LocalDate.now());
-        user.setImgPath(signUpDto.getImgPath());
-
-        userRepository.save(user);
-        log.info("user saved: " + user.getId());
-        return user;
-    }
+//        User user = new User();
+//        user.setId(signUpDto.getUserId());
+//        user.setEmail(email);
+//        user.setUserName(signUpDto.getUserName());
+//        user.setBirthDate(signUpDto.getBirthDate());
+//        user.setRefreshToken(refreshToken);
+//        user.setCreatedDate(LocalDate.now());
+//        user.setImgPath(signUpDto.getImgPath());
+//
+//        userRepository.save(user);
+//        log.info("user saved: " + user.getId());
+//        return user;
+//    }
 
     private void setNaverToken(NaverToken naverToken, User user) {
         naverToken.setUser(user);
+        log.info("네이버 token saved: " + naverToken.getId());
         naverTokenRepository.save(naverToken);
     }
 
