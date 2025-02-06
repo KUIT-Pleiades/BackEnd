@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
-@Table(name = "starbackground")
+@Table(name = "star_background")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,4 +20,7 @@ public class StarBackground {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "background", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+    private List<Star> star;
 }

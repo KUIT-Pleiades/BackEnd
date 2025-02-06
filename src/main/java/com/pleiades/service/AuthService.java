@@ -6,7 +6,6 @@ import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.User;
-import com.pleiades.entity.character.CharacterItem;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.entity.character.Item.Item;
 import com.pleiades.repository.StarBackgroundRepository;
