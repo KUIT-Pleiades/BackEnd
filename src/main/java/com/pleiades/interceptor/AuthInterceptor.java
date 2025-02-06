@@ -34,6 +34,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         log.info("Request URI: {}", request.getRequestURI());
         String authorization = request.getHeader("Authorization");
 
+        log.info("Authorization: {}", authorization);
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             log.info("AuthInterceptor preHandle 428 - no authorization");
             response.sendError(428, "Precondition Required");      // 428

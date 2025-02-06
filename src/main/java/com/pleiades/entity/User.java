@@ -40,21 +40,6 @@ public class User {
     @Column
     private String refreshToken;
 
-    // todo: cascade 설정
-    @OneToOne(mappedBy = "user")
-    private NaverToken naverToken;
-
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
-    private KakaoToken kakaoToken;
-
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
-    private Star star;
-
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
-    private Characters character;
-
     @Column(nullable = true)
     String imgPath;
-
-
 }

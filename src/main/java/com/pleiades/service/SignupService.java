@@ -81,7 +81,6 @@ public class SignupService {
         this.entityManager = entityManager;
     }
 
-    // todo: star, character 저장에 실패하면 user도 저장 X
     @Transactional
     public ValidationStatus signup(String email, SignUpDto signUpDto, String refreshToken) {
         this.signUpDto = signUpDto;
@@ -101,116 +100,87 @@ public class SignupService {
         log.info("social token 존재함");
 
         // 소셜 토큰 존재
-//        User user = setNewUser(email, refreshToken);
-
-        //
-        User user = new User();
-        user.setId(signUpDto.getUserId());
-        user.setEmail(email);
-        user.setUserName(signUpDto.getUserName());
-        user.setBirthDate(signUpDto.getBirthDate());
-        user.setRefreshToken(refreshToken);
-        user.setCreatedDate(LocalDate.now());
-        user.setImgPath(signUpDto.getImgPath());
-
-        userRepository.save(user);
+        User user = createUser(email, signUpDto, refreshToken);
         entityManager.flush();
-        log.info("user saved: " + user.getId());
-        //
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
+        createStar(user, signUpDto);
+        createCharacter(user, signUpDto);
+
+        return ValidationStatus.VALID;
+    }
+
+    private User createUser(String email, SignUpDto signUpDto, String refreshToken) {
+        User user = User.builder()
+                .id(signUpDto.getUserId())
+                .email(email)
+                .userName(signUpDto.getUserName())
+                .birthDate(signUpDto.getBirthDate())
+                .refreshToken(refreshToken)
+                .createdDate(LocalDate.now())
+                .imgPath(signUpDto.getImgPath())
+                .build();
+        userRepository.save(user);
+        log.info("User 저장 완료 - id: {}", user.getId());
+        return user;
+    }
+
+    private void createStar(User user, SignUpDto signUpDto) {
         Star star = new Star();
-        star.setUser(userRepository.findById(user.getId()).get());
-        log.info("set user");
-        // star.setId(user.getId());
+        star.setUser(user);
+
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
-        log.info("get background: " + background.get().getName());
         background.ifPresent(star::setBackground);
-        log.info("set background: " + background.get().getName());
+
         starRepository.save(star);
-        log.info("star saved: " + star.getId());
+        log.info("Star 세팅 완료 - id: {}", star.getId());
+    }
+
+    private void createCharacter(User user, SignUpDto signUpDto) {
+        Face face = createFace(signUpDto);
+        Outfit outfit = createOutfit(signUpDto);
+        Item item = createItem(signUpDto);
 
         Characters character = new Characters();
-        character.setUser(userRepository.findById(user.getId()).get());
-//
-        log.info("get face");
-        Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
-        Optional<Expression> expression = expressionRepository.findByName(signUpDto.getFace().getExpressionImg());
-        Optional<Hair> hair = hairRepository.findByName(signUpDto.getFace().getHairImg());
-
-        log.info("get outfit");
-        Optional<Top> top = topRepository.findByName(signUpDto.getOutfit().getTopImg());
-        Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
-        Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
-
-        Face face = new Face();
-        Outfit outfit = new Outfit();
-        Item item = new Item();
-
-        log.info("set face");
-        face.setSkin(skin.get());
-        face.setExpression(expression.get());
-        face.setHair(hair.get());
-
-        log.info("set outfit");
-        outfit.setTop(top.get());
-        outfit.setBottom(bottom.get());
-        outfit.setShoes(shoes.get());
-
-//        setItem(item);
-
-        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
-        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
-        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
-        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
-        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
-        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
-        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
-        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
-
-        log.info("set item");
-        head.ifPresent(item::setHead); eyes.ifPresent(item::setEyes); ears.ifPresent(item::setEars); neck.ifPresent(item::setNeck);
-        leftWrist.ifPresent(item::setLeftWrist); rightWrist.ifPresent(item::setRightWrist);
-        leftHand.ifPresent(item::setLeftHand); rightHand.ifPresent(item::setRightHand);
-
-        log.info("set character");
-
+        character.setUser(user);
         character.setFace(face);
         character.setOutfit(outfit);
         character.setItem(item);
 
         characterRepository.save(character);
-        log.info("character saved: " + character.getId());
-//
-//        setStar(star);
-//        setCharacter(character);
-
-        return ValidationStatus.VALID;
+        log.info("Character 세팅 완료 - id: {}", character.getId());
     }
 
-//    private User setNewUser(String email, String refreshToken) {
-////        Optional<User> existingUser = userRepository.findByEmail(email);
-////
-////        if (existingUser.isPresent()) {
-////            log.info("Existing user found, using it: " + existingUser.get().getId());
-////            return existingUser.get();
-////        }
-//
-//        User user = new User();
-//        user.setId(signUpDto.getUserId());
-//        user.setEmail(email);
-//        user.setUserName(signUpDto.getUserName());
-//        user.setBirthDate(signUpDto.getBirthDate());
-//        user.setRefreshToken(refreshToken);
-//        user.setCreatedDate(LocalDate.now());
-//        user.setImgPath(signUpDto.getImgPath());
-//
-//        userRepository.save(user);
-//        log.info("user saved: " + user.getId());
-//        return user;
-//    }
+    private Face createFace(SignUpDto signUpDto) {
+        Face face = new Face();
+        face.setSkin(skinRepository.findByName(signUpDto.getFace().getSkinImg()).orElseThrow());
+        face.setExpression(expressionRepository.findByName(signUpDto.getFace().getExpressionImg()).orElseThrow());
+        face.setHair(hairRepository.findByName(signUpDto.getFace().getHairImg()).orElseThrow());
+        return face;
+    }
+
+    private Outfit createOutfit(SignUpDto signUpDto) {
+        Outfit outfit = new Outfit();
+        outfit.setTop(topRepository.findByName(signUpDto.getOutfit().getTopImg()).orElseThrow());
+        outfit.setBottom(bottomRepository.findByName(signUpDto.getOutfit().getBottomImg()).orElseThrow());
+        outfit.setShoes(shoesRepository.findByName(signUpDto.getOutfit().getShoesImg()).orElseThrow());
+        return outfit;
+    }
+
+    private Item createItem(SignUpDto signUpDto) {
+        Item item = new Item();
+        item.setHead(headRepository.findByName(signUpDto.getItem().getHeadImg()).orElse(null));
+        item.setEyes(eyesRepository.findByName(signUpDto.getItem().getEyesImg()).orElse(null));
+        item.setEars(earsRepository.findByName(signUpDto.getItem().getEarsImg()).orElse(null));
+        item.setNeck(neckRepository.findByName(signUpDto.getItem().getNeckImg()).orElse(null));
+        item.setLeftWrist(leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg()).orElse(null));
+        item.setRightWrist(rightWristRepository.findByName(signUpDto.getItem().getRightWristImg()).orElse(null));
+        item.setLeftHand(leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg()).orElse(null));
+        item.setRightHand(rightHandRepository.findByName(signUpDto.getItem().getRightHandImg()).orElse(null));
+        return item;
+    }
 
     private void setNaverToken(NaverToken naverToken, User user) {
         naverToken.setUser(user);
@@ -220,87 +190,7 @@ public class SignupService {
 
     private void setKakaoToken(KakaoToken kakaoToken, User user) {
         kakaoToken.setUser(user);
+        log.info("카카오 token saved: " + kakaoToken.getId());
         kakaoTokenRepository.save(kakaoToken);
-    }
-
-    private void setStar(Star star) {
-        log.info("SignupService - setStar");
-        try {
-            Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
-            background.ifPresent(star::setBackground);
-            log.info("star setted");
-            log.info("starId: " + star.getId());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void setCharacter(Characters character) {
-        log.info("SignupService - setCharacter");
-
-        log.info("get face");
-        Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
-        Optional<Expression> expression = expressionRepository.findByName(signUpDto.getFace().getExpressionImg());
-        Optional<Hair> hair = hairRepository.findByName(signUpDto.getFace().getHairImg());
-
-        log.info("get outfit");
-        Optional<Top> top = topRepository.findByName(signUpDto.getOutfit().getTopImg());
-        Optional<Bottom> bottom = bottomRepository.findByName(signUpDto.getOutfit().getBottomImg());
-        Optional<Shoes> shoes = shoesRepository.findByName(signUpDto.getOutfit().getShoesImg());
-
-        if (skin.isEmpty()) { log.error("need to set skin"); return; }
-        if (expression.isEmpty()) { log.error("need to set expression"); return; }
-        if (hair.isEmpty()) { log.error("need to set hair"); return; }
-        if (top.isEmpty()) { log.error("need to set top"); return; }
-        if (bottom.isEmpty()) { log.error("need to set bottom"); return; }
-        if (shoes.isEmpty()) { log.error("need to set shoes"); return; }
-
-//        if (skin.isEmpty() || expression.isEmpty() || hair.isEmpty() || top.isEmpty() || bottom.isEmpty() || shoes.isEmpty()) {
-//            log.error("need to set face, outfit");
-//            return false;
-//        }
-
-        Face face = new Face();
-        Outfit outfit = new Outfit();
-        Item item = new Item();
-
-        log.info("set face");
-        face.setSkin(skin.get());
-        face.setExpression(expression.get());
-        face.setHair(hair.get());
-
-        log.info("set outfit");
-        outfit.setTop(top.get());
-        outfit.setBottom(bottom.get());
-        outfit.setShoes(shoes.get());
-
-        setItem(item);
-
-        log.info("set character");
-
-        character.setFace(face);
-        character.setOutfit(outfit);
-        character.setItem(item);
-
-        characterRepository.save(character);
-        log.info("character saved: " + character.getId());
-
-    }
-
-    private void setItem(Item item) {
-        log.info("SignupService - setItem");
-        Optional<Head> head = headRepository.findByName(signUpDto.getItem().getHeadImg());
-        Optional<Eyes> eyes = eyesRepository.findByName(signUpDto.getItem().getEyesImg());
-        Optional<Ears> ears = earsRepository.findByName(signUpDto.getItem().getEarsImg());
-        Optional<Neck> neck = neckRepository.findByName(signUpDto.getItem().getNeckImg());
-        Optional<LeftWrist> leftWrist = leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg());
-        Optional<RightWrist> rightWrist = rightWristRepository.findByName(signUpDto.getItem().getRightWristImg());
-        Optional<LeftHand> leftHand = leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg());
-        Optional<RightHand> rightHand = rightHandRepository.findByName(signUpDto.getItem().getRightHandImg());
-
-        log.info("set item");
-        head.ifPresent(item::setHead); eyes.ifPresent(item::setEyes); ears.ifPresent(item::setEars); neck.ifPresent(item::setNeck);
-        leftWrist.ifPresent(item::setLeftWrist); rightWrist.ifPresent(item::setRightWrist);
-        leftHand.ifPresent(item::setLeftHand); rightHand.ifPresent(item::setRightHand);
     }
 }
