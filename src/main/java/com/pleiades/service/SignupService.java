@@ -122,7 +122,7 @@ public class SignupService {
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
         Star star = new Star();
-        star.setUser(user);
+        star.setUser(userRepository.findById(user.getId()).get());
         log.info("set user");
         // star.setId(user.getId());
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
@@ -133,7 +133,7 @@ public class SignupService {
         log.info("star saved: " + star.getId());
 
         Characters character = new Characters();
-        character.setUser(user);
+        character.setUser(userRepository.findById(user.getId()).get());
 //
         log.info("get face");
         Optional<Skin> skin = skinRepository.findByName(signUpDto.getFace().getSkinImg());
