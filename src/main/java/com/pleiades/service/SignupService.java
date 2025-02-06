@@ -184,9 +184,6 @@ public class SignupService {
         characterRepository.save(character);
         log.info("character saved: " + character.getId());
 //
-
-        characterRepository.save(character);
-
 //        setStar(star);
 //        setCharacter(character);
 
