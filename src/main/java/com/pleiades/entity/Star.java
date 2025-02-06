@@ -17,7 +17,7 @@ public class Star {
     private Long id; // User의 기본 키를 그대로 사용 (X)
 
     // @MapsId // User의 기본 키를 Star의 기본 키로 매핑
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "user_id")
     private User user;
 

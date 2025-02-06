@@ -114,6 +114,7 @@ public class SignupService {
         user.setImgPath(signUpDto.getImgPath());
 
         userRepository.save(user);
+        entityManager.flush();
         log.info("user saved: " + user.getId());
         //
 
