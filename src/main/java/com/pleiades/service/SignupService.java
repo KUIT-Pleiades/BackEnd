@@ -122,7 +122,7 @@ public class SignupService {
 
         Star star = new Star();
         star.setUser(user);
-        star.setId(user.getId());
+        // star.setId(user.getId());
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
         background.ifPresent(star::setBackground);
         starRepository.save(star);
