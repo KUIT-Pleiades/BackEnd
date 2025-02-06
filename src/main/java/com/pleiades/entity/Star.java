@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "star")
+@Table(name = "stars")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -24,6 +24,6 @@ public class Star {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "starbackground_id")
+    @JoinColumn(name = "background_id")
     private StarBackground background;
 }
