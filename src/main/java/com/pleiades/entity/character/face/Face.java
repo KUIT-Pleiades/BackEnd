@@ -31,6 +31,6 @@ public class Face {
     @JoinColumn(name = "expression_name")
     private Expression expression;
 
-    @OneToOne(mappedBy = "face")
+    @OneToOne(mappedBy = "face", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
     Characters characters;
 }

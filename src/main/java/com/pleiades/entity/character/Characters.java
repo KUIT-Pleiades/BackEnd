@@ -33,15 +33,15 @@ public class Characters {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="face_id")
     private Face face;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="item_id")
     private Item item;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="outfit_id")
     private Outfit outfit;
 
