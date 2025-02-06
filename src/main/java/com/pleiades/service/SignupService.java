@@ -125,8 +125,9 @@ public class SignupService {
         log.info("set user");
         // star.setId(user.getId());
         Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
+        log.info("get background: " + background.get().getName());
         background.ifPresent(star::setBackground);
-        log.info("background: "+background.get().getName());
+        log.info("set background: " + background.get().getName());
         starRepository.save(star);
         log.info("star saved: " + star.getId());
 
