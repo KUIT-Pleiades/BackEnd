@@ -11,9 +11,7 @@ import com.pleiades.service.SignupService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import com.pleiades.strings.JwtRole;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,7 @@ import java.util.*;
 @Slf4j
 @Controller
 @RequestMapping("/auth")
-public class AuthHomeController {
+public class AuthController {
     JwtUtil jwtUtil;
 
     UserRepository userRepository;
@@ -43,10 +41,10 @@ public class AuthHomeController {
     AuthService authService;
 
     @Autowired
-    AuthHomeController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
-                       NaverTokenRepository naverTokenRepository,
-                       ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService,
-                       JwtUtil jwtUtil, HeaderUtil headerUtil)
+    AuthController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
+                   NaverTokenRepository naverTokenRepository,
+                   ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService,
+                   JwtUtil jwtUtil, HeaderUtil headerUtil)
     {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
@@ -98,7 +96,7 @@ public class AuthHomeController {
         return duplicationService.responseIdDuplication(id);
     }
 
-
+    // todo: AuthInterceptor 겹치는 부분 Refactor
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody SignUpDto signUpDto) {
         log.info("/auth/signup");

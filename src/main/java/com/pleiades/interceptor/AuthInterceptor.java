@@ -1,10 +1,12 @@
 package com.pleiades.interceptor;
 
+import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +58,12 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);       // 401
             return false;
         }
+
+        // 사용자 ID 추출 후 request attribute 에 넣기
+        Claims token = jwtUtil.validateToken(accessToken);
+        String email = token.getSubject();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        request.setAttribute("userId", user.getId());
 
         log.info("AuthInterceptor preHandle 200");
         response.setStatus(HttpServletResponse.SC_OK);

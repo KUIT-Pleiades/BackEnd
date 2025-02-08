@@ -1,36 +1,27 @@
 package com.pleiades.controller;
 
-import com.pleiades.entity.Star;
-import com.pleiades.entity.StarBackground;
-import com.pleiades.entity.User;
-import com.pleiades.entity.character.Characters;
 import com.pleiades.service.AuthService;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
 @Controller
 @RequestMapping("/home")
-public class StarController {
+public class HomeController {
 
     AuthService authService;
 
     @Autowired
-    public StarController(AuthService authService, JwtUtil jwtUtil) {
+    public HomeController(AuthService authService, JwtUtil jwtUtil) {
         this.authService = authService;
     }
 
