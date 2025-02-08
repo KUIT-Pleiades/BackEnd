@@ -1,6 +1,6 @@
 package com.pleiades.util;
 
-import com.pleiades.dto.naver.NaverLoginResponse;
+import com.pleiades.dto.naver.NaverLoginResponseDto;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import lombok.*;
@@ -89,7 +89,7 @@ public class NaverApiUtil {
         return naverToken.getAccessToken();
     }
 
-    public NaverLoginResponse getUserInfo(String accessToken) {
+    public NaverLoginResponseDto getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -99,7 +99,7 @@ public class NaverApiUtil {
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody().get("response");
 
-        return new NaverLoginResponse(
+        return new NaverLoginResponseDto(
                 (String) responseBody.get("email"),
                 accessToken
         );

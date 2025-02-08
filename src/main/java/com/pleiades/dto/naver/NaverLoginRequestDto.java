@@ -1,4 +1,4 @@
-package com.pleiades.dto;
+package com.pleiades.dto.naver;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginCBResponseDto {
+public class NaverLoginRequestDto {
 
-    private String refreshToken;
-    private String accessToken;
-
+    private String code;
 }
-

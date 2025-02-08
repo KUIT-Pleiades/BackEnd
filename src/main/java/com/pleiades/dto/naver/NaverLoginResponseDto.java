@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NaverLoginResponse {
+public class NaverLoginResponseDto {
 
     private String email;
     private String accessToken;

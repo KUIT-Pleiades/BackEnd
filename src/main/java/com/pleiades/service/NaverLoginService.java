@@ -1,7 +1,7 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.LoginCBResponseDto;
-import com.pleiades.dto.naver.NaverLoginResponse;
+import com.pleiades.dto.LoginResponseDto;
+import com.pleiades.dto.naver.NaverLoginResponseDto;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
@@ -28,7 +28,7 @@ public class NaverLoginService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public LoginCBResponseDto handleNaverLoginCallback(String code) {
+    public LoginResponseDto handleNaverLoginCallback(String code) {
         log.info("service 계층 진입");
 
         Map<String, String> naverTokens = naverApiUtil.getTokens(code);
@@ -45,11 +45,11 @@ public class NaverLoginService {
         String accessToken = naverTokens.get("access_token");
         String refreshToken = naverTokens.get("refresh_token");
 
-        NaverLoginResponse userInfo = naverApiUtil.getUserInfo(accessToken);
+        NaverLoginResponseDto userInfo = naverApiUtil.getUserInfo(accessToken);
         String email = userInfo.getEmail();
 
         User user = userRepository.findByEmail(email).orElse(null);
-        LoginCBResponseDto cbResponse;
+        LoginResponseDto cbResponse;
 
         if (user != null) {
             log.info("user 이미 존재");
@@ -80,7 +80,7 @@ public class NaverLoginService {
         return cbResponse;
     }
 
-    private LoginCBResponseDto updateAppTokensForUser(User user) {
+    private LoginResponseDto updateAppTokensForUser(User user) {
 
         String jwtAccessToken = jwtUtil.generateAccessToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
         String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
@@ -89,12 +89,12 @@ public class NaverLoginService {
 //        user.setAccessToken(jwtAccessToken);
 
         log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
-        return new LoginCBResponseDto(jwtRefreshToken, jwtAccessToken);
+        return new LoginResponseDto(jwtRefreshToken, jwtAccessToken);
     }
 
     // todo : 일단 안씀 -> 나중에 검사 해보고 지울 것
     @Transactional
-    public NaverLoginResponse handleNaverRefreshTokenLogin(String refreshToken) {
+    public NaverLoginResponseDto handleNaverRefreshTokenLogin(String refreshToken) {
 
         NaverToken naverToken = naverTokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new IllegalArgumentException("DB에 네이버 Refresh Token 존재 X"));
@@ -109,7 +109,7 @@ public class NaverLoginService {
         naverToken.setLastUpdated(System.currentTimeMillis());
         naverTokenRepository.save(naverToken);
 
-        NaverLoginResponse userInfo = naverApiUtil.getUserInfo(accessToken);
+        NaverLoginResponseDto userInfo = naverApiUtil.getUserInfo(accessToken);
         log.info("Refresh token으로 사용자 정보 조회 성공: {}", userInfo);
 
         return userInfo;

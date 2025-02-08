@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +26,30 @@ public class FriendService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+
+    // 받은 친구 요청 목록
+    @Transactional
+    public List<Friend> getReceivedFriendRequests(String email) {
+        User receiver = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
+
+        return friendRepository.findByReceiverAndStatus(receiver, FriendStatus.PENDING);
+    }
+
+    @Transactional
+    public List<Friend> getFriends(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
+
+        return friendRepository.findBySenderAndStatusOrReceiverAndStatus(
+                user, FriendStatus.ACCEPTED, user, FriendStatus.ACCEPTED);
+    }
+
+    //보낸 친구 요청 목록
+    @Transactional
+    public List<Friend> getSentFriendRequests(String email) {
+        User sender = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
+
+        return friendRepository.findBySenderAndStatus(sender, FriendStatus.PENDING);
+    }
 
     @Transactional
     public ResponseEntity<Map<String, Object>> sendFriendRequest(String email, String receiverId) {
