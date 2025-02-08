@@ -39,7 +39,7 @@ public class FriendService {
     public List<Friend> getFriends(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
 
-        return friendRepository.findBySenderAndStatusOrReceiverAndStatus(
+        return friendRepository.findBySenderAndStatusOrReceiverAndStatusOrderByCreatedAtDesc(
                 user, FriendStatus.ACCEPTED, user, FriendStatus.ACCEPTED);
     }
 
@@ -101,5 +101,36 @@ public class FriendService {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message","Friend request sent successfully"));
 
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> updateFriendStatus(String email, Long friendId, FriendStatus newStatus) {
+        Optional<Friend> optionalFriend = friendRepository.findById(friendId);
+
+        if (optionalFriend.isPresent()) {
+            Friend friend = optionalFriend.get();
+
+            // 저장된 friend receiver != 현재 user
+            if(!friend.getReceiver().getEmail().equals(email)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message","You cannot handle the request"));
+            }
+
+            // status update
+            friend.setStatus(newStatus);
+            friendRepository.save(friend);
+
+            // response
+            if(newStatus.equals(FriendStatus.ACCEPTED)){
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(Map.of("message","Friend request accepted"));
+            }
+            if(newStatus.equals(FriendStatus.REJECTED)){
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(Map.of("message","Friend request rejected"));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message","Friend request not found"));
     }
 }

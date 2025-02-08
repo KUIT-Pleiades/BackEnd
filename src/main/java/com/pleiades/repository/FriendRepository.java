@@ -18,7 +18,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     List<Friend> findByReceiverAndStatus(User receiver, FriendStatus status);
 
     // 친구 목록
-    List<Friend> findBySenderAndStatusOrReceiverAndStatus(User sender, FriendStatus status1, User receiver, FriendStatus status2);
+    List<Friend> findBySenderAndStatusOrReceiverAndStatusOrderByCreatedAtDesc(User sender, FriendStatus status1, User receiver, FriendStatus status2);
 
     // 보낸 친구 요청 목록
     List<Friend> findBySenderAndStatus(User sender, FriendStatus status);

@@ -4,6 +4,7 @@ import com.pleiades.dto.friend.FriendDto;
 import com.pleiades.dto.friend.FriendListDto;
 import com.pleiades.entity.Friend;
 import com.pleiades.service.FriendService;
+import com.pleiades.strings.FriendStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -69,5 +67,17 @@ public class FriendController {
 
         FriendListDto response = new FriendListDto(receivedDtos, friendDtos, sentDtos);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/requests/{friend_id}")
+    public ResponseEntity<Map<String, String>> handleFriendRequest(HttpServletRequest request, @RequestBody Map<String, Object> requestBody, @PathVariable("friend_id") Long friend_id) {
+        log.info("handle request controller 진입");
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
+        FriendStatus status = FriendStatus.valueOf(requestBody.get("status").toString().toUpperCase());
+
+        return friendService.updateFriendStatus(email, friend_id, status);
     }
 }
