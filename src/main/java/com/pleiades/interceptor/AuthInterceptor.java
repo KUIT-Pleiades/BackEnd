@@ -20,13 +20,11 @@ import java.io.IOException;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
     private final AuthService authService;
 
     @Autowired
     public AuthInterceptor(JwtUtil jwtUtil, UserRepository userRepository, AuthService authService) {
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
         this.authService = authService;
     }
 
@@ -59,11 +57,10 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 사용자 ID 추출 후 request attribute 에 넣기
+        // 사용자 email 추출 후 request attribute 에 넣기
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();
-        User user = userRepository.findByEmail(email).orElseThrow();
-        request.setAttribute("userId", user.getId());
+        request.setAttribute("email", email);
 
         log.info("AuthInterceptor preHandle 200");
         response.setStatus(HttpServletResponse.SC_OK);
