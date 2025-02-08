@@ -1,5 +1,6 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.friend.FriendDto;
 import com.pleiades.entity.Friend;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,26 +31,49 @@ public class FriendService {
 
     // 받은 친구 요청 목록
     @Transactional
-    public List<Friend> getReceivedFriendRequests(String email) {
-        User receiver = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
-
-        return friendRepository.findByReceiverAndStatus(receiver, FriendStatus.PENDING);
+    public List<FriendDto> getReceivedFriendRequests(String email) {
+        User currentUser = getUserByEmail(email);
+        return friendRepository.findByReceiverAndStatus(currentUser, FriendStatus.PENDING).stream()
+                .map(f -> new FriendDto(
+                        f.getId(),
+                        f.getSender().getId(),
+                        f.getSender().getUserName(),
+                        f.getSender().getImgPath()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<Friend> getFriends(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
-
+    public List<FriendDto> getFriends(String email) {
+        User currentUser = getUserByEmail(email);
         return friendRepository.findBySenderAndStatusOrReceiverAndStatusOrderByCreatedAtDesc(
-                user, FriendStatus.ACCEPTED, user, FriendStatus.ACCEPTED);
+                        currentUser, FriendStatus.ACCEPTED, currentUser, FriendStatus.ACCEPTED
+                ).stream()
+                .map(f -> {
+                    // sender == currentUser -> (true) f == receiver : (false) f == sender
+                    User friendUser = f.getSender().equals(currentUser) ? f.getReceiver() : f.getSender();
+                    return new FriendDto(
+                            f.getId(),
+                            friendUser.getId(),
+                            friendUser.getUserName(),
+                            friendUser.getImgPath()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     //보낸 친구 요청 목록
     @Transactional
-    public List<Friend> getSentFriendRequests(String email) {
-        User sender = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "User not found"));
-
-        return friendRepository.findBySenderAndStatus(sender, FriendStatus.PENDING);
+    public List<FriendDto> getSentFriendRequests(String email) {
+        User currentUser = getUserByEmail(email);
+        return friendRepository.findBySenderAndStatus(currentUser, FriendStatus.PENDING).stream()
+                .map(f -> new FriendDto(
+                        f.getId(),
+                        f.getReceiver().getId(),
+                        f.getReceiver().getUserName(),
+                        f.getReceiver().getImgPath()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -132,5 +157,42 @@ public class FriendService {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("message","Friend request not found"));
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> deleteFriend(String email, Long friendId) {
+        Optional<Friend> optionalFriend = friendRepository.findById(friendId);
+
+        if (optionalFriend.isPresent()) {
+            Friend friend = optionalFriend.get();
+
+            // 요청 취소
+            if(friend.getStatus() == FriendStatus.PENDING){
+                // 저장된 friend sender != 현재 user
+                if(!friend.getSender().getEmail().equals(email)){
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of("message","You cannot handle the request"));
+                }
+                friendRepository.delete(friend);
+
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body(Map.of("message","Friend request canceled"));
+            }
+
+            // 친구 삭제
+            if(friend.getStatus() == FriendStatus.ACCEPTED){
+                friendRepository.delete(friend);
+
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body(Map.of("message","Friend deleted"));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message","Friend request not found"));
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
     }
 }

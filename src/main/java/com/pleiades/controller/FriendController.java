@@ -3,6 +3,9 @@ package com.pleiades.controller;
 import com.pleiades.dto.friend.FriendDto;
 import com.pleiades.dto.friend.FriendListDto;
 import com.pleiades.entity.Friend;
+import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.service.FriendService;
 import com.pleiades.strings.FriendStatus;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,21 +52,9 @@ public class FriendController {
 
         log.info("사용자 email = {}", email);
 
-        List<Friend> received = friendService.getReceivedFriendRequests(email);
-        List<Friend> friends = friendService.getFriends(email);
-        List<Friend> sent = friendService.getSentFriendRequests(email);
-
-        List<FriendDto> receivedDtos = received.stream()
-                .map(f -> new FriendDto(f.getId(), f.getSender().getId(), f.getSender().getUserName(), f.getSender().getImgPath()))
-                .collect(Collectors.toList());
-
-        List<FriendDto> friendDtos = friends.stream()
-                .map(f -> new FriendDto(f.getId(), f.getReceiver().getId(), f.getReceiver().getUserName(), f.getReceiver().getImgPath()))
-                .collect(Collectors.toList());
-
-        List<FriendDto> sentDtos = sent.stream()
-                .map(f -> new FriendDto(f.getId(), f.getReceiver().getId(), f.getReceiver().getUserName(), f.getReceiver().getImgPath()))
-                .collect(Collectors.toList());
+        List<FriendDto> receivedDtos = friendService.getReceivedFriendRequests(email);
+        List<FriendDto> friendDtos = friendService.getFriends(email);
+        List<FriendDto> sentDtos = friendService.getSentFriendRequests(email);
 
         FriendListDto response = new FriendListDto(receivedDtos, friendDtos, sentDtos);
         return ResponseEntity.ok(response);
@@ -79,5 +70,15 @@ public class FriendController {
         FriendStatus status = FriendStatus.valueOf(requestBody.get("status").toString().toUpperCase());
 
         return friendService.updateFriendStatus(email, friend_id, status);
+    }
+
+    @DeleteMapping("/requests/{friend_id}")
+    public ResponseEntity<Map<String, String>> deleteFriend(HttpServletRequest request, @PathVariable("friend_id") Long friend_id) {
+        log.info("handle request controller 진입");
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
+        return friendService.deleteFriend(email, friend_id);
     }
 }
