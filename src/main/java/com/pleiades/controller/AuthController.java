@@ -1,7 +1,7 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.ProfileDto;
-import com.pleiades.dto.SignUpDto;
+import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
@@ -98,7 +98,7 @@ public class AuthController {
 
     // todo: AuthInterceptor 겹치는 부분 Refactor
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @CookieValue("refreshToken") String refreshToken, @RequestBody UserInfoDto userInfoDto) {
         log.info("/auth/signup");
 
         try {
@@ -108,7 +108,7 @@ public class AuthController {
             Claims token = jwtUtil.validateToken(accessToken);
             String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
 
-            ValidationStatus signupStatus = signupService.signup(email, signUpDto, refreshToken);
+            ValidationStatus signupStatus = signupService.signup(email, userInfoDto, refreshToken);
 
             if (signupStatus == ValidationStatus.NOT_VALID) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","you need to login by social"));      // 401

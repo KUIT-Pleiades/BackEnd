@@ -8,25 +8,10 @@ import com.pleiades.dto.character.CharacterOutfitDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Set;
-
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SignUpDto {
-    @JsonProperty("userId")
-    private String userId;
-
-    @JsonProperty("userName")
-    private String userName;
-
-    @JsonProperty("birthDate")
-    private LocalDate birthDate;
-
-    @JsonProperty("backgroundName")
-    private String backgroundName;
-
+public class CharacterDto {
     @JsonProperty("imgPath")
     private String imgPath;
 

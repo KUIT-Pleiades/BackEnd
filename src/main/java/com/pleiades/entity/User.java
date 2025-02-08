@@ -1,7 +1,5 @@
 package com.pleiades.entity;
 
-import com.pleiades.dto.SignUpDto;
-import com.pleiades.entity.character.Characters;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

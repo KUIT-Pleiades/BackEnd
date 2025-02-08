@@ -1,17 +1,11 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.SignUpDto;
+import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.entity.character.Item.*;
-import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Face;
-import com.pleiades.entity.character.face.Hair;
-import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Outfit;
-import com.pleiades.entity.character.outfit.Shoes;
-import com.pleiades.entity.character.outfit.Top;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.face.ExpressionRepository;
@@ -57,7 +51,7 @@ public class SignupService {
     KakaoTokenRepository kakaoTokenRepository;
     NaverTokenRepository naverTokenRepository;
 
-    SignUpDto signUpDto;
+    UserInfoDto userInfoDto;
 
     EntityManager entityManager;
 
@@ -82,8 +76,8 @@ public class SignupService {
     }
 
     @Transactional
-    public ValidationStatus signup(String email, SignUpDto signUpDto, String refreshToken) {
-        this.signUpDto = signUpDto;
+    public ValidationStatus signup(String email, UserInfoDto userInfoDto, String refreshToken) {
+        this.userInfoDto = userInfoDto;
 
         log.info("signup으로 온 email: " + email);
 
@@ -100,48 +94,48 @@ public class SignupService {
         log.info("social token 존재함");
 
         // 소셜 토큰 존재
-        User user = createUser(email, signUpDto, refreshToken);
+        User user = createUser(email, userInfoDto, refreshToken);
         entityManager.flush();
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
         kakaoToken.ifPresent(token -> setKakaoToken(token, user));
 
-        createStar(user, signUpDto);
-        createCharacter(user, signUpDto);
+        createStar(user, userInfoDto);
+        createCharacter(user, userInfoDto);
 
         return ValidationStatus.VALID;
     }
 
-    private User createUser(String email, SignUpDto signUpDto, String refreshToken) {
+    private User createUser(String email, UserInfoDto userInfoDto, String refreshToken) {
         User user = User.builder()
-                .id(signUpDto.getUserId())
+                .id(userInfoDto.getUserId())
                 .email(email)
-                .userName(signUpDto.getUserName())
-                .birthDate(signUpDto.getBirthDate())
+                .userName(userInfoDto.getUserName())
+                .birthDate(userInfoDto.getBirthDate())
                 .refreshToken(refreshToken)
                 .createdDate(LocalDate.now())
-                .imgPath(signUpDto.getImgPath())
+                .imgPath(userInfoDto.getImgPath())
                 .build();
         userRepository.save(user);
         log.info("User 저장 완료 - id: {}", user.getId());
         return user;
     }
 
-    private void createStar(User user, SignUpDto signUpDto) {
+    private void createStar(User user, UserInfoDto userInfoDto) {
         Star star = new Star();
         star.setUser(user);
 
-        Optional<StarBackground> background = starBackgroundRepository.findByName(signUpDto.getBackgroundName());
+        Optional<StarBackground> background = starBackgroundRepository.findByName(userInfoDto.getBackgroundName());
         background.ifPresent(star::setBackground);
 
         starRepository.save(star);
         log.info("Star 세팅 완료 - id: {}", star.getId());
     }
 
-    private void createCharacter(User user, SignUpDto signUpDto) {
-        Face face = createFace(signUpDto);
-        Outfit outfit = createOutfit(signUpDto);
-        Item item = createItem(signUpDto);
+    private void createCharacter(User user, UserInfoDto userInfoDto) {
+        Face face = createFace(userInfoDto);
+        Outfit outfit = createOutfit(userInfoDto);
+        Item item = createItem(userInfoDto);
 
         Characters character = new Characters();
         character.setUser(user);
@@ -153,32 +147,32 @@ public class SignupService {
         log.info("Character 세팅 완료 - id: {}", character.getId());
     }
 
-    private Face createFace(SignUpDto signUpDto) {
+    private Face createFace(UserInfoDto userInfoDto) {
         Face face = new Face();
-        face.setSkin(skinRepository.findByName(signUpDto.getFace().getSkinImg()).orElseThrow());
-        face.setExpression(expressionRepository.findByName(signUpDto.getFace().getExpressionImg()).orElseThrow());
-        face.setHair(hairRepository.findByName(signUpDto.getFace().getHairImg()).orElseThrow());
+        face.setSkin(skinRepository.findByName(userInfoDto.getFace().getSkinImg()).orElseThrow());
+        face.setExpression(expressionRepository.findByName(userInfoDto.getFace().getExpressionImg()).orElseThrow());
+        face.setHair(hairRepository.findByName(userInfoDto.getFace().getHairImg()).orElseThrow());
         return face;
     }
 
-    private Outfit createOutfit(SignUpDto signUpDto) {
+    private Outfit createOutfit(UserInfoDto userInfoDto) {
         Outfit outfit = new Outfit();
-        outfit.setTop(topRepository.findByName(signUpDto.getOutfit().getTopImg()).orElseThrow());
-        outfit.setBottom(bottomRepository.findByName(signUpDto.getOutfit().getBottomImg()).orElseThrow());
-        outfit.setShoes(shoesRepository.findByName(signUpDto.getOutfit().getShoesImg()).orElseThrow());
+        outfit.setTop(topRepository.findByName(userInfoDto.getOutfit().getTopImg()).orElseThrow());
+        outfit.setBottom(bottomRepository.findByName(userInfoDto.getOutfit().getBottomImg()).orElseThrow());
+        outfit.setShoes(shoesRepository.findByName(userInfoDto.getOutfit().getShoesImg()).orElseThrow());
         return outfit;
     }
 
-    private Item createItem(SignUpDto signUpDto) {
+    private Item createItem(UserInfoDto userInfoDto) {
         Item item = new Item();
-        item.setHead(headRepository.findByName(signUpDto.getItem().getHeadImg()).orElse(null));
-        item.setEyes(eyesRepository.findByName(signUpDto.getItem().getEyesImg()).orElse(null));
-        item.setEars(earsRepository.findByName(signUpDto.getItem().getEarsImg()).orElse(null));
-        item.setNeck(neckRepository.findByName(signUpDto.getItem().getNeckImg()).orElse(null));
-        item.setLeftWrist(leftWristRepository.findByName(signUpDto.getItem().getLeftWristImg()).orElse(null));
-        item.setRightWrist(rightWristRepository.findByName(signUpDto.getItem().getRightWristImg()).orElse(null));
-        item.setLeftHand(leftHandRepository.findByName(signUpDto.getItem().getLeftHandImg()).orElse(null));
-        item.setRightHand(rightHandRepository.findByName(signUpDto.getItem().getRightHandImg()).orElse(null));
+        item.setHead(headRepository.findByName(userInfoDto.getItem().getHeadImg()).orElse(null));
+        item.setEyes(eyesRepository.findByName(userInfoDto.getItem().getEyesImg()).orElse(null));
+        item.setEars(earsRepository.findByName(userInfoDto.getItem().getEarsImg()).orElse(null));
+        item.setNeck(neckRepository.findByName(userInfoDto.getItem().getNeckImg()).orElse(null));
+        item.setLeftWrist(leftWristRepository.findByName(userInfoDto.getItem().getLeftWristImg()).orElse(null));
+        item.setRightWrist(rightWristRepository.findByName(userInfoDto.getItem().getRightWristImg()).orElse(null));
+        item.setLeftHand(leftHandRepository.findByName(userInfoDto.getItem().getLeftHandImg()).orElse(null));
+        item.setRightHand(rightHandRepository.findByName(userInfoDto.getItem().getRightHandImg()).orElse(null));
         return item;
     }
 
