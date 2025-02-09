@@ -1,7 +1,6 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.ReportDto;
-import com.pleiades.entity.Report;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.ReportRepository;
@@ -19,12 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +70,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", reports));
     }
 
-    @GetMapping("")
+    @GetMapping(params = "query")
     public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
         Claims token = jwtUtil.validateToken(accessToken);
@@ -127,7 +124,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "report deleted"));
     }
 
-    @GetMapping("")
+    @GetMapping("/friends")
     public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
@@ -151,7 +148,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", reports));
     }
 
-    @GetMapping("")
+    @GetMapping(value = "/friends", params = "query")
     public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);

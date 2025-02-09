@@ -20,14 +20,14 @@ public class Report {
     private Long id;
 
     @OneToOne
-    @Column
+    @JoinColumn(name = "user_id")
     User user;
 
     @Column
     Long reportId;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(name = "question_id")
     Question question;
 
 //    @ManyToOne

@@ -17,6 +17,4 @@ public class Question {
     private Long id;
 
     private String question;
-
-
 }

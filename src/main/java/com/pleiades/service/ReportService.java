@@ -95,7 +95,6 @@ public class ReportService {
                 reportDtos.add(reportDto);
             }
         }
-
         return reportDtos;
     }
 
@@ -116,10 +115,7 @@ public class ReportService {
                 reportDtos.add(reportDto);
             }
         }
-
         return reportDtos;
     }
-
-
 
 }
