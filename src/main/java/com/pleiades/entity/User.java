@@ -40,4 +40,7 @@ public class User {
 
     @Column(nullable = true)
     String imgPath;
+
+    @Column
+    Long answerNumber = 0L;
 }

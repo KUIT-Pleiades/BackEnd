@@ -27,7 +27,6 @@ import java.util.*;
 @Controller
 @RequestMapping("/home")
 public class HomeController {
-
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
 
