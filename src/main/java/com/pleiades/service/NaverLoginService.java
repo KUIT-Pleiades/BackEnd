@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -49,46 +50,69 @@ public class NaverLoginService {
         String email = userInfo.getEmail();
 
         User user = userRepository.findByEmail(email).orElse(null);
-        LoginResponseDto cbResponse;
+        NaverToken naverToken = naverTokenRepository.findByUserEmail(email).orElse(null);
 
         if (user != null) {
-            log.info("user 이미 존재: userId = {}", user.getEmail());
-            NaverToken naverToken = naverTokenRepository.findByUserEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("에러 : user의 email로 naverToken 못찾음"));
-
-            accessToken = naverApiUtil.getValidAccessToken(naverToken);
-
-            naverToken.setAccessToken(accessToken);
-            naverToken.setLastUpdated(System.currentTimeMillis());
-            naverTokenRepository.save(naverToken);
-
-            cbResponse = updateAppTokensForUser(user);
-        } else {
-            user = new User();
-            log.info("user 새로 생성");
-
-            NaverToken naverToken = new NaverToken();
-            naverToken.setAccessToken(accessToken);
-            naverToken.setEmail(email);
-            naverToken.setRefreshToken(refreshToken);
-            naverToken.setLastUpdated(System.currentTimeMillis());
-            naverTokenRepository.save(naverToken);
-
-            user.setEmail(email);
-            cbResponse = updateAppTokensForUser(user);
+            log.info("기존 유저 네이버 로그인: userId = {}", user.getEmail());
+            return processExistingUser(user, naverToken, accessToken, refreshToken);
         }
-        return cbResponse;
+
+        if (naverToken != null) {
+            log.info("네이버 토큰만 존재하는 유저: email = {}", email);
+            return processUserWithoutSignup(naverToken, accessToken, refreshToken);
+        }
+
+        log.info("네이버 로그인 정보만 있는 신규 유저 저장: email = {}", email);
+        return processNewNaverUser(email, accessToken, refreshToken);
     }
 
-    private LoginResponseDto updateAppTokensForUser(User user) {
+    private LoginResponseDto processExistingUser(User user, NaverToken naverToken, String accessToken, String refreshToken) {
+        if (naverToken == null) {
+            log.error("기존 user NaverToken 존재 X");
+            throw new IllegalStateException("기존 user NaverToken 존재 X");
+        }
 
+        // accessToken = naverApiUtil.getValidAccessToken(naverToken);
+        // naverToken.setAccessToken(accessToken);
+        naverToken.setLastUpdated(System.currentTimeMillis());
+        naverTokenRepository.save(naverToken);
+
+        return generateAppTokens(user);
+    }
+
+    private LoginResponseDto processUserWithoutSignup(NaverToken naverToken, String accessToken, String refreshToken) {
+        naverToken.setRefreshToken(refreshToken);
+        naverToken.setLastUpdated(System.currentTimeMillis());
+        naverTokenRepository.save(naverToken);
+
+        return generateAppTokens(naverToken.getEmail());
+    }
+
+    private LoginResponseDto processNewNaverUser(String email, String accessToken, String refreshToken) {
+        NaverToken naverToken = new NaverToken();
+        naverToken.setEmail(email);
+        naverToken.setRefreshToken(refreshToken);
+        naverToken.setLastUpdated(System.currentTimeMillis());
+        naverTokenRepository.save(naverToken);
+
+        return generateAppTokens(email);
+    }
+
+    private LoginResponseDto generateAppTokens(String email) {
+        String jwtAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
+        String jwtRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+        log.info("앱 자체 토큰 생성 완료 for email: {}", email);
+        return new LoginResponseDto(jwtRefreshToken, jwtAccessToken);
+    }
+
+    private LoginResponseDto generateAppTokens(User user) {
         String jwtAccessToken = jwtUtil.generateAccessToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
         String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getEmail(), JwtRole.ROLE_USER.getRole());
 
         user.setRefreshToken(jwtRefreshToken);
-//        user.setAccessToken(jwtAccessToken);
+        userRepository.save(user);
+        log.info("앱 자체 토큰 생성 완료 for user: {}", user.getEmail());
 
-        log.info("앱 자체 토큰 갱신 완료 for user: {}", user.getEmail());
         return new LoginResponseDto(jwtRefreshToken, jwtAccessToken);
     }
 
