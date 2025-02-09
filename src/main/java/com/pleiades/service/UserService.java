@@ -158,7 +158,7 @@ public class UserService {
                     return new SearchUserDto(
                             user.getId(),
                             user.getUserName(),
-                            user.getImgPath(),
+                            user.getProfileUrl(),
                             isFriend
                     );
                 })

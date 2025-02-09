@@ -8,7 +8,7 @@ import lombok.Data;
 public class SearchUserDto {
     private String userId;
     private String userName;
-    private String imgPath;
+    private String profile;
     private boolean isFriend;
 }
 

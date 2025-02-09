@@ -132,7 +132,7 @@ public class AuthController {
 
         Optional<User> user = userRepository.findById(profileDto.getUserId());
         if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
-            user.get().setImgPath(profileDto.getProfileUrl());
+            user.get().setProfileUrl(profileDto.getProfileUrl());
             try {
                 userRepository.save(user.get());
             } catch (DataIntegrityViolationException e) {
