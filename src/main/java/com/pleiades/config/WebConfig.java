@@ -39,11 +39,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/auth/refresh",
                         "/auth/auth/refresh",
                         "/error",
-                        "/auth/login/**",
-                        "/auth/login/*",
-                        "/auth/login",
-                        "/auth/login/",
-                        "/auth/login/naver"
+                        "/auth/login/**"
+//                        "/auth/login/*",
+//                        "/auth/login",
+//                        "/auth/login/",
+//                        "/auth/login/naver"
                         );  // 제외할 경로
     }
 }

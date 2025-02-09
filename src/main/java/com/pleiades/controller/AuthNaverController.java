@@ -56,7 +56,7 @@ public class AuthNaverController {
                 .secure(false)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("None")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
