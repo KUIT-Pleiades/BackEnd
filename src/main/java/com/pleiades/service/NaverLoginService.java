@@ -50,7 +50,7 @@ public class NaverLoginService {
         String email = userInfo.getEmail();
 
         User user = userRepository.findByEmail(email).orElse(null);
-        NaverToken naverToken = naverTokenRepository.findByUserEmail(email).orElse(null);
+        NaverToken naverToken = naverTokenRepository.findNaverTokenByEmail(email).orElse(null);
 
         if (user != null) {
             log.info("기존 유저 네이버 로그인: userId = {}", user.getEmail());
