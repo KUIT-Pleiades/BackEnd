@@ -19,15 +19,15 @@ public class Outfit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "top_name")
     private Top top;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "bottom_name")
     private Bottom bottom;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "shoes_name")
     private Shoes shoes;
 

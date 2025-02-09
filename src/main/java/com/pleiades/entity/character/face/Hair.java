@@ -13,11 +13,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "hair")
 public class Hair {
-
     @Id
     private String name;
     private Long price = 0L;
 
-    @OneToOne(mappedBy = "hair")
-    private Face face;
+//    @OneToMany
+//    @JoinColumn(name = "id")
+//    private Face face;
 }

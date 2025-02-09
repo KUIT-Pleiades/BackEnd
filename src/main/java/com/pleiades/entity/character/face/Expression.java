@@ -18,6 +18,6 @@ public class Expression {
     private String name;
     private Long price = 0L;
 
-    @OneToOne(mappedBy = "expression")
-    private Face face;
+//    @OneToOne(mappedBy = "expression")
+//    private Face face;
 }

@@ -142,7 +142,7 @@ public class AuthKakaoController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, String.format(
-                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; Secure=%s; SameSite=Strict",
+                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; Secure=%s; SameSite=None",       // Strict -> None
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getPath(),

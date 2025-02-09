@@ -17,6 +17,6 @@ public class Top {
     private String name;
     private Long price = 0L;
 
-    @OneToOne(mappedBy = "top")
-    private Outfit outfit;
+//    @OneToOne(mappedBy = "top")
+//    private Outfit outfit;
 }

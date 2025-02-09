@@ -19,15 +19,15 @@ public class Face {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "hair_name")
     private Hair hair;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "skin_name")
     private Skin skin;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "expression_name")
     private Expression expression;
 

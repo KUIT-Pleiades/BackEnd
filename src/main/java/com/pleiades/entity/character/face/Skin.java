@@ -18,6 +18,6 @@ public class Skin {
     private String name;
     private Long price = 0L;
 
-    @OneToOne(mappedBy = "skin")
-    private Face face;
+//    @OneToOne(mappedBy = "skin")
+//    private Face face;
 }

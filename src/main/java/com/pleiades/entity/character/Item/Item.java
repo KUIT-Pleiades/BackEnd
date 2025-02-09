@@ -22,35 +22,35 @@ public class Item {
     @OneToOne(mappedBy = "item")
     Characters characters;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "ears_name")
     private Ears ears;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "eyes_name")
     private Eyes eyes;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "head_name")
     private Head head;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "leftHand_name")
     private LeftHand leftHand;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "leftWrist_name")
     private LeftWrist leftWrist;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "neck_name")
     private Neck neck;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "rightHand_name")
     private RightHand rightHand;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "rightWrist_name")
     private RightWrist rightWrist;
 }
