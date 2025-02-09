@@ -38,7 +38,7 @@ public class FriendService {
                         f.getId(),
                         f.getSender().getId(),
                         f.getSender().getUserName(),
-                        f.getSender().getImgPath()
+                        f.getSender().getProfileUrl()
                 ))
                 .collect(Collectors.toList());
     }
@@ -56,7 +56,7 @@ public class FriendService {
                             f.getId(),
                             friendUser.getId(),
                             friendUser.getUserName(),
-                            friendUser.getImgPath()
+                            friendUser.getProfileUrl()
                     );
                 })
                 .collect(Collectors.toList());
@@ -71,7 +71,7 @@ public class FriendService {
                         f.getId(),
                         f.getReceiver().getId(),
                         f.getReceiver().getUserName(),
-                        f.getReceiver().getImgPath()
+                        f.getReceiver().getProfileUrl()
                 ))
                 .collect(Collectors.toList());
     }
