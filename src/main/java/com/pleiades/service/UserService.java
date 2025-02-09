@@ -101,6 +101,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
     }
 
+    // todo: character 수정 후 이미지 저장
     @Transactional
     public ValidationStatus setCharacter(String email, CharacterDto characterDto) {
         this.characterDto = characterDto;

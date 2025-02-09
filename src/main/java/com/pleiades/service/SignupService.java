@@ -114,7 +114,8 @@ public class SignupService {
                 .birthDate(userInfoDto.getBirthDate())
                 .refreshToken(refreshToken)
                 .createdDate(LocalDate.now())
-                .imgPath(userInfoDto.getImgPath())
+                .profileUrl(userInfoDto.getProfile())
+                .characterUrl(userInfoDto.getCharacter())
                 .build();
         userRepository.save(user);
         log.info("User 저장 완료 - id: {}", user.getId());

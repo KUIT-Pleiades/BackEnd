@@ -26,8 +26,11 @@ public class UserInfoDto {
     @JsonProperty("backgroundName")
     private String backgroundName;
 
-    @JsonProperty("imgPath")
-    private String imgPath;
+    @JsonProperty("profile")
+    private String profile;
+
+    @JsonProperty("character")
+    private String character;
 
     @JsonProperty("face")
     private CharacterFaceDto face;

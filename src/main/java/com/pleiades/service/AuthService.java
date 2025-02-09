@@ -162,13 +162,15 @@ public class AuthService {
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
         Optional<Characters> character = characterRepository.findByUser(user.get());
 
-        String profile = user.get().getImgPath();       // todo: profile
+        String profileUrl = user.get().getProfileUrl();
+        String characterUrl = user.get().getCharacterUrl();
 
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
-        body.put("starBackground", starBackground.get().getName());
-        body.put("character", "ipfs_url.png");
+        body.put("starBackground", "background_01");   // starBackground.get().getName()
+        body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
+        body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
 
         log.info("body: " + body);
 

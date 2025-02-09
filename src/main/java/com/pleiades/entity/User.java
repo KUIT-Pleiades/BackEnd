@@ -31,7 +31,7 @@ public class User {
     @Column
     private LocalDate createdDate;
 
-    // DB에 앱 자체 tokens 저장 X
+//     DB에 앱 자체 tokens 저장 X
 //    @Transient
 //    private String accessToken;
 
@@ -39,7 +39,10 @@ public class User {
     private String refreshToken;
 
     @Column(nullable = true)
-    String imgPath;
+    String profileUrl;
+
+    @Column(nullable = true)
+    String characterUrl;
 
     @Column
     Long answerNumber = 0L;
