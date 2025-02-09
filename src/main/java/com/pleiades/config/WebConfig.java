@@ -27,6 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://54.252.108.194", FRONT_ORIGIN)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
+                .allowedOriginPatterns("*")
                 .allowCredentials(true);
     }
 
