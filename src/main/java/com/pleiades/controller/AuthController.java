@@ -82,7 +82,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
         log.info("/auth/checkId");
         Map<String, String> body = new HashMap<>();
-        String id = request.getParameter("id");
+        String id = request.getParameter("userId");
 
         if (id == null || id.isEmpty()) {
             body.put("available", "false");
