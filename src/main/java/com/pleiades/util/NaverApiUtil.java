@@ -98,9 +98,10 @@ public class NaverApiUtil {
         ResponseEntity<Map> response = restTemplate.exchange(USER_INFO_URL, HttpMethod.GET, request, Map.class);
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody().get("response");
-
+        String email = responseBody.get("email").toString();
+        log.info("네이버 로그인 getUserInfo - email: {}", email);
         return new NaverLoginResponseDto(
-                (String) responseBody.get("email"),
+                email,
                 accessToken
         );
     }

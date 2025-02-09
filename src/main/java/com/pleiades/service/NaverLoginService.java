@@ -52,8 +52,8 @@ public class NaverLoginService {
         LoginResponseDto cbResponse;
 
         if (user != null) {
-            log.info("user 이미 존재");
-            NaverToken naverToken = naverTokenRepository.findByEmail(email)
+            log.info("user 이미 존재: userId = {}", user.getEmail());
+            NaverToken naverToken = naverTokenRepository.findByUserEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("에러 : user의 email로 naverToken 못찾음"));
 
             accessToken = naverApiUtil.getValidAccessToken(naverToken);
