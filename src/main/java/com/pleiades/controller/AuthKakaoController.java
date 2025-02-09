@@ -151,6 +151,10 @@ public class AuthKakaoController {
         ));
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        log.info("headers: " + headers);
+        log.info("cookie: " + cookie);
+        log.info("body: " + body.get("accessToken"));
+
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);   // 200
     }
 
