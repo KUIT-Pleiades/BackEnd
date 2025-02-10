@@ -19,6 +19,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // todo: 수정 필요
     @OneToOne(mappedBy = "item")
     Characters characters;
 

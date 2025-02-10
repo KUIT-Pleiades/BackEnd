@@ -81,6 +81,7 @@ public class ReportController {
         List<ReportDto> questions = reportService.searchByQuestion(user.get(), query);
         List<ReportDto> answers = reportService.searchByAnswer(user.get(), query);
 
+        // todo: 둘 다 오는 문제
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("reports", questions);
         body.add("reports", answers);
