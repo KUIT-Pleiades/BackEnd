@@ -13,11 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "skin")
 public class Skin {
-
     @Id
     private String name;
     private Long price = 0L;
-
-//    @OneToOne(mappedBy = "skin")
-//    private Face face;
 }

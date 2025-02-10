@@ -20,15 +20,15 @@ public class Face {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "hair_name")
+    @JoinColumn(name = "hair_name", unique = false)
     private Hair hair;
 
     @ManyToOne
-    @JoinColumn(name = "skin_name")
+    @JoinColumn(name = "skin_name", unique = false)
     private Skin skin;
 
     @ManyToOne
-    @JoinColumn(name = "expression_name")
+    @JoinColumn(name = "expression_name", unique = false)
     private Expression expression;
 
     @OneToOne(mappedBy = "face", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})

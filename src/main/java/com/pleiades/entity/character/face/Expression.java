@@ -13,11 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "expression")
 public class Expression {
-
     @Id
     private String name;
     private Long price = 0L;
-
-//    @OneToOne(mappedBy = "expression")
-//    private Face face;
 }

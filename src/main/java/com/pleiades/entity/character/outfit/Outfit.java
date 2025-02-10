@@ -20,15 +20,15 @@ public class Outfit {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "top_name")
+    @JoinColumn(name = "top_name", unique = false)
     private Top top;
 
     @ManyToOne
-    @JoinColumn(name = "bottom_name")
+    @JoinColumn(name = "bottom_name", unique = false)
     private Bottom bottom;
 
     @ManyToOne
-    @JoinColumn(name = "shoes_name")
+    @JoinColumn(name = "shoes_name", unique = false)
     private Shoes shoes;
 
     @OneToOne(mappedBy = "outfit")

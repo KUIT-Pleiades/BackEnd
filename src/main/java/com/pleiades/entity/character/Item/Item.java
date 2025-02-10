@@ -23,35 +23,35 @@ public class Item {
     Characters characters;
 
     @ManyToOne
-    @JoinColumn(name = "ears_name")
+    @JoinColumn(name = "ears_name", unique = false)
     private Ears ears;
 
     @ManyToOne
-    @JoinColumn(name = "eyes_name")
+    @JoinColumn(name = "eyes_name", unique = false)
     private Eyes eyes;
 
     @ManyToOne
-    @JoinColumn(name = "head_name")
+    @JoinColumn(name = "head_name", unique = false)
     private Head head;
 
     @ManyToOne
-    @JoinColumn(name = "leftHand_name")
+    @JoinColumn(name = "leftHand_name", unique = false)
     private LeftHand leftHand;
 
     @ManyToOne
-    @JoinColumn(name = "leftWrist_name")
+    @JoinColumn(name = "leftWrist_name", unique = false)
     private LeftWrist leftWrist;
 
     @ManyToOne
-    @JoinColumn(name = "neck_name")
+    @JoinColumn(name = "neck_name", unique = false)
     private Neck neck;
 
     @ManyToOne
-    @JoinColumn(name = "rightHand_name")
+    @JoinColumn(name = "rightHand_name", unique = false)
     private RightHand rightHand;
 
     @ManyToOne
-    @JoinColumn(name = "rightWrist_name")
+    @JoinColumn(name = "rightWrist_name", unique = false)
     private RightWrist rightWrist;
 }
 

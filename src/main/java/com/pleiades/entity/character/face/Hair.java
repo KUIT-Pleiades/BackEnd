@@ -16,8 +16,4 @@ public class Hair {
     @Id
     private String name;
     private Long price = 0L;
-
-//    @OneToMany
-//    @JoinColumn(name = "id")
-//    private Face face;
 }
