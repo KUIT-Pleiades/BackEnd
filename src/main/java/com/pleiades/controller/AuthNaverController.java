@@ -27,11 +27,7 @@ import java.util.Map;
 public class AuthNaverController {
 
     private final AuthService authService;
-    @Value("${FRONT_ORIGIN}")
-    private String FRONT_ORIGIN;
-
     private final NaverLoginService naverLoginService;
-
 
     @PostMapping("/naver")
     public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequestDto loginRequest, HttpServletResponse response) {

@@ -32,8 +32,7 @@ import java.util.*;
 @Service
 public class AuthService {
 
-    @Value("${FRONT_ORIGIN}")
-    private String FRONT_ORIGIN;
+    private static final String FRONT_DOMAIN = "pleiades-front-deploy.s3-website.ap-northeast-2.amazonaws.com";
 
     UserRepository userRepository;
     StarRepository starRepository;
@@ -199,7 +198,7 @@ public class AuthService {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .domain(FRONT_ORIGIN) // client domain
+                .domain(FRONT_DOMAIN) // client domain
                 .maxAge(Duration.ofDays(7))
                 .sameSite("Lax")
                 .build();
