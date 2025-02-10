@@ -180,6 +180,41 @@ public class AuthService {
                 .body(body);
     }
 
+    public ResponseEntity<Map<String, Object>> responseFriendInfo(String userId) {
+        log.info("AuthService responseFriendInfo");
+
+        Map<String, Object> body = new HashMap<>();
+
+        if (userId == null) { log.info("no userId"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
+
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isEmpty()) {
+            log.info("no user");
+            return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<Star> star = starRepository.findByUserId(userId);
+        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+        Optional<Characters> character = characterRepository.findByUser(user.get());
+
+        String profileUrl = user.get().getProfileUrl();
+        String characterUrl = user.get().getCharacterUrl();
+
+        body.put("userId", userId);
+        body.put("userName", user.get().getUserName());
+        body.put("birthDate", user.get().getBirthDate());
+        body.put("starBackground", "background_01");   // starBackground.get().getName()
+        body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
+        body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
+
+        log.info("body: " + body);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(body);
+    }
+
     public Cookie setRefreshToken(String refreshToken) {
         log.info("AuthService setRefreshToken");
         Cookie cookie = new Cookie("refreshToken", refreshToken);

@@ -71,7 +71,7 @@ public class HomeController {
 
         if (!relationship) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
 
-        return authService.responseUserInfo(userId);
+        return authService.responseFriendInfo(userId);
     }
 
     // todo: dto 유효성 검사 필요
