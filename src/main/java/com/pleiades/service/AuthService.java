@@ -32,8 +32,6 @@ import java.util.*;
 @Service
 public class AuthService {
 
-    private static final String FRONT_DOMAIN = "pleiades-front-deploy.s3-website.ap-northeast-2.amazonaws.com";
-
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -196,11 +194,10 @@ public class AuthService {
     public ResponseCookie addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
-                // .domain(FRONT_DOMAIN) // client domain
                 .maxAge(Duration.ofDays(7))
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         log.info("cookie: {}", cookie);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
