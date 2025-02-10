@@ -198,7 +198,7 @@ public class AuthService {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .domain(FRONT_DOMAIN) // client domain
+                // .domain(FRONT_DOMAIN) // client domain
                 .maxAge(Duration.ofDays(7))
                 .sameSite("Lax")
                 .build();
