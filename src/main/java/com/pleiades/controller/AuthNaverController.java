@@ -3,10 +3,12 @@ package com.pleiades.controller;
 import com.pleiades.dto.LoginResponseDto;
 import com.pleiades.dto.naver.NaverLoginRequestDto;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
+import com.pleiades.service.AuthService;
 import com.pleiades.service.NaverLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -24,7 +26,12 @@ import java.util.Map;
 
 public class AuthNaverController {
 
+    private final AuthService authService;
+    @Value("${FRONT_ORIGIN}")
+    private String FRONT_ORIGIN;
+
     private final NaverLoginService naverLoginService;
+
 
     @PostMapping("/naver")
     public ResponseEntity<?> handleNaverLogin(@RequestBody NaverLoginRequestDto loginRequest, HttpServletResponse response) {
@@ -42,24 +49,12 @@ public class AuthNaverController {
         String accessToken = loginResponse.getAccessToken();
         String refreshToken = loginResponse.getRefreshToken();
 
-        addRefreshTokenCookie(response, refreshToken);
+        authService.addRefreshTokenCookie(response, refreshToken);
 
         log.info("네이버 로그인 access token: {}", accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Map.of("access_token", accessToken));
-    }
-
-    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(Duration.ofDays(7))
-                .sameSite("Lax")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @ExceptionHandler(NaverRefreshTokenExpiredException.class)

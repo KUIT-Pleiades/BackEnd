@@ -13,6 +13,7 @@ import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -69,7 +70,7 @@ public class AuthController {
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
+    public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
         log.info("/auth/refresh");
         log.info("cookie - refreshToken: " + refreshToken);
         if (refreshToken == null) {

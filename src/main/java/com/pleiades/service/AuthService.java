@@ -17,20 +17,24 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.*;
 
 
 @Slf4j
 @Service
 public class AuthService {
+
+    @Value("${FRONT_ORIGIN}")
+    private String FRONT_ORIGIN;
+
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -187,6 +191,20 @@ public class AuthService {
         cookie.setSecure(false);        // 추후 true로 변경
         cookie.setMaxAge(7 * 24 * 60 * 60);
 
+        return cookie;
+    }
+
+    public ResponseCookie addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .domain(FRONT_ORIGIN) // client domain
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax")
+                .build();
+        log.info("cookie: {}", cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return cookie;
     }
 
