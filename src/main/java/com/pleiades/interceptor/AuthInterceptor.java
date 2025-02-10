@@ -38,10 +38,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         if(request.getMethod().equals("OPTIONS")) { return true; }
 
+        // admin user
         String authorization = request.getHeader("Authorization");
         if(authorization.startsWith("admin")){
             log.info("auth - admin login");
-            return true;   // admin user
+            String email = authorization.split(" ")[1];
+            request.setAttribute("email", email);
+            response.setStatus(HttpServletResponse.SC_OK);
+            return true;
         }
 
         log.info("Authorization: {}", authorization);
