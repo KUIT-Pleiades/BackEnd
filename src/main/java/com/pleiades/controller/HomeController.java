@@ -1,6 +1,7 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.CharacterDto;
+import com.pleiades.dto.StarBackgroundDto;
 import com.pleiades.entity.Friend;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
@@ -12,6 +13,7 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,11 +94,14 @@ public class HomeController {
     }
 
     @PostMapping("/settings/background")
-    public ResponseEntity<Map<String, Object>> backgroundSetting(@RequestHeader("Authorization") String authorization, @RequestBody String backgroundName) {
+    public ResponseEntity<Map<String, Object>> backgroundSetting(@RequestHeader("Authorization") String authorization, @RequestBody StarBackgroundDto starBackgroundDto) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();
+
+        String backgroundName = starBackgroundDto.getBackgroundName();
+        log.info("backgroundName: " + backgroundName);
 
         ValidationStatus setBackground = userService.setBackground(email, backgroundName);
 

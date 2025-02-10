@@ -127,18 +127,26 @@ public class UserService {
     }
 
     public ValidationStatus setBackground(String email, String backgroundName) {
+        log.info("setBackground");
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
+            log.info("user not found");
             return ValidationStatus.NONE;
         }
 
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
         if (star.isEmpty()) {
+            log.info("star not found");
             return ValidationStatus.NOT_VALID;
         }
 
         Optional<StarBackground> background = starBackgroundRepository.findByName(backgroundName);
+        if (background.isEmpty()) {
+            log.info("background not found");
+            return ValidationStatus.NOT_VALID;
+        }
+
         background.ifPresent(star.get()::setBackground);
 
         starRepository.save(star.get());
