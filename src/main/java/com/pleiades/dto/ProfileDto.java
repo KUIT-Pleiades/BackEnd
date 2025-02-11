@@ -12,6 +12,6 @@ public class ProfileDto {
     @JsonProperty("userId")
     private String userId;
 
-    @JsonProperty("profileUrl")
+    @JsonProperty("profile")
     private String profileUrl;
 }

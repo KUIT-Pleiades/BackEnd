@@ -32,10 +32,10 @@ public class UserHistory {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_user", nullable = false)
+    @JoinColumn(name = "current_user_id", nullable = false)
     private User currentUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "searched_user", nullable = false)
+    @JoinColumn(name = "searched_user_id", nullable = false)
     private User searchedUser;
 }
