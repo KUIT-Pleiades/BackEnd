@@ -1,7 +1,7 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.SearchUserDto;
-import com.pleiades.entity.User;
+import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
@@ -10,8 +10,6 @@ import com.pleiades.strings.FriendStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.pleiades.dto.CharacterDto;
-import com.pleiades.entity.Star;
-import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.entity.character.Item.Item;
@@ -35,9 +33,13 @@ import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import java.util.List;
@@ -47,54 +49,22 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepository userRepository; private final UserHistoryRepository userHistoryRepository;
     private final FriendRepository friendRepository;
+    private final HeadRepository headRepository; private final EyesRepository eyesRepository; private final EarsRepository earsRepository; private final NeckRepository neckRepository;
+    private final LeftWristRepository leftWristRepository; private final RightWristRepository rightWristRepository; private final LeftHandRepository leftHandRepository;private final RightHandRepository rightHandRepository;
+    private final StarBackgroundRepository starBackgroundRepository; private final StarRepository starRepository;
+    private final CharacterRepository characterRepository;
+    private final SkinRepository skinRepository; private final ExpressionRepository expressionRepository; private final HairRepository hairRepository;
+    private final TopRepository topRepository; private final BottomRepository bottomRepository; private final ShoesRepository shoesRepository;
+    private final ItemRepository itemRepository;
 
-    HeadRepository headRepository;
-    EyesRepository eyesRepository;
-    EarsRepository earsRepository;
-    NeckRepository neckRepository;
-    LeftWristRepository leftWristRepository;
-    RightWristRepository rightWristRepository;
-    LeftHandRepository leftHandRepository;
-    RightHandRepository rightHandRepository;
-    StarBackgroundRepository starBackgroundRepository;
-    StarRepository starRepository;
-    CharacterRepository characterRepository;
-    SkinRepository skinRepository;
-    ExpressionRepository expressionRepository;
-    HairRepository hairRepository;
-    TopRepository topRepository;
-    BottomRepository bottomRepository;
-    ShoesRepository shoesRepository;
-    ItemRepository itemRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
+    private final NaverTokenRepository naverTokenRepository;
 
-    KakaoTokenRepository kakaoTokenRepository;
-    NaverTokenRepository naverTokenRepository;
-
-    EntityManager entityManager;
+    private final EntityManager entityManager;
 
     private CharacterDto characterDto = null;
-
-    @Autowired
-    public UserService(UserRepository userRepository, FriendRepository friendRepository, StarRepository starRepository, CharacterRepository characterRepository,
-                         SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
-                         TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository, ItemRepository itemRepository,
-                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository,
-                         HeadRepository headRepository, EyesRepository eyesRepository, EarsRepository earsRepository, NeckRepository neckRepository,
-                         LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository,
-                         EntityManager entityManager) {
-        this.userRepository = userRepository; this.friendRepository = friendRepository; this.starRepository = starRepository; this.characterRepository = characterRepository;
-        this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
-        this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
-        this.itemRepository = itemRepository;
-        this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
-        this.starBackgroundRepository = starBackgroundRepository;
-        this.headRepository = headRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository; this.neckRepository = neckRepository;
-        this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
-        this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository;
-        this.entityManager = entityManager;
-    }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -154,6 +124,7 @@ public class UserService {
         return ValidationStatus.VALID;
     }
 
+    @Transactional
     public List<SearchUserDto> searchUser(String userId, String email) {
         List<User> users = userRepository.findByIdContainingIgnoreCase(userId);
         User currentUser = getUserByEmail(email);
@@ -171,6 +142,96 @@ public class UserService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional
+    public List<SearchUserDto> searchUserHistory(String email) {
+        User currentUser = getUserByEmail(email);
+        List<UserHistory> histories = userHistoryRepository.findByCurrentUserOrderByUpdatedAtDesc(currentUser);
+        return histories.stream()
+                .map(history -> {
+                    User searchedUser = history.getSearchedUser();
+                    boolean isFriend = friendRepository
+                            .isFriend(currentUser, searchedUser, FriendStatus.ACCEPTED);
+
+                    return new SearchUserDto(
+                            searchedUser.getId(),
+                            searchedUser.getUserName(),
+                            searchedUser.getProfileUrl(),
+                            isFriend
+                    );
+                })
+                .toList();
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, Object>> deleteOldUserHistory(String email, String searchedId) {
+        log.info("UserService - delete old UserHistory");
+
+        User currentUser = getUserByEmail(email);
+        User searchedUser = userRepository.findById(searchedId).orElse(null);
+
+        if(searchedUser == null){
+            log.info("searchedUser: null");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","searchedId doesn't exist"));
+        }
+
+        UserHistory toDelete = userHistoryRepository.findByCurrentUserAndSearchedUser(currentUser, searchedUser).orElse(null);
+
+        if(toDelete == null){
+            log.info("toDelete: null");
+            return ResponseEntity.noContent().build();
+        }
+        userHistoryRepository.delete(toDelete);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, Object>> addUserHistory(String email, String searchedId) {
+        log.info("UserService - addUserHistory");
+
+        User currentUser = getUserByEmail(email);
+        User searchedUser = userRepository.findById(searchedId).orElse(null);
+
+        // 기존 검색 기록 조회 - 같은 searchedUser 가 있는지 확인
+        Optional<UserHistory> existingHistory = userHistoryRepository.findByCurrentUserAndSearchedUser(currentUser, searchedUser);
+
+        boolean isFriend = friendRepository.isFriend(currentUser, searchedUser, FriendStatus.ACCEPTED);
+
+        if (existingHistory.isPresent()) {
+            // 기존 기록 존재 -> searchCount++ & updatedAt 갱신
+            UserHistory history = existingHistory.get();
+            history.setSearchCount(history.getSearchCount() + 1);
+            history.setUpdatedAt(LocalDateTime.now());
+            userHistoryRepository.save(history);
+        } else {
+            // 새로운 검색 기록 저장
+            UserHistory newHistory = UserHistory.builder()
+                    .currentUser(currentUser)
+                    .searchedUser(searchedUser)
+                    .isFriend(isFriend)
+                    .searchCount(1)
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            userHistoryRepository.save(newHistory);
+        }
+
+        // 최신 10개 유지 (초과 시 삭제)
+        deleteOldUserHistoryIfNeeded(currentUser);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message","added successfully"));
+    }
+
+    @Transactional
+    public void deleteOldUserHistoryIfNeeded(User currentUser) {
+        List<UserHistory> userHistories = userHistoryRepository.findByCurrentUserOrderByUpdatedAtDesc(currentUser);
+
+        if (userHistories.size() > 10) {
+            // 최신 10개를 제외한 나머지 삭제
+            List<UserHistory> toDelete = userHistories.subList(10, userHistories.size());
+            userHistoryRepository.deleteAll(toDelete);
+        }
     }
 
     private Face makeFace() {
