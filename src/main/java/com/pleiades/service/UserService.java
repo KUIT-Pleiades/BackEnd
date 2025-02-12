@@ -151,7 +151,8 @@ public class UserService {
                 .map(UserHistory::getSearched)
                 .toList();
 
-        List<Friend> friends = friendRepository.findAllByUsersIn(currentUser, searchedUsers);
+        List<Friend> friends = searchedUsers.isEmpty() ? new ArrayList<>() :
+                friendRepository.findAllByUsersIn(currentUser, searchedUsers);
 
         Map<User, String> friendStatusMap = new HashMap<>();
         for (Friend friend : friends) {
