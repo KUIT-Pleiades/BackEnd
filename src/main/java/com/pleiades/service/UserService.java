@@ -39,11 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -124,6 +123,7 @@ public class UserService {
         return ValidationStatus.VALID;
     }
 
+    // 사용자 ID 검색
     @Transactional
     public List<SearchUserDto> searchUser(String userId, String email) {
         List<User> users = userRepository.findByIdContainingIgnoreCase(userId);
@@ -131,34 +131,52 @@ public class UserService {
 
         return users.stream()
                 .map(user -> {
-                    boolean isFriend = friendRepository
-                            .isFriend(currentUser, user, FriendStatus.ACCEPTED);
-
                     return new SearchUserDto(
                             user.getId(),
                             user.getUserName(),
                             user.getProfileUrl(),
-                            isFriend
+                            null
                     );
                 })
                 .toList();
     }
 
+    // 최근 검색 기록
     @Transactional
     public List<SearchUserDto> searchUserHistory(String email) {
         User currentUser = getUserByEmail(email);
         List<UserHistory> histories = userHistoryRepository.findByCurrentOrderByUpdatedAtDesc(currentUser);
+
+        List<User> searchedUsers = histories.stream()
+                .map(UserHistory::getSearched)
+                .toList();
+
+        List<Friend> friends = friendRepository.findAllByUsersIn(currentUser, searchedUsers);
+
+        Map<User, String> friendStatusMap = new HashMap<>();
+        for (Friend friend : friends) {
+            if (friend.getSender().equals(currentUser)) {
+                if(friend.getStatus()==FriendStatus.PENDING)
+                    friendStatusMap.put(friend.getReceiver(), "SENT");
+                else if(friend.getStatus()==FriendStatus.ACCEPTED)
+                    friendStatusMap.put(friend.getReceiver(), "FRIEND");
+            } else if(friend.getReceiver().equals(currentUser)) {
+                if(friend.getStatus()==FriendStatus.PENDING)
+                    friendStatusMap.put(friend.getReceiver(), "RECEIVED");
+                else if(friend.getStatus()==FriendStatus.ACCEPTED)
+                    friendStatusMap.put(friend.getReceiver(), "FRIEND");
+            }
+        }
         return histories.stream()
                 .map(history -> {
                     User searchedUser = history.getSearched();
-                    boolean isFriend = friendRepository
-                            .isFriend(currentUser, searchedUser, FriendStatus.ACCEPTED);
+                    String status = friendStatusMap.getOrDefault(searchedUser, "JUSTHUMAN");
 
                     return new SearchUserDto(
                             searchedUser.getId(),
                             searchedUser.getUserName(),
                             searchedUser.getProfileUrl(),
-                            isFriend
+                            status
                     );
                 })
                 .toList();

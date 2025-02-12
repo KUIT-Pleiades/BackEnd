@@ -26,6 +26,14 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
                      @Param("user") User user,
                      @Param("status") FriendStatus status);
 
+
+    @Query("""
+    SELECT f FROM Friend f
+    WHERE (f.sender = :currentUser AND f.receiver IN :searchedUsers)
+       OR (f.receiver = :currentUser AND f.sender IN :searchedUsers)
+""")
+    List<Friend> findAllByUsersIn(@Param("currentUser") User currentUser, @Param("searchedUser") List<User> searchedUsers);
+
     // 받은 친구 요청 목록
     List<Friend> findByReceiverAndStatus(User receiver, FriendStatus status);
 
