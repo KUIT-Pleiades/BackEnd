@@ -12,22 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReportDto {
+public class ReportHistoryDto {
     @JsonProperty
     private Long id;
-
     @JsonProperty
-    private Long questionId;
-
-    @JsonProperty
-    private String question;
-
+    private String query;
     @JsonProperty
     private LocalDateTime createdAt;
-
-    @JsonProperty
-    private LocalDateTime modifiedAt;
-
-    @JsonProperty
-    private String answer;
 }

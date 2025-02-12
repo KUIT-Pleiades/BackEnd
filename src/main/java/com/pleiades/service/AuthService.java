@@ -219,7 +219,7 @@ public class AuthService {
         log.info("AuthService setRefreshToken");
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setPath("/");
-        cookie.setHttpOnly(false);      // 임시 false
+        cookie.setHttpOnly(true);
         cookie.setSecure(false);        // 추후 true로 변경
         cookie.setMaxAge(7 * 24 * 60 * 60);
 

@@ -14,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ReportService {
@@ -37,7 +35,6 @@ public class ReportService {
         for (Report report : reports) {
             ReportDto reportDto = new ReportDto();
 
-            reportDto.setReportId(report.getReportId());
             reportDto.setQuestionId(report.getQuestion().getId());
             reportDto.setQuestion(report.getQuestion().getQuestion());
             reportDto.setAnswer(report.getAnswer());
@@ -85,7 +82,6 @@ public class ReportService {
         for (Report report : reports) {
             if (report.getQuestion().getQuestion().contains(query)) {
                 ReportDto reportDto = new ReportDto();
-                reportDto.setReportId(report.getReportId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());
@@ -105,7 +101,6 @@ public class ReportService {
         for (Report report : reports) {
             if (report.getAnswer().contains(query)) {
                 ReportDto reportDto = new ReportDto();
-                reportDto.setReportId(report.getReportId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());
@@ -118,4 +113,13 @@ public class ReportService {
         return reportDtos;
     }
 
+    public Set<ReportDto> searchResult(User user, String query) {
+        List<ReportDto> questions = searchByQuestion(user, query);
+        List<ReportDto> answers = searchByAnswer(user, query);
+
+        Set<ReportDto> result = new HashSet<>(questions);
+        result.addAll(answers);
+
+        return result;
+    }
 }
