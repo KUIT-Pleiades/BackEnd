@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface UserHistoryRepository extends JpaRepository<UserHistory, Long> {
 
     // 최신순으로 검색 기록 가져 오기
-    List<UserHistory> findByCurrentUserOrderByUpdatedAtDesc(User currentUser);
+    List<UserHistory> findByCurrentOrderByUpdatedAtDesc(User current);
 
     // 검색 기록이 존재 하는 지 확인
-    Optional<UserHistory> findByCurrentUserAndSearchedUser(User currentUser, User searchedUser);
+    Optional<UserHistory> findByCurrentAndSearched(User current, User searched);
 }

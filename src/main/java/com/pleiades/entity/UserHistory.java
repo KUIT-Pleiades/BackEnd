@@ -6,11 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user_histories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,10 +31,10 @@ public class UserHistory {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_user_id", nullable = false)
-    private User currentUser;
+    @JoinColumn(name = "current_id", nullable = false)
+    private User current;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "searched_user_id", nullable = false)
-    private User searchedUser;
+    @JoinColumn(name = "searched_id", nullable = false)
+    private User searched;
 }

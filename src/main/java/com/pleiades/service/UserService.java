@@ -147,10 +147,10 @@ public class UserService {
     @Transactional
     public List<SearchUserDto> searchUserHistory(String email) {
         User currentUser = getUserByEmail(email);
-        List<UserHistory> histories = userHistoryRepository.findByCurrentUserOrderByUpdatedAtDesc(currentUser);
+        List<UserHistory> histories = userHistoryRepository.findByCurrentOrderByUpdatedAtDesc(currentUser);
         return histories.stream()
                 .map(history -> {
-                    User searchedUser = history.getSearchedUser();
+                    User searchedUser = history.getSearched();
                     boolean isFriend = friendRepository
                             .isFriend(currentUser, searchedUser, FriendStatus.ACCEPTED);
 
@@ -176,7 +176,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","searchedId doesn't exist"));
         }
 
-        UserHistory toDelete = userHistoryRepository.findByCurrentUserAndSearchedUser(currentUser, searchedUser).orElse(null);
+        UserHistory toDelete = userHistoryRepository.findByCurrentAndSearched(currentUser, searchedUser).orElse(null);
 
         if(toDelete == null){
             log.info("toDelete: null");
@@ -194,7 +194,7 @@ public class UserService {
         User searchedUser = userRepository.findById(searchedId).orElse(null);
 
         // 기존 검색 기록 조회 - 같은 searchedUser 가 있는지 확인
-        Optional<UserHistory> existingHistory = userHistoryRepository.findByCurrentUserAndSearchedUser(currentUser, searchedUser);
+        Optional<UserHistory> existingHistory = userHistoryRepository.findByCurrentAndSearched(currentUser, searchedUser);
 
         boolean isFriend = friendRepository.isFriend(currentUser, searchedUser, FriendStatus.ACCEPTED);
 
@@ -207,8 +207,8 @@ public class UserService {
         } else {
             // 새로운 검색 기록 저장
             UserHistory newHistory = UserHistory.builder()
-                    .currentUser(currentUser)
-                    .searchedUser(searchedUser)
+                    .current(currentUser)
+                    .searched(searchedUser)
                     .isFriend(isFriend)
                     .searchCount(1)
                     .updatedAt(LocalDateTime.now())
@@ -225,7 +225,7 @@ public class UserService {
 
     @Transactional
     public void deleteOldUserHistoryIfNeeded(User currentUser) {
-        List<UserHistory> userHistories = userHistoryRepository.findByCurrentUserOrderByUpdatedAtDesc(currentUser);
+        List<UserHistory> userHistories = userHistoryRepository.findByCurrentOrderByUpdatedAtDesc(currentUser);
 
         if (userHistories.size() > 10) {
             // 최신 10개를 제외한 나머지 삭제

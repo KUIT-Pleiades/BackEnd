@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,10 +33,6 @@ public class User {
     @Column
     private LocalDate createdDate;
 
-//     DB에 앱 자체 tokens 저장 X
-//    @Transient
-//    private String accessToken;
-
     @Column
     private String refreshToken;
 
@@ -46,4 +44,5 @@ public class User {
 
     @Column
     Long answerNumber = 0L;
+
 }
