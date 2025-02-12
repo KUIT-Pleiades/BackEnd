@@ -44,5 +44,4 @@ public class User {
 
     @Column
     Long answerNumber = 0L;
-
 }

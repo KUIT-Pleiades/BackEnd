@@ -193,6 +193,11 @@ public class UserService {
         User currentUser = getUserByEmail(email);
         User searchedUser = userRepository.findById(searchedId).orElse(null);
 
+        if(searchedUser == null){
+            log.info("history add: searchedUser == null");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","searchedId doesn't exist"));
+        }
+
         // 기존 검색 기록 조회 - 같은 searchedUser 가 있는지 확인
         Optional<UserHistory> existingHistory = userHistoryRepository.findByCurrentAndSearched(currentUser, searchedUser);
 
