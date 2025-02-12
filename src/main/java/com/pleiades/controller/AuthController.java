@@ -72,7 +72,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).build();    // user 존재: 200
     }
 
-/*    @GetMapping("/refresh")
+    @GetMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
         log.info("/auth/refresh");
         log.info("cookie - refreshToken: " + refreshToken);
@@ -82,7 +82,7 @@ public class AuthController {
                     .body(Map.of("message","Refresh Token is required"));
         }
         return authService.responseRefreshTokenStatus(refreshToken);
-    }*/
+    }
 
     @GetMapping("/checkId")
     public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
