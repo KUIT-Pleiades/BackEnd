@@ -43,9 +43,9 @@ public class AuthNaverController {
         log.info("네이버 로그인 request 받음. AuthCode: {}", authCode);
         LoginResponseDto loginResponse = naverLoginService.handleNaverLoginCallback(authCode);
         String accessToken = loginResponse.getAccessToken();
-        String refreshToken = loginResponse.getRefreshToken();
+//        String refreshToken = loginResponse.getRefreshToken();
 
-        authService.addRefreshTokenCookie(response, refreshToken);
+//        authService.addRefreshTokenCookie(response, refreshToken);
 
         log.info("네이버 로그인 access token: {}", accessToken);
         return ResponseEntity

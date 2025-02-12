@@ -76,7 +76,7 @@ public class SignupService {
     }
 
     @Transactional
-    public ValidationStatus signup(String email, UserInfoDto userInfoDto, String refreshToken) {
+    public ValidationStatus signup(String email, UserInfoDto userInfoDto) {
         this.userInfoDto = userInfoDto;
 
         log.info("signup으로 온 email: " + email);
@@ -94,7 +94,7 @@ public class SignupService {
         log.info("social token 존재함");
 
         // 소셜 토큰 존재
-        User user = createUser(email, userInfoDto, refreshToken);
+        User user = createUser(email, userInfoDto);
         entityManager.flush();
 
         naverToken.ifPresent(token -> setNaverToken(token, user));
@@ -106,13 +106,12 @@ public class SignupService {
         return ValidationStatus.VALID;
     }
 
-    private User createUser(String email, UserInfoDto userInfoDto, String refreshToken) {
+    private User createUser(String email, UserInfoDto userInfoDto) {
         User user = User.builder()
                 .id(userInfoDto.getUserId())
                 .email(email)
                 .userName(userInfoDto.getUserName())
                 .birthDate(userInfoDto.getBirthDate())
-                .refreshToken(refreshToken)
                 .createdDate(LocalDate.now())
                 .profileUrl(userInfoDto.getProfile())
                 .characterUrl(userInfoDto.getCharacter())

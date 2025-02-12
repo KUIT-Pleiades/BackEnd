@@ -1,13 +1,9 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.Item.Item;
 import com.pleiades.repository.StarBackgroundRepository;
 import com.pleiades.repository.StarRepository;
 import com.pleiades.repository.UserRepository;
@@ -20,7 +16,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 

@@ -86,21 +86,17 @@ public class AuthKakaoController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code) {
         log.info("kakao code redirected");
         try {
             log.info("code: " + code);
-            HttpHeaders headers = new HttpHeaders();
-            Map<String, String> body = new HashMap<>();
 
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
-
-            String email = null;
 
             if (responseToken == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();       // 400
             }
-            email = getKakaoEmail(responseToken.getAccessToken());
+            String email = getKakaoEmail(responseToken.getAccessToken());
             if (email == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
             }
@@ -132,27 +128,27 @@ public class AuthKakaoController {
         Map<String, String> body = new HashMap<>();
 
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+//        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
         log.info("accessToken: " + accessToken);
-        log.info("refreshToken: " + refreshToken);
+//        log.info("refreshToken: " + refreshToken);
 
         body.put("accessToken", accessToken);
-        Cookie cookie = authService.setRefreshToken(refreshToken);
+//        Cookie cookie = authService.setRefreshToken(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, String.format(
+        /*headers.add(HttpHeaders.SET_COOKIE, String.format(
                 "%s=%s; Path=%s; HttpOnly; Max-Age=%d; %sSameSite=None",       // Strict -> None
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getPath(),
                 cookie.getMaxAge(),
                 cookie.getSecure() ? "Secure; " : ""
-        ));
+        ));*/
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         log.info("headers: " + headers);
-        log.info("cookie: " + cookie);
+//        log.info("cookie: " + cookie);
         log.info("body: " + body.get("accessToken"));
 
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);   // 200
