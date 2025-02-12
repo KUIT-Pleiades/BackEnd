@@ -161,11 +161,12 @@ public class UserService {
                     friendStatusMap.put(friend.getReceiver(), "SENT");
                 else if(friend.getStatus()==FriendStatus.ACCEPTED)
                     friendStatusMap.put(friend.getReceiver(), "FRIEND");
-            } else if(friend.getReceiver().equals(currentUser)) {
+            }
+            else if(friend.getReceiver().equals(currentUser)) {
                 if(friend.getStatus()==FriendStatus.PENDING)
-                    friendStatusMap.put(friend.getReceiver(), "RECEIVED");
+                    friendStatusMap.put(friend.getSender(), "RECEIVED");
                 else if(friend.getStatus()==FriendStatus.ACCEPTED)
-                    friendStatusMap.put(friend.getReceiver(), "FRIEND");
+                    friendStatusMap.put(friend.getSender(), "FRIEND");
             }
         }
         return histories.stream()
