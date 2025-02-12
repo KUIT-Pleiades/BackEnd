@@ -102,8 +102,11 @@ public class ReportController {
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User is Empty")); }
 
         List<ReportHistory> histories = reportHistoryRepository.findByUser(user.get());
+        log.info("histories: {}", histories);
         List<ReportHistoryDto> historyDtos = new ArrayList<>();
         for (ReportHistory history : histories) {
+            log.info("history: {}", history);
+            log.info("id: {}", history.getId());
             ReportHistoryDto dto = new ReportHistoryDto();
             dto.setId(history.getId());
             dto.setQuery(history.getQuery());
@@ -115,7 +118,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/history/{historyId}")
-    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @RequestParam("historyId") Long historyId) {
+    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();

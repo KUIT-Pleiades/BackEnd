@@ -5,7 +5,8 @@ import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
 import com.pleiades.repository.ReportHistoryRepository;
 import com.pleiades.repository.ReportRepository;
-import com.pleiades.strings.ValidationStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @Service
 public class ReportHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(ReportHistoryService.class);
     ReportRepository reportRepository;
     ReportHistoryRepository reportHistoryRepository;
 
@@ -31,9 +33,11 @@ public class ReportHistoryService {
 
     @Transactional
     public void saveReportHistory(String query, User user) {
+        log.info("Saving report history");
         String noSpaceQuery = query.trim();
         Optional<ReportHistory> history = reportHistoryRepository.findByQuery(noSpaceQuery);
         if (history.isPresent()) {
+            log.info("history exists");
             history.get().setCreatedAt(LocalDateTime.now());
             reportHistoryRepository.save(history.get());
         }
@@ -41,14 +45,18 @@ public class ReportHistoryService {
         newReportHistory.setUser(user);
         newReportHistory.setQuery(query);
         newReportHistory.setCreatedAt(LocalDateTime.now());
+        reportHistoryRepository.save(newReportHistory);
+        log.info("report history: {}", newReportHistory);
     }
 
     @Transactional
     public void deleteIfOverTen(User user) {
+        log.info("deleteIfOverTen");
         if (reportHistoryRepository.findByUser(user).size() > 10) deleteOldReportHistory(user);
     }
 
     protected void deleteOldReportHistory(User user) {
+        log.info("deleteOldReportHistory");
         List<ReportHistory> reportHistories = reportHistoryRepository.findByUser(user);
         LocalDateTime oldest = LocalDateTime.now();
         ReportHistory oldestReportHistory = reportHistories.get(0);

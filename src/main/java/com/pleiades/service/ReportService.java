@@ -7,6 +7,7 @@ import com.pleiades.repository.QuestionRepository;
 import com.pleiades.repository.ReportRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.ValidationStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ReportService {
     private final UserRepository userRepository;
@@ -76,12 +78,14 @@ public class ReportService {
     }
 
     public List<ReportDto> searchByQuestion(User user, String query) {
+        log.info("searchByQuestion");
         List<Report> reports = reportRepository.findByUser(user);
         List<ReportDto> reportDtos = new ArrayList<>();
 
         for (Report report : reports) {
             if (report.getQuestion().getQuestion().contains(query)) {
                 ReportDto reportDto = new ReportDto();
+                reportDto.setId(report.getId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());
@@ -95,12 +99,14 @@ public class ReportService {
     }
 
     public List<ReportDto> searchByAnswer(User user, String query) {
+        log.info("searchByAnswer");
         List<Report> reports = reportRepository.findByUser(user);
         List<ReportDto> reportDtos = new ArrayList<>();
 
         for (Report report : reports) {
             if (report.getAnswer().contains(query)) {
                 ReportDto reportDto = new ReportDto();
+                reportDto.setId(report.getId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());
@@ -114,11 +120,14 @@ public class ReportService {
     }
 
     public Set<ReportDto> searchResult(User user, String query) {
+        log.info("Searching result for query {}", query);
         List<ReportDto> questions = searchByQuestion(user, query);
         List<ReportDto> answers = searchByAnswer(user, query);
 
         Set<ReportDto> result = new HashSet<>(questions);
         result.addAll(answers);
+
+        log.info("result: {}", result);
 
         return result;
     }
