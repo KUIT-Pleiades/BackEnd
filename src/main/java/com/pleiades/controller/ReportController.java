@@ -17,6 +17,7 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,11 +60,14 @@ public class ReportController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
+    public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
 
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
@@ -76,10 +80,14 @@ public class ReportController {
     }
 
     @GetMapping(params = "query")
-    public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
 
@@ -93,10 +101,14 @@ public class ReportController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User is Empty")); }
@@ -118,10 +130,14 @@ public class ReportController {
     }
 
     @DeleteMapping("/history/{historyId}")
-    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User is Empty")); }
 
@@ -129,11 +145,14 @@ public class ReportController {
     }
 
     @PatchMapping("/{reportId}")
-    public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
+    public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
 
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
@@ -148,10 +167,13 @@ public class ReportController {
     }
 
     @DeleteMapping("/{reportId}")
-    public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, HttpServletRequest request) {
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
@@ -165,16 +187,18 @@ public class ReportController {
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId) {
+    public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, HttpServletRequest request) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
         if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
 
         // 친구 관계에 있는지 검증
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
 
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
@@ -189,15 +213,19 @@ public class ReportController {
     }
 
     @GetMapping(value = "/friends", params = "query")
-    public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query) {
+    public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query, HttpServletRequest request) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
         if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
 
         // 친구 관계에 있는지 검증
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+//        String accessToken = HeaderUtil.authorizationBearer(authorization);
+//        Claims token = jwtUtil.validateToken(accessToken);
+//        String email = token.getSubject();
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
 
