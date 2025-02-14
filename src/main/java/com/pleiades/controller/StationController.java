@@ -1,18 +1,19 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.SearchUserDto;
-import com.pleiades.repository.StationRepository;
-import com.pleiades.service.UserService;
+
+import com.pleiades.dto.station.StationCreateDto;
+import com.pleiades.service.StationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -20,15 +21,19 @@ import java.util.List;
 @RequestMapping("/stations")
 public class StationController {
 
-    private final UserService userService;
+    private final StationService stationService;
 
-    @GetMapping("")
-    public ResponseEntity<List<SearchUserDto>> searchUser(HttpServletRequest request) {
-        log.info("station controller 진입");
+    @PostMapping("")
+    public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @RequestBody StationCreateDto requestDto) {
+        log.info("createStation controller 진입");
 
         String email = (String) request.getAttribute("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+        }
         log.info("사용자 email = {}", email);
 
-        return ResponseEntity.ok().build();
+        Map<String, Object> response = stationService.createStation(email, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
