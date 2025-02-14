@@ -10,6 +10,7 @@ import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
+import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
@@ -252,5 +253,14 @@ public class AuthService {
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).build(); }   // user 없음: 202
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public String getEmailByAuthorization(String authorization) {
+        if (authorization.startsWith("admin")) { return HeaderUtil.authorizationAdmin(authorization); }
+
+        String accessToken = HeaderUtil.authorizationBearer(authorization);
+        Claims token = jwtUtil.validateToken(accessToken);
+
+        return token.getSubject();
     }
 }

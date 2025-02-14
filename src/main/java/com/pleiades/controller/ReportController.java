@@ -61,13 +61,8 @@ public class ReportController {
 
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
-
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
@@ -81,11 +76,7 @@ public class ReportController {
 
     @GetMapping(params = "query")
     public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -102,11 +93,7 @@ public class ReportController {
 
     @GetMapping("/history")
     public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -131,11 +118,7 @@ public class ReportController {
 
     @DeleteMapping("/history/{historyId}")
     public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -146,12 +129,7 @@ public class ReportController {
 
     @PatchMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -168,11 +146,7 @@ public class ReportController {
 
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, HttpServletRequest request) {
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -193,11 +167,7 @@ public class ReportController {
         if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
 
         // 친구 관계에 있는지 검증
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -219,11 +189,7 @@ public class ReportController {
         if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
 
         // 친구 관계에 있는지 검증
-//        String accessToken = HeaderUtil.authorizationBearer(authorization);
-//        Claims token = jwtUtil.validateToken(accessToken);
-//        String email = token.getSubject();
-
-        String email = (String) request.getAttribute("email");
+        String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
