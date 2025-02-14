@@ -1,6 +1,8 @@
 package com.pleiades.config;
 
+import com.pleiades.entity.Friend;
 import com.pleiades.entity.StarBackground;
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Hair;
@@ -8,7 +10,9 @@ import com.pleiades.entity.character.face.Skin;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;
+import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StarBackgroundRepository;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.face.ExpressionRepository;
 import com.pleiades.repository.character.face.HairRepository;
 import com.pleiades.repository.character.face.SkinRepository;
@@ -16,53 +20,119 @@ import com.pleiades.repository.character.item.*;
 import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
+import com.pleiades.strings.FriendStatus;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RequiredArgsConstructor
 @Configuration
 public class DataInitializer {
 
-    SkinRepository skinRepository;
-    ExpressionRepository expressionRepository;
-    HairRepository hairRepository;
+    private final UserRepository userRepository;
+    private final FriendRepository friendRepository;
 
-    HeadRepository headRepository;
-    NeckRepository neckRepository;
-    EyesRepository eyesRepository;
-    EarsRepository earsRepository;
-    LeftHandRepository leftHandRepository;
-    RightHandRepository rightHandRepository;
-    LeftWristRepository leftWristRepository;
-    RightWristRepository rightWristRepository;
+    private final SkinRepository skinRepository;
+    private final ExpressionRepository expressionRepository;
+    private final HairRepository hairRepository;
 
-    TopRepository topRepository;
-    BottomRepository bottomRepository;
-    ShoesRepository shoesRepository;
+    private final HeadRepository headRepository;
+    private final NeckRepository neckRepository;
+    private final EyesRepository eyesRepository;
+    private final EarsRepository earsRepository;
+    private final LeftHandRepository leftHandRepository;
+    private final RightHandRepository rightHandRepository;
+    private final LeftWristRepository leftWristRepository;
+    private final RightWristRepository rightWristRepository;
 
-    StarBackgroundRepository starBackgroundRepository;
+    private final TopRepository topRepository;
+    private final BottomRepository bottomRepository;
+    private final ShoesRepository shoesRepository;
+
+    private final StarBackgroundRepository starBackgroundRepository;
 
     private final String IPFS_URL = System.getenv("IPFS_URL");
 
-    DataInitializer(SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
-                    HeadRepository headRepository, NeckRepository neckRepository, EyesRepository eyesRepository, EarsRepository earsRepository,
-                    LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository,
-                    TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository,
-                    StarBackgroundRepository starBackgroundRepository) {
-        this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
-        this.headRepository = headRepository; this.neckRepository = neckRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository;
-        this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository; this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
-        this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
-        this.starBackgroundRepository = starBackgroundRepository;
-    }
 
     @PostConstruct
     public void initData() {
+        saveUser(); saveFriend();
         saveSkin(); saveExpression(); saveHair();
         saveItem();
         saveTop(); saveBottom(); saveShoes();
         saveStarBackground();
     }
+
+    private void saveUser() {
+        List<User> users = List.of(
+                new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                new User("yuna1217", "yuna569@naver.com", "yuna", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                new User("lylylylh", "yh81260@naver.com", "yoonhee", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1", 0L),
+                new User("user2", "user2@naver.com", "jeongyoon", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_02", "character_02", "refresh2", 0L),
+                new User("user3", "user3@naver.com", "sejin", LocalDate.of(2002, 4, 17), LocalDate.of(2025, 2, 5), "profile_03", "character_03", "refresh3", 0L),
+                new User("user4", "user4@naver.com", "youngeun", LocalDate.of(2002, 12, 2), LocalDate.of(2025, 2, 3), "profile_04", "character_04", "refresh4", 0L),
+                new User("user5", "user5@naver.com", "sangeun", LocalDate.of(2002, 9, 27), LocalDate.of(2025, 2, 6), "profile_05", "character_05", "refresh5", 0L),
+                new User("user6", "user6@naver.com", "taeun", LocalDate.of(2002, 1, 3), LocalDate.of(2025, 2, 7), "profile_06", "character_06", "refresh6", 0L),
+                new User("user7", "user7@naver.com", "hayeon", LocalDate.of(2002, 11, 14), LocalDate.of(2025, 2, 4), "profile_07", "character_07", "refresh7", 0L)
+        );
+
+        userRepository.saveAll(users);
+        userRepository.flush();
+    }
+
+    private void saveFriend() {
+
+        List<Friend> friends = List.of(
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("user2").orElseThrow())
+                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 19, 46, 5))
+                        .sender(userRepository.findById("user3").orElseThrow())
+                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 12, 9, 46, 5))
+                        .sender(userRepository.findById("lylylylh").orElseThrow())
+                        .receiver(userRepository.findById("user4").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 12, 11, 46, 5))
+                        .sender(userRepository.findById("lylylylh").orElseThrow())
+                        .receiver(userRepository.findById("user5").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 12, 12, 46, 5))
+                        .sender(userRepository.findById("user4").orElseThrow())
+                        .receiver(userRepository.findById("user3").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 12, 14, 46, 5))
+                        .sender(userRepository.findById("user5").orElseThrow())
+                        .receiver(userRepository.findById("user4").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 13, 9, 46, 5))
+                        .sender(userRepository.findById("user6").orElseThrow())
+                        .receiver(userRepository.findById("user5").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 14, 9, 46, 5))
+                        .sender(userRepository.findById("user7").orElseThrow())
+                        .receiver(userRepository.findById("user6").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 14, 16, 46, 5))
+                        .sender(userRepository.findById("user2").orElseThrow())
+                        .receiver(userRepository.findById("user7").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 14, 20, 46, 5))
+                        .sender(userRepository.findById("user7").orElseThrow())
+                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build()
+        );
+
+        friendRepository.saveAll(friends);
+    }
+
 
     private void saveSkin() {
         String[] skins = {"skin_01", "skin_02", "skin_03", "skin_04", "skin_05", "skin_06", "skin_07"};

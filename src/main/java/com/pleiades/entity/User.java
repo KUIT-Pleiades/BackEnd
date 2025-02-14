@@ -36,14 +36,14 @@ public class User implements Serializable {
     @Column
     private LocalDate createdDate;
 
-    @Column
-    private String refreshToken;
-
     @Column(nullable = true)
     String profileUrl;
 
     @Column(nullable = true)
     String characterUrl;
+
+    @Column
+    private String refreshToken;
 
     @Column
     Long answerNumber = 0L;
