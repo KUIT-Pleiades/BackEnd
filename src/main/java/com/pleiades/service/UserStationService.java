@@ -32,8 +32,27 @@ public class UserStationService {
 
     private final UserService userService;
 
+    // 정거장 홈 _ 입장
     @Transactional
-    public StationHomeDto addUserToStation(String email, String stationId) {
+    public StationHomeDto enterStation(String email, String stationId) {
+        // 사용자 조회
+        User user = userService.getUserByEmail(email);
+
+        // 정거장 존재 여부 확인 (404)
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        // 사용자가 정거장 멤버인지 확인 (403)
+        UserStation userStation = userStationRepository.findById(new UserStationId(user.getId(), stationId))
+                .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
+
+        // response DTO 생성
+        return buildStationHomeDto(station, userStation.isTodayReport());
+    }
+
+    // 정거장 첫 입장 _ 멤버 추가
+    @Transactional
+    public StationHomeDto addMemberToStation(String email, String stationId) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
@@ -55,11 +74,12 @@ public class UserStationService {
         stationRepository.save(station);
 
         // response DTO 생성
-        return buildStationHomeDto(station, false, "Enter new station success");
+        return buildStationHomeDto(station, false);
     }
 
+    // response DTO 형성 method
     @Transactional
-    public StationHomeDto buildStationHomeDto(Station station, boolean reportWritten, String message) {
+    public StationHomeDto buildStationHomeDto(Station station, boolean reportWritten) {
         List<UserStation> userStations = userStationRepository.findByStationId(station.getId());
 
         List<StationMemberDto> members = userStations.stream()
@@ -77,7 +97,6 @@ public class UserStationService {
                 .collect(Collectors.toList());
 
         return new StationHomeDto(
-                message,
                 station.getId(),
                 station.getAdminUserId(),
                 station.getName(),
@@ -90,6 +109,7 @@ public class UserStationService {
         );
     }
 
+    // 사용자 _ 우주 정거장 관계 테이블 객체 추가
     @Transactional
     public void addUserStation(User user, Station station, boolean isAdmin) {
 

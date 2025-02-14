@@ -9,9 +9,11 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid or expired token"),
     MISSING_AUTH_HEADER(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header"),
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "Access denied"),
+    FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "You are not a member of this station."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
-    USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station");
+    USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station"),
+    REPORT_REQUIRED(HttpStatus.ACCEPTED, "You must submit a report before entering this station.");
 
     private final HttpStatus status;
     private final String message;
