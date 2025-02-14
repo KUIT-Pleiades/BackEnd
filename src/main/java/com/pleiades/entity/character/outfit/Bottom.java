@@ -16,7 +16,4 @@ public class Bottom {
     @Id
     private String name;
     private Long price = 0L;
-
-//    @OneToOne(mappedBy = "bottom")
-//    private Outfit outfit;
 }

@@ -127,6 +127,11 @@ public class AuthKakaoController {
     public ResponseEntity<Map<String, String>> responseToken(@RequestParam("hash") String email, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
 
+        Optional<KakaoToken> kakaoToken = kakaoTokenRepository.findByEmail(email);
+        if (kakaoToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 로그인 필요
+        }
+
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
 //        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
