@@ -80,10 +80,10 @@ public class FriendService {
     public ResponseEntity<Map<String, Object>> sendFriendRequest(String email, String receiverId) {
 
         // access token -> sender
-        User sender = userRepository.findByEmail(email).orElseThrow(()-> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
+        User sender = userRepository.findByEmail(email).orElseThrow(()-> new CustomException(ErrorCode.INVALID_TOKEN));
 
         // receiver
-        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "receiver doesn't exist"));
+        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 이미 친구 요청 보낸 경우
         Optional<Friend> optionalFriend = friendRepository.findBySenderAndReceiver(sender,receiver);
@@ -193,6 +193,6 @@ public class FriendService {
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
     }
 }

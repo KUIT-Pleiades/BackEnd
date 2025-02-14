@@ -74,7 +74,7 @@ public class FriendController {
 
     @DeleteMapping("/requests/{friend_id}")
     public ResponseEntity<Map<String, String>> deleteFriend(HttpServletRequest request, @PathVariable("friend_id") Long friend_id) {
-        log.info("handle request controller 진입");
+        log.info("delete request controller 진입");
 
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);

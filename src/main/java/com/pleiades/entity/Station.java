@@ -42,6 +42,7 @@ public class Station {
     @Column(nullable = false)
     private Time reportNoticeTime;
 
+    // TODO: StationBackGround entity 연동
     @Column(nullable = false)
-    private String backgroundName; // stationBackground와 연동 필요
+    private String backgroundName;
 }

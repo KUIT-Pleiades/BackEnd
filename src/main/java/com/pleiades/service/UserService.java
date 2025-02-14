@@ -65,9 +65,9 @@ public class UserService {
 
     private CharacterDto characterDto = null;
 
-    private User getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
     }
 
     // todo: character 수정 후 이미지 저장

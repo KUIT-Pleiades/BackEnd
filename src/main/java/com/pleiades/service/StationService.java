@@ -28,9 +28,9 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class StationService {
 
-    private final UserRepository userRepository;
     private final StationRepository stationRepository;
-    private final UserStationRepository userStationRepository;
+    private final UserStationService userStationService;
+    private final UserService userService;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
@@ -38,7 +38,7 @@ public class StationService {
     @Transactional
     public Map<String, Object> createStation(String email, StationCreateDto requestDto) {
 
-        User adminUser = getUserByEmail(email);
+        User adminUser = userService.getUserByEmail(email);
         String stationId = generateUniqueStationCode();
 
         Station station = Station.builder()
@@ -55,28 +55,12 @@ public class StationService {
         stationRepository.save(station);
         log.info("새로운 정거장 생성 완료: {}", station.getName());
 
-        addUserStation(adminUser, station);
+        userStationService.addUserStation(adminUser, station, true);
 
         return Map.of("message", "Station created");
     }
 
-    @Transactional
-    public void addUserStation(User adminUser, Station station) {
-        // 방장(정거장 생성한 user) 정보를 UserStation 에 추가
-        UserStation userStation = UserStation.builder()
-                .id(new UserStationId(adminUser.getId(), station.getId()))
-                .user(adminUser)
-                .station(station)
-                .isAdmin(true)
-                .createdAt(LocalDateTime.now())
-                .todayReport(false)
-                .positionX(50f) // 기본 위치값 설정
-                .positionY(70f)
-                .build();
 
-        userStationRepository.save(userStation);
-        log.info("방장 정보 UserStation 에 저장 완료: {}", adminUser.getUserName());
-    }
     private String generateUniqueStationCode() {
         String code;
         do {
@@ -96,9 +80,5 @@ public class StationService {
         }
 
         return code.toString();
-    }
-    private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL, "login token expired"));
     }
 }

@@ -1,24 +1,27 @@
 package com.pleiades.exception;
 
-public enum ErrorCode {
-    INVALID_USERNAME_OR_PASSWORD(401, "Invalid username or password"),
-    INVALID_USER_EMAIL(401, "Invalid user email"),
-    INVALID_USER_ID(401, "Invalid user id"),
-    INVALID_TOKEN(401, "Invalid or expired token"),
-    MISSING_AUTH_HEADER(401, "Missing or invalid Authorization header"),
-    FORBIDDEN_ACCESS(403, "Access denied"),
-    USER_NOT_FOUND(404, "User not found"),
-    INTERNAL_SERVER_ERROR(500, "Internal server error");
+import org.springframework.http.HttpStatus;
 
-    private final int status;
+public enum ErrorCode {
+    INVALID_USERNAME_OR_PASSWORD(HttpStatus.UNAUTHORIZED, "Invalid username or password"),
+    INVALID_USER_EMAIL(HttpStatus.UNAUTHORIZED, "Invalid user email"),
+    INVALID_USER_ID(HttpStatus.UNAUTHORIZED, "Invalid user id"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid or expired token"),
+    MISSING_AUTH_HEADER(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header"),
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "Access denied"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+    STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
+    USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station");
+
+    private final HttpStatus status;
     private final String message;
 
-    ErrorCode(int status, String message) {
+    ErrorCode(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
     }
 
-    public int getStatus() {
+    public HttpStatus getStatus() {
         return status;
     }
 

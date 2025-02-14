@@ -13,8 +13,13 @@ import java.util.List;
 @Repository
 public interface UserStationRepository extends JpaRepository<UserStation, UserStationId> {
 
+    boolean existsById(UserStationId id);
+    List<UserStation> findByStationId(String stationId);
+
     @Query("SELECT us FROM UserStation us " +
             "JOIN FETCH us.station s " +
             "WHERE us.user.id = :userId " +
             "ORDER BY s.createdAt DESC")
-    List<UserStation> findByUserIdOrderByCreatedAtDesc(@Param("userId") String userId);}
+    List<UserStation> findByUserIdOrderByCreatedAtDesc(@Param("userId") String userId);
+
+}
