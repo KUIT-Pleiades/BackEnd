@@ -70,10 +70,11 @@ public class DataInitializer {
 
     private void saveUser() {
         List<User> users = List.of(
-                new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("yuna1217", "yuna569@naver.com", "yuna", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("lylylylh", "yh81260@naver.com", "yoonhee", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1", 0L),
+                //new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                //new User("yuna1217", "yuna569@naver.com", "yuna", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                //new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
+                //new User("lylylylh", "yh81260@naver.com", "yoonhee", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1", 0L),
+                new User("user1", "user1@naver.com", "yh", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_01", "character_01", "refresh1", 0L),
                 new User("user2", "user2@naver.com", "jeongyoon", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_02", "character_02", "refresh2", 0L),
                 new User("user3", "user3@naver.com", "sejin", LocalDate.of(2002, 4, 17), LocalDate.of(2025, 2, 5), "profile_03", "character_03", "refresh3", 0L),
                 new User("user4", "user4@naver.com", "youngeun", LocalDate.of(2002, 12, 2), LocalDate.of(2025, 2, 3), "profile_04", "character_04", "refresh4", 0L),
@@ -91,18 +92,18 @@ public class DataInitializer {
         List<Friend> friends = List.of(
                 Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
                         .sender(userRepository.findById("user2").orElseThrow())
-                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build(),
+                        .receiver(userRepository.findById("user1").orElseThrow()).build(),
 
                 Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 19, 46, 5))
                         .sender(userRepository.findById("user3").orElseThrow())
-                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build(),
+                        .receiver(userRepository.findById("user1").orElseThrow()).build(),
 
                 Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 12, 9, 46, 5))
-                        .sender(userRepository.findById("lylylylh").orElseThrow())
+                        .sender(userRepository.findById("user1").orElseThrow())
                         .receiver(userRepository.findById("user4").orElseThrow()).build(),
 
                 Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 12, 11, 46, 5))
-                        .sender(userRepository.findById("lylylylh").orElseThrow())
+                        .sender(userRepository.findById("user1").orElseThrow())
                         .receiver(userRepository.findById("user5").orElseThrow()).build(),
 
                 Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 12, 12, 46, 5))
@@ -127,7 +128,7 @@ public class DataInitializer {
 
                 Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 14, 20, 46, 5))
                         .sender(userRepository.findById("user7").orElseThrow())
-                        .receiver(userRepository.findById("lylylylh").orElseThrow()).build()
+                        .receiver(userRepository.findById("user1").orElseThrow()).build()
         );
 
         friendRepository.saveAll(friends);
