@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
+import com.pleiades.dto.station.UserPositionDto;
 import com.pleiades.service.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +21,20 @@ import org.springframework.web.bind.annotation.*;
 public class UserStationController {
 
     private final UserStationService userStationService;
+
+    @PatchMapping("/{station_id}/users/{user_id}/position")
+    public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
+        log.info("setUserPosition controller 진입");
+
+        String email = (String) request.getAttribute("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+        }
+        log.info("사용자 email = {}", email);
+
+        Map<String, String> response = userStationService.setUserPosition(email, station_id, user_id, requestBody);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @GetMapping("")
     public ResponseEntity<StationListDto> getStationList(HttpServletRequest request) {

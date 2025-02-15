@@ -13,7 +13,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
     USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station"),
-    REPORT_REQUIRED(HttpStatus.ACCEPTED, "You must submit a report before entering this station.");
+    REPORT_REQUIRED(HttpStatus.ACCEPTED, "You must submit a report before entering this station."),
+    USER_NOT_IN_STATION(HttpStatus.NOT_FOUND, "Target User is not in a station"),;
 
     private final HttpStatus status;
     private final String message;

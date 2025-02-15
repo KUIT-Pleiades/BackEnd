@@ -1,9 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.station.StationDto;
-import com.pleiades.dto.station.StationHomeDto;
-import com.pleiades.dto.station.StationListDto;
-import com.pleiades.dto.station.StationMemberDto;
+import com.pleiades.dto.station.*;
 import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
@@ -20,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +29,31 @@ public class UserStationService {
     private final UserStationRepository userStationRepository;
 
     private final UserService userService;
+
+    @Transactional
+    public Map<String,String> setUserPosition(String email, String stationId, String userId, UserPositionDto requestBody){
+        // 사용자 조회
+        User user = userService.getUserByEmail(email);
+
+        // 정거장 존재 여부 확인 (404)
+        stationRepository.findById(stationId).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        // target 사용자가 정거장에 있는지 확인 (404)
+        UserStation targetUserStation = userStationRepository.findById(new UserStationId(userId, stationId))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_IN_STATION));
+
+        // 사용자가 정거장 멤버인지 확인 (403)
+        userStationRepository.findById(new UserStationId(user.getId(), stationId))
+                .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
+
+        targetUserStation.setPositionX(requestBody.getPositionX());
+        targetUserStation.setPositionY(requestBody.getPositionY());
+
+        userStationRepository.save(targetUserStation);
+        log.info("사용자({})가 사용자({})의 위치를 변경: X={}, Y={}", user.getId(), userId, requestBody.getPositionX(), requestBody.getPositionY());
+
+        return Map.of("message", "User Position in station editted");
+    }
 
     // 정거장 홈 _ 입장
     @Transactional
