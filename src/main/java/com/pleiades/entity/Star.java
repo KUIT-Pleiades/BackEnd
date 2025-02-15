@@ -2,6 +2,8 @@ package com.pleiades.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @NoArgsConstructor
@@ -14,10 +16,10 @@ public class Star {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // User의 기본 키를 그대로 사용 (X)
+    private Long id;
 
-    // @MapsId // User의 기본 키를 Star의 기본 키로 매핑
     @OneToOne(cascade = CascadeType.MERGE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
     private User user;
 

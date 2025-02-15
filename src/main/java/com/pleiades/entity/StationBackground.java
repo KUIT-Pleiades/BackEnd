@@ -3,16 +3,14 @@ package com.pleiades.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
-@Table(name = "star_backgrounds")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class StarBackground {
+@Table(name="station_backgrounds")
+public class StationBackground {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

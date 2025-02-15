@@ -1,9 +1,6 @@
 package com.pleiades.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +17,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Station {
-
     @Id
     private String id; // 정거장 code
 
@@ -45,4 +41,8 @@ public class Station {
     // TODO: StationBackGround entity 연동
     @Column(nullable = false)
     private String backgroundName;
+
+//    @ManyToOne
+//    @JoinColumn(name = "background_id")
+//    StationBackground background;
 }

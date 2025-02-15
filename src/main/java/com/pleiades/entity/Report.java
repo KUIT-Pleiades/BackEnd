@@ -27,9 +27,9 @@ public class Report {
     @JoinColumn(name = "question_id")
     Question question;
 
-//    @ManyToOne
-//    @Column(nullable = false)
-//    Station station;
+    @ManyToOne
+    @JoinColumn(nullable = true, name = "station_id")   // false
+    Station station;
 
     @Column(nullable = false)
     String answer;
