@@ -74,7 +74,7 @@ public class DataInitializer {
         saveItem();
         saveTop(); saveBottom(); saveShoes();
         saveQuestion();
-        saveReport();
+//        saveReport();
         saveStarBackground();
 //        saveStation();
     }
