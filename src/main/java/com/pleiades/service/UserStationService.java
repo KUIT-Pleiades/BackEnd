@@ -135,7 +135,9 @@ public class UserStationService {
     // 사용자 _ 우주 정거장 관계 테이블 객체 추가
     @Transactional
     public void addUserStation(User user, Station station, boolean isAdmin) {
-        int currentMembers = station.getNumberOfUsers();
+
+        int currentMembers = userStationRepository.countByStationId(station.getId());
+
         if (currentMembers >= 6) {
             throw new CustomException(ErrorCode.STATION_FULL);
         }

@@ -17,6 +17,8 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
     boolean existsById(UserStationId id);
     List<UserStation> findByStationId(String stationId);
 
+    int countByStationId(String stationId);
+
     @Query("SELECT us FROM UserStation us " +
             "JOIN FETCH us.station s " +
             "WHERE us.user.id = :userId " +
