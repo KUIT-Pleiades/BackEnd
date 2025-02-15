@@ -233,9 +233,9 @@ public class DataInitializer {
         Optional<Question> question3 = questionRepository.findById(3L);
 
         List<Report> reports = List.of(
-                new Report(1L, wonwoo.get(), question1.get(), null, "qwer", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(2L, wonwoo.get(), question2.get(), null, "asdf", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(3L, wonwoo.get(), question3.get(), null, "zxcv", true, LocalDateTime.now(), LocalDateTime.now())
+                new Report(1L, wonwoo.get(), question1.get(), "qwer", true, LocalDateTime.now(), LocalDateTime.now()),
+                new Report(2L, wonwoo.get(), question2.get(), "asdf", true, LocalDateTime.now(), LocalDateTime.now()),
+                new Report(3L, wonwoo.get(), question3.get(), "zxcv", true, LocalDateTime.now(), LocalDateTime.now())
         );
         reportRepository.saveAll(reports);
     }

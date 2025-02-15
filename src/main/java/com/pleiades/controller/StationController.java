@@ -2,15 +2,10 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.SearchUserDto;
-import com.pleiades.entity.Report;
-import com.pleiades.entity.Station;
-import com.pleiades.entity.User;
+import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
-import com.pleiades.repository.ReportRepository;
-import com.pleiades.repository.StationRepository;
-import com.pleiades.repository.UserRepository;
-import com.pleiades.repository.UserStationRepository;
+import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.ReportService;
 import com.pleiades.service.UserService;
@@ -27,10 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.Map;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -47,6 +41,8 @@ public class StationController {
     private final ReportRepository reportRepository;
     private final ReportService reportService;
     private final StationService stationService;
+    private final QuestionRepository questionRepository;
+    private final StationQuestionRepository stationQuestionRepository;
 
     @PostMapping("")
     public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @RequestBody StationCreateDto requestDto) {
@@ -77,7 +73,7 @@ public class StationController {
 
     // todo: dto 반영
     @GetMapping("/{stationId}/report")
-    public ResponseEntity<List<Report>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<List<ReportDto>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         if (stationId == null || stationId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -102,9 +98,58 @@ public class StationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        List<Report> reports = reportRepository.findByStation(station.get());
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
+        List<UserStation> usersInStation = userStationRepository.findByStationId(stationId);
+        List<ReportDto> reportDtos = new ArrayList<>();
 
-        return ResponseEntity.status(HttpStatus.OK).body(reports);
+        for (StationQuestion stationQuestion : stationQuestions) {
+            Question question = stationQuestion.getQuestion();
+            for (UserStation userInStation : usersInStation) {
+                Report report = reportService.searchUserQuestion(userInStation.getUser(), question);
+                ReportDto reportDto = new ReportDto();
+                reportDto.setReportId(report.getId());
+                reportDto.setReportId(report.getQuestion().getId());
+                reportDto.setQuestion(report.getQuestion().getQuestion());
+                reportDto.setAnswer(report.getAnswer());
+                reportDto.setCreatedAt(report.getCreatedAt());
+                reportDto.setModifiedAt(report.getModifiedAt());
+                reportDtos.add(reportDto);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(reportDtos);
     }
 
+    @PostMapping("/{stationId}/report")
+    public ResponseEntity<Map<String,String>> submitReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+        if (stationId == null || stationId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        String email = authService.getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
+
+        Optional<Station> station = stationRepository.findById(stationId);
+        if (station.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "station not found")); }
+
+        UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
+        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+
+        if (userStation.isEmpty()) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "user is not in station")); }
+
+        String answer = body.get("answer").toString();
+
+        Report todayReport = reportService.searchTodaysReport(user.get(), stationId);
+
+        if (todayReport == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "report not found")); }
+
+        todayReport.setAnswer(answer);
+        todayReport.setModifiedAt(LocalDateTime.now());
+        reportRepository.save(todayReport);
+
+        userStation.get().setTodayReport(true);
+        userStationRepository.save(userStation.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
+    }
 }

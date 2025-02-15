@@ -6,36 +6,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "reports")
+@Table(name = "station_question")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Report {
+public class StationQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    @JoinColumn(name = "station_id")
+    Station station;
 
     @ManyToOne
     @JoinColumn(name = "question_id")
     Question question;
 
-    @Column(nullable = false)
-    String answer;
-
     @Column
-    boolean written = false;
-
-    @Column(updatable = false)
-    LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column
-    LocalDateTime modifiedAt = LocalDateTime.now();
+    LocalDate createdAt;
 }
