@@ -1,6 +1,8 @@
 package com.pleiades.config;
 
 import com.pleiades.entity.*;
+import com.pleiades.entity.User_Station.UserStation;
+import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Hair;
@@ -41,6 +43,7 @@ public class DataInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private final UserRepository userRepository;
+    private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
 
     private final SkinRepository skinRepository;
@@ -77,7 +80,52 @@ public class DataInitializer {
         saveQuestion();
 //        saveReport();
         saveStarBackground();
-        saveStation();
+        saveStation(); saveUserStation();
+    }
+    private void saveUserStation() {
+        List<UserStation> userStations = List.of(
+                // 첫 번째 정거장 (ABCDEF)
+                new UserStation(new UserStationId("woogie", "ABCDEF"), userRepository.findById("woogie").orElseThrow(),
+                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+
+                new UserStation(new UserStationId("yuna1217", "ABCDEF"), userRepository.findById("yuna1217").orElseThrow(),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
+
+                new UserStation(new UserStationId("danpung628", "ABCDEF"), userRepository.findById("danpung628").orElseThrow(),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
+
+                // 두 번째 정거장 (BC123D)
+                new UserStation(new UserStationId("woogie", "BC123D"), userRepository.findById("woogie").orElseThrow(),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
+
+                new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
+                        stationRepository.findById("BC123D").orElseThrow(), true, LocalDateTime.now(), false, 50f, 50f),
+
+                new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
+
+                // 세 번째 정거장 (OPQ4R5)
+                new UserStation(new UserStationId("user3", "OPQ4R5"), userRepository.findById("user3").orElseThrow(),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+
+                // 네 번째 정거장 (VW0XYZ)
+                new UserStation(new UserStationId("user1", "VW0XYZ"), userRepository.findById("user1").orElseThrow(),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+
+                new UserStation(new UserStationId("user2", "VW0XYZ"), userRepository.findById("user2").orElseThrow(),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
+
+                // 다섯 번째 정거장 (LYHENO)
+                new UserStation(new UserStationId("user2", "LYHENO"), userRepository.findById("user2").orElseThrow(),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
+
+                new UserStation(new UserStationId("user4", "LYHENO"), userRepository.findById("user4").orElseThrow(),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
+
+                new UserStation(new UserStationId("user5", "LYHENO"), userRepository.findById("user5").orElseThrow(),
+                        stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTime.now(), false, 75f, 50f)
+        );
+        userStationRepository.saveAll(userStations);
     }
 
     private void saveStation() {
@@ -89,6 +137,7 @@ public class DataInitializer {
                 new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationBackground_05")
             );
         stationRepository.saveAll(stations);
+        stationRepository.flush();
     }
     private void saveUser() {
         List<User> users = List.of(
