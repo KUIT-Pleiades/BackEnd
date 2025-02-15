@@ -39,7 +39,7 @@ public class ReportService {
         for (Report report : reports) {
             ReportDto reportDto = new ReportDto();
 
-            reportDto.setId(report.getId());
+            reportDto.setReportId(report.getId());
             reportDto.setQuestionId(report.getQuestion().getId());
             reportDto.setQuestion(report.getQuestion().getQuestion());
             reportDto.setAnswer(report.getAnswer());
@@ -88,7 +88,7 @@ public class ReportService {
         for (Report report : reports) {
             if (report.getQuestion().getQuestion().contains(query)) {
                 ReportDto reportDto = new ReportDto();
-                reportDto.setId(report.getId());
+                reportDto.setReportId(report.getId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());
@@ -109,7 +109,7 @@ public class ReportService {
         for (Report report : reports) {
             if (report.getAnswer().contains(query)) {
                 ReportDto reportDto = new ReportDto();
-                reportDto.setId(report.getId());
+                reportDto.setReportId(report.getId());
                 reportDto.setQuestionId(report.getQuestion().getId());
                 reportDto.setQuestion(report.getQuestion().getQuestion());
                 reportDto.setAnswer(report.getAnswer());

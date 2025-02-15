@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportDto {
     @JsonProperty
-    private Long id;
+    private Long reportId;
 
     @JsonProperty
     private Long questionId;

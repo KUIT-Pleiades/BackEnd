@@ -78,7 +78,9 @@ public class StationController {
     // todo: dto 반영
     @GetMapping("/{stationId}/report")
     public ResponseEntity<List<Report>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
-        if (stationId == null || stationId.isEmpty()) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); }
+        if (stationId == null || stationId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         String email = authService.getEmailByAuthorization(authorization);
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
@@ -104,4 +106,5 @@ public class StationController {
 
         return ResponseEntity.status(HttpStatus.OK).body(reports);
     }
+
 }
