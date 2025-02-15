@@ -13,6 +13,8 @@ import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +31,50 @@ import java.util.concurrent.ThreadLocalRandom;
 public class StationService {
 
     private final StationRepository stationRepository;
+    private final UserStationRepository userStationRepository;
+
     private final UserStationService userStationService;
     private final UserService userService;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> deleteStation(String email, String stationId){
+        Map<String, String> response = new HashMap<>();
+
+        User user = userService.getUserByEmail(email);
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        // 방장인지 확인
+        if (station.getAdminUserId().equals(user.getId())) {
+            // 방장: 정거장 폭파 (모든 관계 삭제)
+            log.info("방장({}) -> 정거장 삭제 {}", user.getEmail(), station.getName());
+
+            removeAllUsersFromStation(station); // 모든 사용자 삭제
+            stationRepository.delete(station); // 정거장 삭제
+
+            response.put("message", "Station deleted");
+        } else {
+            // 방장 X: 정거장 나가기 (사용자_정거장 관계만 삭제)
+            log.info("일반 사용자({}) -> 정거장 나가기: {}", user.getEmail(), station.getName());
+
+            UserStationId userStationId = new UserStationId(user.getId(), stationId);
+            UserStation userStation = userStationRepository.findById(userStationId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
+
+            userStationRepository.delete(userStation);
+            response.put("message", "User exitted the station");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Transactional
+    public void removeAllUsersFromStation(Station station) {
+        userStationRepository.deleteAllByStationId(station.getId());
+    }
 
     @Transactional
     public Map<String, Object> createStation(String email, StationCreateDto requestDto) {

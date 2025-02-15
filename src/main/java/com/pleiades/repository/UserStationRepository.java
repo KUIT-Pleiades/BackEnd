@@ -4,6 +4,7 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,7 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
             "ORDER BY s.createdAt DESC")
     List<UserStation> findByUserIdOrderByCreatedAtDesc(@Param("userId") String userId);
 
+    @Modifying
+    @Query("DELETE FROM UserStation us WHERE us.station.id = :stationId")
+    void deleteAllByStationId(@Param("stationId") String stationId);
 }
