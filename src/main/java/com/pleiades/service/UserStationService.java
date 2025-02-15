@@ -135,6 +135,16 @@ public class UserStationService {
     // 사용자 _ 우주 정거장 관계 테이블 객체 추가
     @Transactional
     public void addUserStation(User user, Station station, boolean isAdmin) {
+        int currentMembers = station.getNumberOfUsers();
+        if (currentMembers >= 6) {
+            throw new CustomException(ErrorCode.STATION_FULL);
+        }
+        // 입장 순서에 따른 X, Y 좌표 설정
+        float[] xPositions = {25f, 50f, 75f};
+        float[] yPositions = {50f, 70f};
+
+        float positionX = xPositions[currentMembers % 3];
+        float positionY = yPositions[currentMembers / 3];
 
         UserStation userStation = UserStation.builder()
                 .id(new UserStationId(user.getId(), station.getId()))
@@ -143,9 +153,8 @@ public class UserStationService {
                 .isAdmin(isAdmin)
                 .createdAt(LocalDateTime.now())
                 .todayReport(false)
-                // TODO: default Position X,Y 변경
-                .positionX(50f) // 기본 위치값 설정
-                .positionY(70f)
+                .positionX(positionX) // 기본 위치값 설정
+                .positionY(positionY)
                 .build();
 
         userStationRepository.save(userStation);
