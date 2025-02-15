@@ -132,33 +132,7 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
 
-    @GetMapping("/{stationId}/users/{userId}/report")
-    public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
 
-        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
-        List<ReportDto> reportDtos = new ArrayList<>();
-
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
-
-        for (StationQuestion stationQuestion : stationQuestions) {
-            Question question = stationQuestion.getQuestion();
-
-            Report report = reportService.searchUserQuestion(user.get(), question);
-            ReportDto reportDto = new ReportDto();
-            reportDto.setReportId(report.getId());
-            reportDto.setReportId(report.getQuestion().getId());
-            reportDto.setQuestion(report.getQuestion().getQuestion());
-            reportDto.setAnswer(report.getAnswer());
-            reportDto.setCreatedAt(report.getCreatedAt());
-            reportDto.setModifiedAt(report.getModifiedAt());
-            reportDtos.add(reportDto);
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
-    }
 
 
 }
