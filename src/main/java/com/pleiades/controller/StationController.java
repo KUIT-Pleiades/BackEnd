@@ -73,30 +73,9 @@ public class StationController {
 
     // todo: dto 반영
     @GetMapping("/{stationId}/report")
-    public ResponseEntity<List<ReportDto>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
-        if (stationId == null || stationId.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        String email = authService.getEmailByAuthorization(authorization);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Optional<Station> station = stationRepository.findById(stationId);
-        if (station.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "station not found"));
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
-        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
-
-        if (userStation.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "user is not in station"));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<Map<String, Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
+        if (response != null) { return response; }
 
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
         List<UserStation> usersInStation = userStationRepository.findByStationId(stationId);
@@ -117,7 +96,7 @@ public class StationController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(reportDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
     }
 
     @PostMapping("/{stationId}/report")
@@ -152,4 +131,34 @@ public class StationController {
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
+
+    @GetMapping("/{stationId}/users/{userId}/report")
+    public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
+        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
+        if (response != null) { return response; }
+
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
+        List<ReportDto> reportDtos = new ArrayList<>();
+
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+
+        for (StationQuestion stationQuestion : stationQuestions) {
+            Question question = stationQuestion.getQuestion();
+
+            Report report = reportService.searchUserQuestion(user.get(), question);
+            ReportDto reportDto = new ReportDto();
+            reportDto.setReportId(report.getId());
+            reportDto.setReportId(report.getQuestion().getId());
+            reportDto.setQuestion(report.getQuestion().getQuestion());
+            reportDto.setAnswer(report.getAnswer());
+            reportDto.setCreatedAt(report.getCreatedAt());
+            reportDto.setModifiedAt(report.getModifiedAt());
+            reportDtos.add(reportDto);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
+    }
+
+
 }

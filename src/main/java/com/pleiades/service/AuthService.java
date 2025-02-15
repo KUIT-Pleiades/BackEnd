@@ -2,11 +2,12 @@ package com.pleiades.service;
 
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
+import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
+import com.pleiades.entity.User_Station.UserStation;
+import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.repository.StarBackgroundRepository;
-import com.pleiades.repository.StarRepository;
-import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
@@ -28,6 +29,8 @@ import java.util.*;
 @Service
 public class AuthService {
 
+    private final StationRepository stationRepository;
+    private final UserStationRepository userStationRepository;
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -38,11 +41,13 @@ public class AuthService {
 
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                   CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
         this.jwtUtil = jwtUtil; this.imageJsonCreator = imageJsonCreator;
+        this.stationRepository = stationRepository;
+        this.userStationRepository = userStationRepository;
     }
 
 
@@ -263,7 +268,22 @@ public class AuthService {
         return token.getSubject();
     }
 
-//    public ResponseEntity<Map<String, String>> userInStation(String accessToken) {
-//
-//    }
+    public ResponseEntity<Map<String, Object>> userInStation(String stationId, String authorization) {
+        if (stationId == null || stationId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        String email = getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
+
+        Optional<Station> station = stationRepository.findById(stationId);
+        if (station.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "station not found")); }
+
+        UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
+        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+
+        if (userStation.isEmpty()) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "user is not in station")); }
+
+        return null;
+    }
 }
