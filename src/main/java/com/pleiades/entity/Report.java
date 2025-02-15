@@ -37,7 +37,7 @@ public class Report {
     @Column
     boolean written = false;
 
-    @Column
+    @Column(updatable = false)
     LocalDateTime createdAt = LocalDateTime.now();
 
     @Column

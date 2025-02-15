@@ -12,6 +12,7 @@ import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.service.AuthService;
+import com.pleiades.service.ReportService;
 import com.pleiades.service.UserService;
 import com.pleiades.util.HeaderUtil;
 
@@ -44,6 +45,7 @@ public class StationController {
     private final UserStationRepository userStationRepository;
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
+    private final ReportService reportService;
     private final StationService stationService;
 
     @PostMapping("")
@@ -102,5 +104,4 @@ public class StationController {
 
         return ResponseEntity.status(HttpStatus.OK).body(reports);
     }
-
 }

@@ -1,7 +1,9 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.ReportDto;
+import com.pleiades.entity.Question;
 import com.pleiades.entity.Report;
+import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.repository.QuestionRepository;
 import com.pleiades.repository.ReportRepository;
@@ -37,6 +39,7 @@ public class ReportService {
         for (Report report : reports) {
             ReportDto reportDto = new ReportDto();
 
+            reportDto.setId(report.getId());
             reportDto.setQuestionId(report.getQuestion().getId());
             reportDto.setQuestion(report.getQuestion().getQuestion());
             reportDto.setAnswer(report.getAnswer());
@@ -130,5 +133,14 @@ public class ReportService {
         log.info("result: {}", result);
 
         return result;
+    }
+
+    public Report searchTodaysReport(User user) {
+        log.info("searchTodaysReport");
+        List<Report> reports = reportRepository.findByUser(user);
+        for (Report report : reports) {
+            if (!report.isWritten()) { return report; }
+        }
+        return null;
     }
 }
