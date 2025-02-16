@@ -83,7 +83,7 @@ public class DataInitializer {
         saveStarBackground();
 //        saveStation();
         saveStationBackground();
-        saveStation(); saveUserStation();
+        saveUserStation();
     }
     private void saveUserStation() {
         List<UserStation> userStations = List.of(
@@ -131,17 +131,17 @@ public class DataInitializer {
         userStationRepository.saveAll(userStations);
     }
 
-    private void saveStation() {
-        List<Station> stations = List.of(
-                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_01"),
-                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_02"),
-                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),"stationBackground_03"),
-                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),"stationBackground_04"),
-                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationBackground_05")
-            );
-        stationRepository.saveAll(stations);
-        stationRepository.flush();
-    }
+//    private void saveStation() {
+//        List<Station> stations = List.of(
+//                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_01"),
+//                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_02"),
+//                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),"stationBackground_03"),
+//                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),"stationBackground_04"),
+//                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationBackground_05")
+//            );
+//        stationRepository.saveAll(stations);
+//        stationRepository.flush();
+//    }
     private void saveUser() {
         List<User> users = List.of(
                 new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
