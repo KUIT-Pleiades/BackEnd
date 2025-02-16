@@ -57,6 +57,10 @@ public class AuthController {
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {
         log.info("/auth");
+        if(authorization==null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         if(authorization.startsWith("admin")){
             log.info("auth - admin login");
             return ResponseEntity.status(HttpStatus.OK).body(Map.of("message","admin"));    // admin user

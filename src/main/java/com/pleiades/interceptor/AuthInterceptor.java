@@ -38,8 +38,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         if(request.getMethod().equals("OPTIONS")) { return true; }
 
-        // admin user
         String authorization = request.getHeader("Authorization");
+        if(authorization ==null){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+
+        // admin user
         if(authorization.startsWith("admin")){
             log.info("auth - admin login");
             String email = authorization.split(" ")[1];
@@ -49,7 +53,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         log.info("Authorization: {}", authorization);
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
+        if (!authorization.startsWith("Bearer ")) {
             log.info("AuthInterceptor preHandle 428 - no authorization");
             response.sendError(428, "Precondition Required");      // 428
             return false;
