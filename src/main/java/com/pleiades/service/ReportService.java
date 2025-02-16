@@ -171,15 +171,28 @@ public class ReportService {
         }
 
         log.info("question: {}", question);
-        if (question == null) { question = randomQuestion(); }
+        if (question == null) { return setTodaysStationQuesiton(station); }
 
-        log.info("question: {}", question);
         return question;
-
     }
 
     private Question setTodaysStationQuesiton(Station station) {
-        Question question = randomQuestion();
+        Question question = null;
+        Optional<StationQuestion> existingStationQuesiton;
+        int count = 0;
+        do {
+            count++;
+            question = randomQuestion();
+            existingStationQuesiton = stationQuestionRepository.findByStationIdAndQuestiontId(station.getId(), question.getId());
+        } while (existingStationQuesiton.isPresent() && count <= questionRepository.count());
+
+        // 더 이상 할당 가능한 질문이 없으면 어떡하지
+        if (count > questionRepository.count()) {
+            question = new Question();
+            question.setQuestion("!!!!!우주의 종말!!!!!");
+            return question;
+        }
+
         StationQuestion stationQuestion = new StationQuestion();
         stationQuestion.setStation(station);
         stationQuestion.setQuestion(question);

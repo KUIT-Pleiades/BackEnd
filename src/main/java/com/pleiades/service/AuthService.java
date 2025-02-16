@@ -152,7 +152,7 @@ public class AuthService {
 
         if (userValidation.equals(ValidationStatus.NOT_VALID)) {
             body.put("message", "Need Sign-up");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);     // 202
         }
 
         Claims claims = jwtUtil.validateToken(accessToken);
