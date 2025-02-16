@@ -130,7 +130,7 @@ public class UserStationService {
                 station.getName(),
                 station.getIntro(),
                 station.getNumberOfUsers(),
-                station.getBackgroundName(),
+                station.getBackground().getName(),
                 station.getReportNoticeTime(),
                 reportWritten,
                 members
@@ -180,7 +180,7 @@ public class UserStationService {
                             station.getId(),
                             station.getName(),
                             station.getNumberOfUsers(),
-                            station.getBackgroundName()
+                            station.getBackground().getName()
                     );
                 })
                 .collect(Collectors.toList());

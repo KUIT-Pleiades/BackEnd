@@ -37,10 +37,6 @@ public class Station {
     @Column(nullable = false)
     private Time reportNoticeTime;
 
-    // TODO: StationBackGround entity 연동
-    @Column
-    private String backgroundName;
-
     // name으로 바꿔야할 듯
     @ManyToOne
     @JoinColumn(name = "background_id")

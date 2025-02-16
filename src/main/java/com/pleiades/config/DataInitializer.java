@@ -374,9 +374,8 @@ public class DataInitializer {
         }
     }
 
-    // todo: ipfs 업로드 필요 - 일단 이름만
     private void saveStationBackground() {
-        String[] bgimgs = {"station_01", "station_02", "station_03", "station_04", "station_05"};
+        String[] bgimgs = {"station_01", "station_02", "station_03", "station_04"};
         for (String name : bgimgs) {
             StationBackground bgimg = new StationBackground();
             bgimg.setName(name);
