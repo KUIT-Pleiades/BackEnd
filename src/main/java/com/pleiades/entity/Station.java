@@ -38,7 +38,7 @@ public class Station {
     private Time reportNoticeTime;
 
     // TODO: StationBackGround entity 연동
-    @Column(nullable = false)
+    @Column
     private String backgroundName;
 
     // name으로 바꿔야할 듯
