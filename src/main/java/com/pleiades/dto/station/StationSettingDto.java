@@ -11,6 +11,7 @@ import java.sql.Time;
 
 @Data
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StationSettingDto {

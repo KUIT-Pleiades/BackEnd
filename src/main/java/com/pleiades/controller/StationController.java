@@ -106,7 +106,7 @@ public class StationController {
 
     @PostMapping("/{stationId}/report")
     public ResponseEntity<Map<String,String>> submitReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
-        log.info("/stations/{}/report", stationId);
+        log.info("POST /stations/{}/report", stationId);
         if (stationId == null || stationId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -136,6 +136,43 @@ public class StationController {
         userStationRepository.save(userStation.get());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
+    }
+
+    // submit이랑 뭐가 달라야 할까
+    @PatchMapping("/{stationId}/report")
+    public ResponseEntity<Map<String,String>> updateReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+        log.info("PATCH /stations/{}/report", stationId);
+
+        if (stationId == null || stationId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        String email = authService.getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
+
+        Optional<Station> station = stationRepository.findById(stationId);
+        if (station.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "station not found")); }
+
+        UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
+        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+
+        if (userStation.isEmpty()) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "user is not in station")); }
+
+        String answer = body.get("answer").toString();
+
+        Report todayReport = reportService.searchTodaysReport(user.get(), stationId);
+
+        if (todayReport == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "report not found")); }
+
+        todayReport.setAnswer(answer);
+        todayReport.setModifiedAt(LocalDateTime.now());
+        reportRepository.save(todayReport);
+
+        userStation.get().setTodayReport(true);
+        userStationRepository.save(userStation.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
+
     }
 
     @PatchMapping("/{station_id}/background")

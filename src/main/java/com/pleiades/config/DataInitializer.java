@@ -69,6 +69,7 @@ public class DataInitializer {
     private final String IPFS_URL = System.getenv("IPFS_URL");
     private final StationRepository stationRepository;
     private final ReportRepository reportRepository;
+    private final StationBackgroundRepository stationBackgroundRepository;
 
 
     @PostConstruct
@@ -80,7 +81,7 @@ public class DataInitializer {
         saveQuestion();
 //        saveReport();
         saveStarBackground();
-        saveStation();
+//        saveStation();
         saveStationBackground();
         saveStation(); saveUserStation();
     }
@@ -209,7 +210,7 @@ public class DataInitializer {
 
 //    private void saveStation() {
 //        List<Station> stations = List.of(
-//                new Station("qwe123", "station1", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),null),
+//                new Station("qwe123", "station1", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
 //                new Station("asd456", "station2", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
 //                new Station("zxc789", "station3", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null)
 //        );
@@ -349,13 +350,13 @@ public class DataInitializer {
         }
     }
 
-    // todo: ipfs 업로드 필요 - 일단 별 배경화면으로
+    // todo: ipfs 업로드 필요 - 일단 이름만
     private void saveStationBackground() {
-        String[] bgimgs = {"background_01", "background_02", "background_03", "background_04", "background_05"};
+        String[] bgimgs = {"station_01", "station_02", "station_03", "station_04", "station_05"};
         for (String name : bgimgs) {
-            StarBackground bgimg = new StarBackground();
+            StationBackground bgimg = new StationBackground();
             bgimg.setName(name);
-            starBackgroundRepository.save(bgimg);
+            stationBackgroundRepository.save(bgimg);
         }
     }
 }
