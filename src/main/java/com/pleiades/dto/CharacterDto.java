@@ -12,9 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterDto {
-    @JsonProperty("imgPath")
-    private String imgPath;
-
     @JsonProperty("face")
     private CharacterFaceDto face;
 
@@ -23,4 +20,10 @@ public class CharacterDto {
 
     @JsonProperty("item")
     private CharacterItemDto item;
+
+    @JsonProperty("profile")
+    private String profile;
+
+    @JsonProperty("character")
+    private String character;
 }

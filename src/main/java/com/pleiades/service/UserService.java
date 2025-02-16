@@ -70,7 +70,6 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
     }
 
-    // todo: character 수정 후 이미지 저장
     @Transactional
     public ValidationStatus setCharacter(String email, CharacterDto characterDto) {
         this.characterDto = characterDto;
@@ -91,6 +90,10 @@ public class UserService {
         character.setOutfit(outfit);
         character.setItem(item);
         characterRepository.save(character);
+
+        user.get().setProfileUrl(characterDto.getProfile());
+        user.get().setCharacterUrl(characterDto.getCharacter());
+        userRepository.save(user.get());
 
         return ValidationStatus.VALID;
     }

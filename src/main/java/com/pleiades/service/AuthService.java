@@ -169,7 +169,7 @@ public class AuthService {
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
-        body.put("backgroundName", "background_01");   // starBackground.get().getName()
+        body.put("backgroundName", starBackground.get().getName());
         body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
         body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
 

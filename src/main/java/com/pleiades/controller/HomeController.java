@@ -74,7 +74,6 @@ public class HomeController {
         return authService.responseFriendInfo(userId);
     }
 
-    // todo: dto 유효성 검사 필요
     @PostMapping("/settings/character")
     public ResponseEntity<Map<String, Object>> characterSetting(@RequestHeader("Authorization") String authorization, @RequestBody @Validated CharacterDto characterDto) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
