@@ -39,8 +39,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         if(request.getMethod().equals("OPTIONS")) { return true; }
 
         String authorization = request.getHeader("Authorization");
-        if(authorization ==null){
+        if(authorization == null || authorization.isEmpty()) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return false;
         }
 
         // admin user

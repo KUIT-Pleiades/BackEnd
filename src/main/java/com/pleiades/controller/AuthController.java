@@ -53,27 +53,10 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    // todo: user 정보가 존재하는지 검증 - 200, 202
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {
         log.info("/auth");
-        if(authorization==null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if(authorization.startsWith("admin")){
-            log.info("auth - admin login");
-            return ResponseEntity.status(HttpStatus.OK).body(Map.of("message","admin"));    // admin user
-        }
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-        ValidationStatus userValidation = authService.userValidation(accessToken);
-
-        // todo: message
-        if (userValidation == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        }
-        return ResponseEntity.status(HttpStatus.OK).build();    // user 존재: 200
+        return ResponseEntity.status(HttpStatus.OK).build();  // user 존재 여부는 /home 에서
     }
 
     @GetMapping("/refresh")
@@ -106,17 +89,12 @@ public class AuthController {
         return duplicationService.responseIdDuplication(id);
     }
 
-    // todo: AuthInterceptor 겹치는 부분 Refactor
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody UserInfoDto userInfoDto) {
         log.info("/auth/signup");
 
         try {
-            // access token에서 email 추출
-            String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-            Claims token = jwtUtil.validateToken(accessToken);
-            String email = token.getSubject();   // email은 token의 subject에 저장되어 있음!
+            String email = authService.getEmailByAuthorization(authorization);
 
             ValidationStatus signupStatus = signupService.signup(email, userInfoDto);
 
@@ -132,8 +110,6 @@ public class AuthController {
             log.info("sign-up failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
         }
-
-
     }
 
     @PostMapping("/profile")
@@ -141,7 +117,7 @@ public class AuthController {
         log.info("/auth/profile");
 
         Optional<User> user = userRepository.findById(profileDto.getUserId());
-        if (user.isPresent()) { // todo: profileUrl만 업데이트하는 메서드 추가
+        if (user.isPresent()) {
             user.get().setProfileUrl(profileDto.getProfileUrl());
             try {
                 userRepository.save(user.get());
