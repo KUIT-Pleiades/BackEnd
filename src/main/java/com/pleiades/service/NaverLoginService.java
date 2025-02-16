@@ -4,6 +4,8 @@ import com.pleiades.dto.LoginResponseDto;
 import com.pleiades.dto.naver.NaverLoginResponseDto;
 import com.pleiades.entity.NaverToken;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.repository.NaverTokenRepository;
 import com.pleiades.repository.UserRepository;
@@ -35,12 +37,12 @@ public class NaverLoginService {
         Map<String, String> naverTokens = naverApiUtil.getTokens(code);
         if (naverTokens == null) {
             log.error("에러: Naver API로부터 token들 받아오기 실패");
-            throw new IllegalArgumentException("에러: Naver API로부터 token들 받아오기 실패");
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
         log.info("Naver API Response: {}", naverTokens);
         if (naverTokens.get("access_token") == null) {
             log.error("에러: Naver API로부터 access token 받아오기 실패");
-            throw new IllegalArgumentException("에러: Naver API로부터 access token 받아오기 실패");
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
         String accessToken = naverTokens.get("access_token");
