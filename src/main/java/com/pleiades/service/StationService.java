@@ -34,6 +34,7 @@ public class StationService {
 
     private final UserStationService userStationService;
     private final UserService userService;
+    private final ReportService reportService;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
@@ -101,6 +102,8 @@ public class StationService {
         log.info("새로운 정거장 생성 완료: {}", station.getName());
 
         userStationService.addUserStation(adminUser, station, true);
+        Report report = reportService.createReport(adminUser,station);
+        log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
         return Map.of("message", "Station created");
     }

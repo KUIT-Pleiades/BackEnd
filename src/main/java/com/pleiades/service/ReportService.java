@@ -205,7 +205,7 @@ public class ReportService {
 
         // 이전에 답변한 적 있는 질문
         if (existingReport != null) {
-            existingReport.setCreatedAt(LocalDateTime.now());
+            // existingReport.setCreatedAt(LocalDateTime.now());
             existingReport.setModifiedAt(LocalDateTime.now());
             reportRepository.save(existingReport);
             stationReport.setReport(existingReport);

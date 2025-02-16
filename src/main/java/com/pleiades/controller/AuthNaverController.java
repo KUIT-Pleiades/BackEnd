@@ -50,6 +50,7 @@ public class AuthNaverController {
         log.info("네이버 로그인 access token: {}", accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .header("Content-Type", "application/json")
                 .body(Map.of("accessToken", accessToken));
     }
 

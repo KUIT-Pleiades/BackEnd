@@ -1,6 +1,7 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.station.*;
+import com.pleiades.entity.Report;
 import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
@@ -29,6 +30,7 @@ public class UserStationService {
     private final UserStationRepository userStationRepository;
 
     private final UserService userService;
+    private final ReportService reportService;
 
     @Transactional
     public Map<String,String> setUserPosition(String email, String stationId, String userId, UserPositionDto requestBody){
@@ -95,6 +97,9 @@ public class UserStationService {
         // 정거장 인원수 업데이트
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
         stationRepository.save(station);
+
+        Report report = reportService.createReport(user,station);
+        log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
         // response DTO 생성
         return buildStationHomeDto(station, false);
