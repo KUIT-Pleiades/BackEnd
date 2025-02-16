@@ -27,7 +27,7 @@ public class Report {
     @JoinColumn(name = "question_id")
     Question question;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     String answer;
 
     @Column

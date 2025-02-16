@@ -24,14 +24,16 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserStationRepository userStationRepository;
     private final StationQuestionRepository stationQuestionRepository;
+    private final StationReportRepository stationReportRepository;
 
     @Autowired
-    ReportService(UserRepository userRepository, QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository) {
+    ReportService(UserRepository userRepository, QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository, StationReportRepository stationReportRepository) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.reportRepository = reportRepository;
         this.userStationRepository = userStationRepository;
         this.stationQuestionRepository = stationQuestionRepository;
+        this.stationReportRepository = stationReportRepository;
     }
 
     public List<ReportDto> getAllReports(User user) {
@@ -136,9 +138,9 @@ public class ReportService {
         return result;
     }
 
-    public Report searchTodaysReport(User user, String stationId) {
+    public Report searchTodaysReport(User user, Station station) {
         log.info("searchTodaysReport");
-        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
         if (stationQuestions.isEmpty()) { return null; }
 
         Report report = null;
@@ -153,23 +155,38 @@ public class ReportService {
         return report;
     }
 
-    public Question todaysQuestion(String stationId) {
+    // 정거장에 그 날 처음 들어온 사람이 호출
+    public Question todaysQuestion(Station station) {
         log.info("searchTodaysQuestion");
-        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
-        if (stationQuestions.isEmpty()) { return null; }
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
+        if (stationQuestions.isEmpty()) { return setTodaysStationQuesiton(station); }
 
         Question question = null;
 
         for (StationQuestion stationQuestion : stationQuestions) {
             if (stationQuestion.getCreatedAt().equals(LocalDate.now())) {
+                log.info("stationQuestion: {}", stationQuestion);
                 question = questionRepository.findById(stationQuestion.getQuestion().getId()).get();
             }
         }
 
+        log.info("question: {}", question);
         if (question == null) { question = randomQuestion(); }
 
+        log.info("question: {}", question);
         return question;
 
+    }
+
+    private Question setTodaysStationQuesiton(Station station) {
+        Question question = randomQuestion();
+        StationQuestion stationQuestion = new StationQuestion();
+        stationQuestion.setStation(station);
+        stationQuestion.setQuestion(question);
+        stationQuestion.setCreatedAt(LocalDate.now());
+        stationQuestionRepository.save(stationQuestion);
+
+        return question;
     }
 
     // 오늘 리포트를 안 쓴 건지 - 이건 메서드 밖에서 검증하는 게 좋을 듯 - userStation의 todayReport가 false일 때만 호출
@@ -180,14 +197,28 @@ public class ReportService {
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
         if (userStation.isEmpty()) { log.info("user not in station"); return null; }
 
-        Question question = todaysQuestion(station.getId());
+        Question question = todaysQuestion(station);
 
         Report existingReport = searchUserQuestion(user, question);
-        // 이전에 답변한 적 있는 질문
-        if (existingReport != null) { return existingReport; }
+        StationReport stationReport = new StationReport();
+        stationReport.setStation(station);
 
-        Report report = Report.builder().user(user).written(false).createdAt(LocalDateTime.now()).build();
+        // 이전에 답변한 적 있는 질문
+        if (existingReport != null) {
+            existingReport.setCreatedAt(LocalDateTime.now());
+            existingReport.setModifiedAt(LocalDateTime.now());
+            reportRepository.save(existingReport);
+            stationReport.setReport(existingReport);
+            stationReportRepository.save(stationReport);
+
+            return existingReport;
+        }
+
+        Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build();
         reportRepository.save(report);
+        stationReport.setStation(station);
+        stationReport.setReport(report);
+        stationReportRepository.save(stationReport);
 
         return report;
     }
@@ -206,5 +237,28 @@ public class ReportService {
             if (report.getQuestion().getQuestion().equals(question.getQuestion())) { return report; }
         }
         return null;
+    }
+
+    public ValidationStatus updateTodaysReport(User user, Station station, String answer) {
+        log.info("updateTodaysReport");
+
+        Report report = searchTodaysReport(user, station);
+        if (report == null) { return ValidationStatus.NONE; }
+
+        // 만약에 사용자가 이전에 답변했던 질문이 오늘 떴는데, createReport하기 전에 update를 하게 되면? 안 되니까~ 검증
+        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
+        if (stationReport.isEmpty()) { return ValidationStatus.NOT_VALID; }
+
+        report.setAnswer(answer);
+        report.setModifiedAt(LocalDateTime.now());
+        reportRepository.save(report);
+
+        UserStationId userStationId = new UserStationId(user.getId(), station.getId());
+        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+
+        userStation.get().setTodayReport(true);
+        userStationRepository.save(userStation.get());
+
+        return ValidationStatus.VALID;
     }
 }
