@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.SearchUserDto;
+import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
@@ -9,11 +10,13 @@ import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.ReportService;
 import com.pleiades.service.UserService;
+import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.service.StationService;
 import com.pleiades.service.UserStationService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,7 @@ public class StationController {
     private final StationService stationService;
     private final QuestionRepository questionRepository;
     private final StationQuestionRepository stationQuestionRepository;
+    private final StationBackgroundRepository stationBackgroundRepository;
 
     @PostMapping("")
     public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @RequestBody StationCreateDto requestDto) {
@@ -74,6 +78,7 @@ public class StationController {
     // todo: dto 반영
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String, Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+        log.info("/stations/{}/report", stationId);
         ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
         if (response != null) { return response; }
 
@@ -101,6 +106,7 @@ public class StationController {
 
     @PostMapping("/{stationId}/report")
     public ResponseEntity<Map<String,String>> submitReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+        log.info("/stations/{}/report", stationId);
         if (stationId == null || stationId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -132,7 +138,36 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
 
+    @PatchMapping("/{station_id}/background")
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+        log.info("/stations/"+stationId+"/background");
+        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
+        if (response != null) { return response; }
 
+        String backgroundName = body.get("backgroundName").toString();
+        log.info("backgroundName: " + backgroundName);
 
+        ValidationStatus setBackground = stationService.setBackground(stationId, backgroundName);
 
+        // station 없음
+        if (setBackground == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+
+        // background 없음
+        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background editted"));
+    }
+
+    @PatchMapping("/{stationId}/settings")
+    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody StationSettingDto settingDto) {
+        log.info("/stations/"+stationId+"/settings");
+        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
+        if (response != null) { return response; }
+
+        ValidationStatus setStation = stationService.stationSettings(stationId, settingDto);
+
+        if (setStation == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Info editted"));
+    }
 }

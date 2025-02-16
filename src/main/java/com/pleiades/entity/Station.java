@@ -1,10 +1,7 @@
 package com.pleiades.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Time;
 import java.time.LocalDate;
@@ -15,6 +12,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Station {
     @Id
@@ -38,11 +37,11 @@ public class Station {
     @Column(nullable = false)
     private Time reportNoticeTime;
 
-    // TODO: StationBackGround entity 연동
-    @Column(nullable = false)
-    private String backgroundName;
+//    // TODO: StationBackGround entity 연동
+//    @Column(nullable = false)
+//    private String backgroundName;
 
-//    @ManyToOne
-//    @JoinColumn(name = "background_id")
-//    StationBackground background;
+    @ManyToOne
+    @JoinColumn(name = "background_id")
+    StationBackground background;
 }
