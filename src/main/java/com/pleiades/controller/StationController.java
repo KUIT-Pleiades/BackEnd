@@ -75,33 +75,24 @@ public class StationController {
         return stationService.deleteStation(email, station_id);
     }
 
-    // todo: dto 반영
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String, Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
         ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
         if (response != null) { return response; }
 
-        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
-        List<UserStation> usersInStation = userStationRepository.findByStationId(stationId);
-        List<ReportDto> reportDtos = new ArrayList<>();
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).get();
 
-        for (StationQuestion stationQuestion : stationQuestions) {
-            Question question = stationQuestion.getQuestion();
-            for (UserStation userInStation : usersInStation) {
-                Report report = reportService.searchUserQuestion(userInStation.getUser(), question);
-                ReportDto reportDto = new ReportDto();
-                reportDto.setReportId(report.getId());
-                reportDto.setReportId(report.getQuestion().getId());
-                reportDto.setQuestion(report.getQuestion().getQuestion());
-                reportDto.setAnswer(report.getAnswer());
-                reportDto.setCreatedAt(report.getCreatedAt());
-                reportDto.setModifiedAt(report.getModifiedAt());
-                reportDtos.add(reportDto);
-            }
-        }
+        Station station = stationRepository.findById(stationId).get();
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
+        Question question = reportService.todaysQuestion(station);
+        Report report = reportService.searchUserQuestion(user, question);
+
+        if (report == null) { return ResponseEntity.status(HttpStatus.OK).build(); }
+
+        ReportDto reportDto = reportService.reportToDto(report);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }
 
     @PatchMapping("/{stationId}/report")

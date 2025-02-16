@@ -261,4 +261,18 @@ public class ReportService {
 
         return ValidationStatus.VALID;
     }
+
+    public ReportDto reportToDto(Report report) {
+        log.info("reportToDto");
+        ReportDto reportDto = new ReportDto();
+
+        reportDto.setReportId(report.getId());
+        reportDto.setQuestionId(report.getQuestion().getId());
+        reportDto.setQuestion(report.getQuestion().getQuestion());
+        reportDto.setAnswer(report.getAnswer());
+        reportDto.setCreatedAt(report.getCreatedAt());
+        reportDto.setModifiedAt(report.getModifiedAt());
+
+        return reportDto;
+    }
 }
