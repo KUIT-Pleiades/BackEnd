@@ -71,7 +71,7 @@ public class NaverLoginService {
     private LoginResponseDto processExistingUser(User user, NaverToken naverToken, String accessToken, String refreshToken) {
         if (naverToken == null) {
             log.error("기존 user NaverToken 존재 X");
-            throw new IllegalStateException("기존 user NaverToken 존재 X");
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
         // accessToken = naverApiUtil.getValidAccessToken(naverToken);

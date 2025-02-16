@@ -2,6 +2,8 @@ package com.pleiades.util;
 
 import com.pleiades.dto.naver.NaverLoginResponseDto;
 import com.pleiades.entity.NaverToken;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,8 @@ public class NaverApiUtil {
             return tokens;
         } else {
             log.error("에러 - 네이버 토큰 받아 오기 실패 : {}", response.getBody());
-            throw new IllegalStateException("에러 - 네이버 토큰 요청 실패");
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+            // throw new IllegalStateException("에러 - 네이버 토큰 요청 실패");
         }
     }
 
@@ -73,7 +76,8 @@ public class NaverApiUtil {
 
         if (response.getBody() == null || !response.getBody().containsKey("access_token")) {
             log.error("에러 - access token 갱신 실패 : {}", response.getBody());
-            throw new NaverRefreshTokenExpiredException("네이버 access token 갱신 실패");
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+            // throw new NaverRefreshTokenExpiredException("네이버 access token 갱신 실패");
         }
         return (String) response.getBody().get("access_token");
     }
@@ -82,7 +86,9 @@ public class NaverApiUtil {
         if (naverToken.getAccessToken() == null) {
             String newAccessToken = refreshAccessToken(naverToken.getRefreshToken());
             if (newAccessToken == null) {
-                throw new NaverRefreshTokenExpiredException("네이버 Refresh Token 만료 - 재로그인 필요");
+                log.info("네이버 Refresh Token 만료 - 재로그인 필요");
+                throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+                //throw new NaverRefreshTokenExpiredException("네이버 Refresh Token 만료 - 재로그인 필요");
             }
             return newAccessToken;
         }
