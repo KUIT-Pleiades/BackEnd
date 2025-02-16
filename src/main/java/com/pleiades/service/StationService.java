@@ -81,9 +81,9 @@ public class StationService {
 
         User adminUser = userService.getUserByEmail(email);
         String stationId = generateUniqueStationCode();
-        Optional<StationBackground> stationBackground = stationBackgroundRepository.findByName(requestDto.getBackgroundName());
-        if (stationBackground.isEmpty()) {
-            // todo: 처리
+        StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getBackgroundName()).orElse(null);
+        if (stationBackground == null) {
+            stationBackground = new StationBackground(null, "station_01", null);
         }
 
         Station station = Station.builder()
@@ -94,7 +94,7 @@ public class StationService {
                 .createdAt(LocalDateTime.now())
                 .adminUserId(adminUser.getId())
                 .reportNoticeTime(requestDto.getReportNoticeTime())
-                .background(stationBackground.get())
+                .background(stationBackground)
                 .build();
 
         stationRepository.save(station);
