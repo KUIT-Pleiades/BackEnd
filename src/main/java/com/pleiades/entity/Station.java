@@ -1,10 +1,7 @@
 package com.pleiades.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Time;
 import java.time.LocalDate;
@@ -15,6 +12,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Station {
     @Id
@@ -42,7 +41,8 @@ public class Station {
     @Column(nullable = false)
     private String backgroundName;
 
-//    @ManyToOne
-//    @JoinColumn(name = "background_id")
-//    StationBackground background;
+    // name으로 바꿔야할 듯
+    @ManyToOne
+    @JoinColumn(name = "background_id")
+    StationBackground background;
 }

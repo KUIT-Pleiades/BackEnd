@@ -1,16 +1,18 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.station.StationCreateDto;
-import com.pleiades.entity.Station;
-import com.pleiades.entity.User;
+import com.pleiades.dto.station.StationSettingDto;
+import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
+import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -38,6 +37,7 @@ public class StationService {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
+    private final StationBackgroundRepository stationBackgroundRepository;
 
     @Transactional
     public ResponseEntity<Map<String, String>> deleteStation(String email, String stationId){
@@ -81,6 +81,10 @@ public class StationService {
 
         User adminUser = userService.getUserByEmail(email);
         String stationId = generateUniqueStationCode();
+        Optional<StationBackground> stationBackground = stationBackgroundRepository.findByName(requestDto.getBackgroundName());
+        if (stationBackground.isEmpty()) {
+            // todo: 처리
+        }
 
         Station station = Station.builder()
                 .id(stationId)
@@ -90,7 +94,7 @@ public class StationService {
                 .createdAt(LocalDateTime.now())
                 .adminUserId(adminUser.getId())
                 .reportNoticeTime(requestDto.getReportNoticeTime())
-                .backgroundName(requestDto.getBackgroundName())
+                .background(stationBackground.get())
                 .build();
 
         stationRepository.save(station);
@@ -121,5 +125,41 @@ public class StationService {
         }
 
         return code.toString();
+    }
+
+    public ValidationStatus setBackground(String stationId, String backgroundName) {
+        log.info("setBackground");
+        Optional<Station> station = stationRepository.findById(stationId);
+
+        if (station.isEmpty()) {
+            log.info("station not found");
+            return ValidationStatus.NONE;
+        }
+
+        Optional<StationBackground> background = stationBackgroundRepository.findByName(backgroundName);
+        if (background.isEmpty()) {
+            log.info("background not found");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        background.ifPresent(station.get()::setBackground);
+
+        stationRepository.save(station.get());
+
+        return ValidationStatus.VALID;
+    }
+
+    public ValidationStatus stationSettings(String stationId, StationSettingDto settingDto) {
+        log.info("stationSettings");
+        Optional<Station> station = stationRepository.findById(stationId);
+        if (station.isEmpty()) { return ValidationStatus.NONE; }
+
+        station.get().setName(settingDto.getName());
+        station.get().setIntro(settingDto.getIntro());
+        station.get().setReportNoticeTime(settingDto.getReportNoticeTime());
+
+        stationRepository.save(station.get());
+
+        return ValidationStatus.VALID;
     }
 }

@@ -70,6 +70,7 @@ public class DataInitializer {
     private final String IPFS_URL = System.getenv("IPFS_URL");
     private final StationRepository stationRepository;
     private final ReportRepository reportRepository;
+    private final StationBackgroundRepository stationBackgroundRepository;
 
 
     @PostConstruct
@@ -82,7 +83,9 @@ public class DataInitializer {
         saveQuestion();
 //        saveReport();
         saveStarBackground();
-        saveStation(); saveUserStation();
+//        saveStation();
+        saveStationBackground();
+//        saveUserStation();
     }
 
     private void saveNaverToken(){
@@ -151,17 +154,18 @@ public class DataInitializer {
         userStationRepository.saveAll(userStations);
     }
 
-    private void saveStation() {
-        List<Station> stations = List.of(
-                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_01"),
-                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"stationBackground_02"),
-                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),"stationBackground_03"),
-                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),"stationBackground_04"),
-                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationBackground_05")
-            );
-        stationRepository.saveAll(stations);
-        stationRepository.flush();
-    }
+//    private void saveStation() {
+//        List<Station> stations = List.of(
+//                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"station_01"),
+//                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"station_02"),
+//                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),"station_03"),
+//                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),"station_04"),
+//                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationd_05")
+//            );
+//        stationRepository.saveAll(stations);
+//        stationRepository.flush();
+//    }
+
     private void saveUser() {
         List<User> users = List.of(
                 new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
@@ -230,9 +234,9 @@ public class DataInitializer {
 
 //    private void saveStation() {
 //        List<Station> stations = List.of(
-//                new Station("qwe123", "station1", "hi", 1, LocalDateTime.now(), "yuna1217", null),
-//                new Station("asd456", "station2", "hi", 1, LocalDateTime.now(), "yuna1217", null),
-//                new Station("zxc789", "station3", "hi", 1, LocalDateTime.now(), "yuna1217", null)
+//                new Station("qwe123", "station1", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
+//                new Station("asd456", "station2", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
+//                new Station("zxc789", "station3", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null)
 //        );
 //        stationRepository.saveAll(stations);
 //    }
@@ -256,9 +260,9 @@ public class DataInitializer {
         Optional<Question> question3 = questionRepository.findById(3L);
 
         List<Report> reports = List.of(
-                new Report(1L, wonwoo.get(), question1.get(), null, "qwer", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(2L, wonwoo.get(), question2.get(), null, "asdf", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(3L, wonwoo.get(), question3.get(), null, "zxcv", true, LocalDateTime.now(), LocalDateTime.now())
+                new Report(1L, wonwoo.get(), question1.get(), "qwer", true, LocalDateTime.now(), LocalDateTime.now()),
+                new Report(2L, wonwoo.get(), question2.get(), "asdf", true, LocalDateTime.now(), LocalDateTime.now()),
+                new Report(3L, wonwoo.get(), question3.get(), "zxcv", true, LocalDateTime.now(), LocalDateTime.now())
         );
         reportRepository.saveAll(reports);
     }
@@ -369,12 +373,14 @@ public class DataInitializer {
             starBackgroundRepository.save(bgimg);
         }
     }
-/*    private void saveStationBackground() {
-        String[] bgimgs = {"background_01", "background_02", "background_03", "background_04", "background_05"};
+
+    // todo: ipfs 업로드 필요 - 일단 이름만
+    private void saveStationBackground() {
+        String[] bgimgs = {"station_01", "station_02", "station_03", "station_04", "station_05"};
         for (String name : bgimgs) {
-            StarBackground bgimg = new StarBackground();
+            StationBackground bgimg = new StationBackground();
             bgimg.setName(name);
-            starBackgroundRepository.save(bgimg);
+            stationBackgroundRepository.save(bgimg);
         }
-    }*/
+    }
 }

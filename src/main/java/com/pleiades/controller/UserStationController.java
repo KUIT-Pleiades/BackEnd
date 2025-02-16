@@ -1,8 +1,17 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
+import com.pleiades.entity.Question;
+import com.pleiades.entity.Report;
+import com.pleiades.entity.StationQuestion;
+import com.pleiades.entity.User;
+import com.pleiades.repository.StationQuestionRepository;
+import com.pleiades.repository.UserRepository;
+import com.pleiades.service.AuthService;
+import com.pleiades.service.ReportService;
 import com.pleiades.service.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -21,6 +33,38 @@ import java.util.Map;
 public class UserStationController {
 
     private final UserStationService userStationService;
+    private final AuthService authService;
+    private final StationQuestionRepository stationQuestionRepository;
+    private final UserRepository userRepository;
+    private final ReportService reportService;
+
+    @GetMapping("/{stationId}/users/{userId}/report")
+    public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
+        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
+        if (response != null) { return response; }
+
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
+        List<ReportDto> reportDtos = new ArrayList<>();
+
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+
+        for (StationQuestion stationQuestion : stationQuestions) {
+            Question question = stationQuestion.getQuestion();
+
+            Report report = reportService.searchUserQuestion(user.get(), question);
+            ReportDto reportDto = new ReportDto();
+            reportDto.setReportId(report.getId());
+            reportDto.setReportId(report.getQuestion().getId());
+            reportDto.setQuestion(report.getQuestion().getQuestion());
+            reportDto.setAnswer(report.getAnswer());
+            reportDto.setCreatedAt(report.getCreatedAt());
+            reportDto.setModifiedAt(report.getModifiedAt());
+            reportDtos.add(reportDto);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
+    }
 
     @PatchMapping("/{station_id}/users/{user_id}/position")
     public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
