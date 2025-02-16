@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Builder
 public class NaverToken {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

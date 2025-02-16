@@ -45,6 +45,7 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
+    private final NaverTokenRepository naverTokenRepository;
 
     private final SkinRepository skinRepository;
     private final ExpressionRepository expressionRepository;
@@ -73,6 +74,7 @@ public class DataInitializer {
 
     @PostConstruct
     public void initData() throws IOException {
+        saveNaverToken();
         saveUser(); saveFriend();
         saveSkin(); saveExpression(); saveHair();
         saveItem();
@@ -82,6 +84,27 @@ public class DataInitializer {
         saveStarBackground();
         saveStation(); saveUserStation();
     }
+
+    private void saveNaverToken(){
+        List<NaverToken> naverTokens = List.of(
+
+                 new NaverToken(null,null, "wook2442@naver.com", null, "refresh1", 1L),
+                new NaverToken(null, null, "yuna569@naver.com", null, "refresh2", 1L),
+                new NaverToken(null, null, "danpung628@gmail.com", null, "refresh3", 1L),
+                new NaverToken(null, null, "yh81260@naver.com", null, "refresh4", 1L),
+                new NaverToken(null, null, "yona0209n@naver.com", null, "refresh5", 1L),
+                new NaverToken(null, null, "user1@naver.com", null, "refresh6", 1L),
+                new NaverToken(null, null, "user2@naver.com", null, "refresh7", 1L),
+                new NaverToken(null, null, "user3@naver.com", null, "refresh8", 1L),
+                new NaverToken(null, null, "user4@naver.com", null, "refresh8", 1L),
+                new NaverToken(null, null, "user5@naver.com", null, "refresh8", 1L),
+                new NaverToken(null, null, "user6@naver.com", null, "refresh8", 1L),
+                new NaverToken(null, null, "user7@naver.com", null, "refresh8", 1L)
+        );
+        naverTokenRepository.saveAll(naverTokens);
+        naverTokenRepository.flush();
+    }
+
     private void saveUserStation() {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
