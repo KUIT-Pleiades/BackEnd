@@ -23,7 +23,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth/login")
 @RequiredArgsConstructor
-
 public class AuthNaverController {
 
     private final AuthService authService;

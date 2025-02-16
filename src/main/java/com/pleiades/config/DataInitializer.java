@@ -95,7 +95,7 @@ public class DataInitializer {
                 new NaverToken(null, null, "yuna569@naver.com", null, "refresh2", 1L),
                 new NaverToken(null, null, "danpung628@gmail.com", null, "refresh3", 1L),
                 new NaverToken(null, null, "yh81260@naver.com", null, "refresh4", 1L),
-                new NaverToken(null, null, "yona0209n@naver.com", null, "refresh5", 1L),
+                new NaverToken(null, null, "yona0209@naver.com", null, "refresh5", 1L),
                 new NaverToken(null, null, "user1@naver.com", null, "refresh6", 1L),
                 new NaverToken(null, null, "user2@naver.com", null, "refresh7", 1L),
                 new NaverToken(null, null, "user3@naver.com", null, "refresh8", 1L),
