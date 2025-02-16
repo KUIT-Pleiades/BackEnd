@@ -140,7 +140,7 @@ public class AuthService {
         return ValidationStatus.VALID;
     }
 
-    // Todo: 202 회원가입 안했을 시 -> star, starBG, User NOT FOUND
+    // 회원가입 안 한 경우 -> 202 or 204
     public ResponseEntity<Map<String, Object>> responseUserInfo(String accessToken) {
         log.info("AuthService responseUserInfo");
 

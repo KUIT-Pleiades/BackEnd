@@ -83,9 +83,9 @@ public class DataInitializer {
         saveQuestion();
 //        saveReport();
         saveStarBackground();
-//        saveStation();
         saveStationBackground();
-//        saveUserStation();
+        saveStation();
+        saveUserStation();
     }
 
     private void saveNaverToken(){
@@ -154,17 +154,18 @@ public class DataInitializer {
         userStationRepository.saveAll(userStations);
     }
 
-//    private void saveStation() {
-//        List<Station> stations = List.of(
-//                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"station_01"),
-//                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),"station_02"),
-//                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),"station_03"),
-//                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),"station_04"),
-//                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),"stationd_05")
-//            );
-//        stationRepository.saveAll(stations);
-//        stationRepository.flush();
-//    }
+    private void saveStation() {
+        List<StationBackground> bgs = stationBackgroundRepository.findAll();
+        List<Station> stations = List.of(
+                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), bgs.get(0)),
+                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),bgs.get(1)),
+                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),bgs.get(2)),
+                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),bgs.get(0)),
+                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),bgs.get(3))
+            );
+        stationRepository.saveAll(stations);
+        stationRepository.flush();
+    }
 
     private void saveUser() {
         List<User> users = List.of(
@@ -172,7 +173,7 @@ public class DataInitializer {
                 new User("yuna1217", "yuna569@naver.com", "yuna", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
                 new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
                 new User("lylylylh", "yh81260@naver.com", "yoonhee", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1", 0L),
-                new User("hyungyu", "yona0209n@naver.com", "현규", LocalDate.of(2002, 2, 9), LocalDate.of(2025, 2, 16), "profile_01", "character_01", "refresh", 0L),
+                new User("hyungyu", "yona0209@naver.com", "현규", LocalDate.of(2002, 2, 9), LocalDate.of(2025, 2, 16), "profile_01", "character_01", "refresh", 0L),
                 new User("user1", "user1@naver.com", "person", LocalDate.of(2002, 1, 1), LocalDate.of(2025, 2, 1), "profile_02", "character_02", "refresh2", 0L),
                 new User("user2", "user2@naver.com", "jeongyoon", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_02", "character_02", "refresh2", 0L),
                 new User("user3", "user3@naver.com", "sejin", LocalDate.of(2002, 4, 17), LocalDate.of(2025, 2, 5), "profile_03", "character_03", "refresh3", 0L),
@@ -381,5 +382,6 @@ public class DataInitializer {
             bgimg.setName(name);
             stationBackgroundRepository.save(bgimg);
         }
+        stationBackgroundRepository.flush();
     }
 }

@@ -27,7 +27,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthNaverController {
 
-    private final AuthService authService;
     private final NaverLoginService naverLoginService;
 
     @PostMapping("/naver")
