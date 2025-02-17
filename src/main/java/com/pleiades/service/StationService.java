@@ -104,7 +104,7 @@ public class StationService {
         Report report = reportService.createReport(adminUser,station);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        return Map.of("message", "Station created");
+        return Map.of("stationId", stationId);
     }
 
 
