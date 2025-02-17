@@ -117,6 +117,7 @@ public class UserStationService {
                             member.getId(),
                             member.getUserName(),
                             member.getProfileUrl(),
+                            member.getCharacterUrl(),
                             userStation.getPositionX(),
                             userStation.getPositionY(),
                             userStation.isTodayReport()
