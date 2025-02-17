@@ -50,13 +50,13 @@ public class NaverApiUtil {
         params.add("code", code);
         params.add("state", state);
 
-        log.info("client id: {}", clientId);
         log.info("code: {}", code);
         log.info("state: {}", state);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        log.info("request: {}", request);
         ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
-        log.info("Naver API Util Response: {}", response.getBody().get("access_token"));
+        log.info("Naver API Util Response: {}", response);
 
         if (response.getBody() != null) {
             Map<String, String> tokens = new HashMap<>();
