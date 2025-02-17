@@ -43,7 +43,7 @@ public class NaverApiUtil {
             SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
             // 둘 다 SocketTimeoutException
             factory.setConnectTimeout(3000); // 연결 timeout (3초)
-            factory.setReadTimeout(5000);    // 응답 대기 timeout (5초)
+            factory.setReadTimeout(4000);    // 응답 대기 timeout (4초)
             return new RestTemplate(factory);
     }
 
@@ -97,7 +97,7 @@ public class NaverApiUtil {
                     log.info("네이버 API 요청 Timeout 발생 -> {}번째 재시도", attempt + 1);
                     attempt++;
                     try {
-                        Thread.sleep(2000); // 2초 대기 후 재시도
+                        Thread.sleep(1000); // 1초 대기 후 재시도
                     } catch (InterruptedException interruptedException) {
                         Thread.currentThread().interrupt();
                         throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);

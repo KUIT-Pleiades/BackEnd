@@ -31,6 +31,7 @@ public class AuthNaverController {
 
     @PostMapping("/naver")
     public ResponseEntity<Map<String,String>> handleNaverLogin(@RequestBody NaverLoginRequestDto loginRequest, HttpServletResponse response) {
+        long startTime = System.currentTimeMillis();
         log.info("handleNaverLogin 시작");
 
         String authCode = loginRequest.getCode();
@@ -45,7 +46,9 @@ public class AuthNaverController {
 //        String refreshToken = loginResponse.getRefreshToken();
 
 //        authService.addRefreshTokenCookie(response, refreshToken);
-
+        long endTime = System.currentTimeMillis();
+        double elapsedTime = (endTime - startTime) / 1000.0;
+        log.info("Naver Login 수행 시간: {} ms",  String.format("%.1f", elapsedTime));
         log.info("네이버 로그인 access token: {}", accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
