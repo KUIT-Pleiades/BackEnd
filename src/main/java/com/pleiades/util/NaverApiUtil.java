@@ -13,8 +13,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -27,21 +30,29 @@ public class NaverApiUtil {
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 
+    public String generateEncodedState() {
+        String state = UUID.randomUUID().toString();
+        return URLEncoder.encode(state, StandardCharsets.UTF_8);
+    }
+
     public Map<String,String> getTokens(String code) {
         log.info("Util 계층 진입");
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String state = generateEncodedState();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
         params.add("code", code);
+        params.add("state", state);
 
         log.info("client id: {}", clientId);
         log.info("code: {}", code);
+        log.info("state: {}", state);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
