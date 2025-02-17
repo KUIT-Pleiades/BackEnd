@@ -7,12 +7,15 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -29,6 +32,20 @@ public class NaverApiUtil {
 
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+
+    private final RestTemplate restTemplate;
+
+    public NaverApiUtil() {
+        this.restTemplate = createRestTemplate();
+    }
+
+    private RestTemplate createRestTemplate() {
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            // 둘 다 SocketTimeoutException
+            factory.setConnectTimeout(3000); // 연결 timeout (3초)
+            factory.setReadTimeout(5000);    // 응답 대기 timeout (5초)
+            return new RestTemplate(factory);
+    }
 
     public String generateEncodedState() {
         String state = UUID.randomUUID().toString();
@@ -55,21 +72,42 @@ public class NaverApiUtil {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         log.info("request: {}", request);
-        ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
-        log.info("Naver API Util Response: {}", response);
 
-        if (response.getBody() != null) {
-            Map<String, String> tokens = new HashMap<>();
-            tokens.put("access_token", (String) response.getBody().get("access_token"));
-            tokens.put("refresh_token", (String) response.getBody().get("refresh_token"));
-            tokens.put("expires_in", (String) response.getBody().get("expires_in"));
-            tokens.put("token_type", (String) response.getBody().get("token_type"));
-            return tokens;
-        } else {
-            log.error("에러 - 네이버 토큰 받아 오기 실패 : {}", response.getBody());
-            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
-            // throw new IllegalStateException("에러 - 네이버 토큰 요청 실패");
+        int maxRetries = 2; // 최대 재시도 횟수
+        int attempt = 0;
+        while (attempt < maxRetries) {
+            try {
+                ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, request, Map.class);
+                log.info("Naver API Util Response: {}", response);
+                if (response.getBody() != null) {
+                    Map<String, String> tokens = new HashMap<>();
+                    tokens.put("access_token", (String) response.getBody().get("access_token"));
+                    tokens.put("refresh_token", (String) response.getBody().get("refresh_token"));
+                    tokens.put("expires_in", (String) response.getBody().get("expires_in"));
+                    tokens.put("token_type", (String) response.getBody().get("token_type"));
+                    return tokens;
+                } else {
+                    log.error("에러 - 네이버 토큰 받아 오기 실패 : {}", response.getBody());
+                    throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+                }
+            } catch (Exception e) {
+                if (e.getCause() instanceof SocketTimeoutException) {
+                    log.warn("네이버 API 요청 Timeout 발생 -> {}번째 재시도", attempt + 1);
+                    attempt++;
+                    try {
+                        Thread.sleep(2000); // 2초 대기 후 재시도
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread().interrupt();
+                        throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+                    }
+                } else {
+                    log.error("네이버 API 요청 중 오류 발생: " + e.getMessage());
+                    throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+                }
+            }
         }
+        log.error("네이버 API 요청 {}번 실패-> 중단", maxRetries);
+        throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
     }
 
     public String refreshAccessToken(String refreshToken) {
