@@ -9,8 +9,11 @@ import com.pleiades.entity.User_Station.UserStationId;
 
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
+import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.strings.FriendStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class UserStationService {
 
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
+    private final FriendRepository friendRepository;
 
     private final UserService userService;
     private final ReportService reportService;
@@ -72,7 +76,7 @@ public class UserStationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // response DTO 생성
-        return buildStationHomeDto(station, userStation.isTodayReport());
+        return buildStationHomeDto(station, userStation.isTodayReport(), user);
     }
 
     // 정거장 첫 입장 _ 멤버 추가
@@ -106,7 +110,7 @@ public class UserStationService {
 
     // response DTO 형성 method
     @Transactional
-    public StationHomeDto buildStationHomeDto(Station station, boolean reportWritten) {
+    public StationHomeDto buildStationHomeDto(Station station, boolean reportWritten, User currentUser) {
         List<UserStation> userStations = userStationRepository.findByStationId(station.getId());
 
         List<StationMemberDto> members = userStations.stream()
@@ -119,7 +123,8 @@ public class UserStationService {
                             member.getCharacterUrl(),
                             userStation.getPositionX(),
                             userStation.getPositionY(),
-                            userStation.isTodayReport()
+                            userStation.isTodayReport(),
+                            friendRepository.isFriend(currentUser, member, FriendStatus.ACCEPTED)
                     );
                 })
                 .collect(Collectors.toList());

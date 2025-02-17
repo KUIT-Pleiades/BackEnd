@@ -13,4 +13,5 @@ public class StationMemberDto {
     private float positionX;
     private float positionY;
     private boolean todayReport;
+    private boolean isFriend;
 }
