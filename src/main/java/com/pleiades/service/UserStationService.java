@@ -77,7 +77,7 @@ public class UserStationService {
 
     // 정거장 첫 입장 _ 멤버 추가
     @Transactional
-    public StationHomeDto addMemberToStation(String email, String stationId) {
+    public Map<String, String> addMemberToStation(String email, String stationId) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
@@ -101,8 +101,7 @@ public class UserStationService {
         Report report = reportService.createReport(user,station);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        // response DTO 생성
-        return buildStationHomeDto(station, false);
+        return Map.of("message","Enter Station Success");
     }
 
     // response DTO 형성 method

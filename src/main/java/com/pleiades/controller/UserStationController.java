@@ -96,7 +96,7 @@ public class UserStationController {
     }
 
     @PatchMapping("/{station_id}")
-    public ResponseEntity<StationHomeDto> addUserStation(@PathVariable("station_id") String stationId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> addUserStation(@PathVariable("station_id") String stationId, HttpServletRequest request) {
         log.info("멤버 추가: add UserStation Controller 진입");
         String email = (String) request.getAttribute("email");
         if (email == null) {
@@ -104,9 +104,9 @@ public class UserStationController {
         } // 401
         log.info("사용자 email = {}", email);
 
-        StationHomeDto stationHomeDto = userStationService.addMemberToStation(email, stationId);
+        Map<String, String> response = userStationService.addMemberToStation(email, stationId);
 
-        return ResponseEntity.ok(stationHomeDto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{station_id}")
