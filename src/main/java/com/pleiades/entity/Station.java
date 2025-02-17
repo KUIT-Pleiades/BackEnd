@@ -6,6 +6,7 @@ import lombok.*;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "stations")
@@ -35,7 +36,7 @@ public class Station {
     private String adminUserId;
 
     @Column(nullable = false)
-    private Time reportNoticeTime;
+    private LocalTime reportNoticeTime;
 
     // name으로 바꿔야할 듯
     @ManyToOne

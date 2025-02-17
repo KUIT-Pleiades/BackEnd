@@ -1,10 +1,12 @@
 package com.pleiades.dto.station;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -17,7 +19,10 @@ public class StationHomeDto {
     private String intro;
     private int numOfUsers;
     private String stationBackground;
-    private Time reportNoticeTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+    private LocalTime reportNoticeTime;
+
     private boolean reportWritten;
     private List<StationMemberDto> stationMembers;
 }

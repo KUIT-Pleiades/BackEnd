@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -157,11 +158,11 @@ public class DataInitializer {
     private void saveStation() {
         List<StationBackground> bgs = stationBackgroundRepository.findAll();
         List<Station> stations = List.of(
-                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), bgs.get(0)),
-                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"),bgs.get(1)),
-                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", Time.valueOf("09:00:00"),bgs.get(2)),
-                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", Time.valueOf("09:00:00"),bgs.get(0)),
-                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", Time.valueOf("09:00:00"),bgs.get(3))
+                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", LocalTime.of(9,0,0), bgs.get(0)),
+                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", LocalTime.of(9,0,0),bgs.get(1)),
+                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
+                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", LocalTime.of(9,0,0),bgs.get(0)),
+                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", LocalTime.of(9,0,0),bgs.get(3))
             );
         stationRepository.saveAll(stations);
         stationRepository.flush();
