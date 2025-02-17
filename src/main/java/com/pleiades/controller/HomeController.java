@@ -2,7 +2,6 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.CharacterDto;
 import com.pleiades.dto.StarBackgroundDto;
-import com.pleiades.entity.Friend;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
@@ -17,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -45,7 +43,6 @@ public class HomeController {
         this.friendRepository = friendRepository;
     }
 
-
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
@@ -53,51 +50,40 @@ public class HomeController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> friendHome(@RequestHeader("Authorization") String authorization, @PathVariable("userId") String userId) {
+    public ResponseEntity<Map<String, Object>> friendHome(HttpServletRequest request, @PathVariable("userId") String userId) {
         // 친구 아이디 존재 여부
+        if (userId == null) { log.info("no userId"); return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message", "no userId")); }
+
+        // 친구 존재 여부
         Optional<User> friend = userRepository.findById(userId);
-        if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
+        if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }
 
-        // 친구 관계에 있는지 검증
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
-
+        // 사용자 존재 여부
+        String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
-        boolean relationship = friendRepository.isFriend(user.get(), friend.get(), FriendStatus.ACCEPTED);
-
-        if (!relationship) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
-
-        return authService.responseFriendInfo(userId);
+        return authService.responseFriendInfo(user.get(), friend.get());
     }
 
     @PostMapping("/settings/character")
-    public ResponseEntity<Map<String, Object>> characterSetting(@RequestHeader("Authorization") String authorization, @RequestBody @Validated CharacterDto characterDto) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @RequestBody @Validated CharacterDto characterDto) {
+        String email = (String) request.getAttribute("email");
 
         ValidationStatus setCharacter = userService.setCharacter(email, characterDto);
 
         // user 없음
-        if (setCharacter == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (setCharacter == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         // character 없음
-        if (setCharacter == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (setCharacter == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no character")); }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/settings/background")
-    public ResponseEntity<Map<String, Object>> backgroundSetting(@RequestHeader("Authorization") String authorization, @RequestBody StarBackgroundDto starBackgroundDto) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-
-        Claims token = jwtUtil.validateToken(accessToken);
-        String email = token.getSubject();
+    public ResponseEntity<Map<String, Object>> backgroundSetting(HttpServletRequest request, @RequestBody StarBackgroundDto starBackgroundDto) {
+        String email = (String) request.getAttribute("email");
 
         String backgroundName = starBackgroundDto.getBackgroundName();
         log.info("backgroundName: " + backgroundName);
@@ -105,10 +91,10 @@ public class HomeController {
         ValidationStatus setBackground = userService.setBackground(email, backgroundName);
 
         // user 없음
-        if (setBackground == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (setBackground == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
 
         // star 없음
-        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "star not found")); }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

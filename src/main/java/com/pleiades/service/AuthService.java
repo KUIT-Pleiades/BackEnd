@@ -9,6 +9,7 @@ import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
@@ -31,6 +32,7 @@ public class AuthService {
 
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
+    private final FriendRepository friendRepository;
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -41,13 +43,14 @@ public class AuthService {
 
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
         this.jwtUtil = jwtUtil; this.imageJsonCreator = imageJsonCreator;
         this.stationRepository = stationRepository;
         this.userStationRepository = userStationRepository;
+        this.friendRepository = friendRepository;
     }
 
 
@@ -104,6 +107,7 @@ public class AuthService {
                 .body(body);
     }
 
+    // 회원가입 여부
     public ValidationStatus userValidation(String accessToken) {
         log.info("AuthService userValidation");
 
@@ -146,8 +150,6 @@ public class AuthService {
 
         Map<String, Object> body = new HashMap<>();
 
-        if (accessToken == null) { log.info("no access token"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
-
         ValidationStatus userValidation = userValidation(accessToken);
 
         if (userValidation.equals(ValidationStatus.NOT_VALID)) {
@@ -180,30 +182,27 @@ public class AuthService {
                 .body(body);
     }
 
-    public ResponseEntity<Map<String, Object>> responseFriendInfo(String userId) {
+    public ResponseEntity<Map<String, Object>> responseFriendInfo(User user, User friend) {
         log.info("AuthService responseFriendInfo");
 
         Map<String, Object> body = new HashMap<>();
 
-        if (userId == null) { log.info("no userId"); return new ResponseEntity<>(body, HttpStatus.PRECONDITION_REQUIRED);}
+        // 친구는 userValidation 검사가 필요 없을까? - ㅇㅇ 회원가입 안 했으면 친구도 못됐을테니까
 
-        Optional<User> user = userRepository.findById(userId);
+        boolean relationship = friendRepository.isFriend(user, friend, FriendStatus.ACCEPTED);
 
-        if (user.isEmpty()) {
-            log.info("no user");
-            return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
-        }
+        if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
-        Optional<Star> star = starRepository.findByUserId(userId);
+        Optional<Star> star = starRepository.findByUserId(friend.getId());
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-        Optional<Characters> character = characterRepository.findByUser(user.get());
+        Optional<Characters> character = characterRepository.findByUser(friend);
 
-        String profileUrl = user.get().getProfileUrl();
-        String characterUrl = user.get().getCharacterUrl();
+        String profileUrl = friend.getProfileUrl();
+        String characterUrl = friend.getCharacterUrl();
 
-        body.put("userId", userId);
-        body.put("userName", user.get().getUserName());
-        body.put("birthDate", user.get().getBirthDate());
+        body.put("userId", friend.getId());
+        body.put("userName", friend.getUserName());
+        body.put("birthDate", friend.getBirthDate());
         body.put("starBackground", "background_01");   // starBackground.get().getName()
         body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
         body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
