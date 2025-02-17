@@ -94,7 +94,7 @@ public class NaverApiUtil {
                 if (e.getCause() instanceof SocketTimeoutException ||
                         e.getMessage().contains("Connection reset") ||
                         e.getMessage().contains("I/O error")) {
-                    log.warn("네이버 API 요청 Timeout 발생 -> {}번째 재시도", attempt + 1);
+                    log.info("네이버 API 요청 Timeout 발생 -> {}번째 재시도", attempt + 1);
                     attempt++;
                     try {
                         Thread.sleep(2000); // 2초 대기 후 재시도
@@ -103,7 +103,7 @@ public class NaverApiUtil {
                         throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
                     }
                 } else {
-                    log.error("네이버 API 요청 중 오류 발생: " + e.getMessage());
+                    log.error("네이버 API 요청 중 오류 발생: {}", e.getMessage());
                     throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
                 }
             }
