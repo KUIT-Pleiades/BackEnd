@@ -32,7 +32,6 @@ public class NaverLoginService {
 
     @Transactional
     public LoginResponseDto handleNaverLoginCallback(String code) {
-        log.info("service 계층 진입");
 
         Map<String, String> naverTokens = naverApiUtil.getTokens(code);
         if (naverTokens == null) {

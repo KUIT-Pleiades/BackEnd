@@ -40,7 +40,6 @@ public class AuthNaverController {
             log.error("에러: authCode -> NULL");
             throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
-        log.info("네이버 로그인 request 받음. AuthCode: {}", authCode);
         LoginResponseDto loginResponse = naverLoginService.handleNaverLoginCallback(authCode);
         String accessToken = loginResponse.getAccessToken();
 //        String refreshToken = loginResponse.getRefreshToken();

@@ -42,8 +42,8 @@ public class NaverApiUtil {
     private RestTemplate createRestTemplate() {
             SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
             // 둘 다 SocketTimeoutException
-            factory.setConnectTimeout(3000); // 연결 timeout (3초)
-            factory.setReadTimeout(4000);    // 응답 대기 timeout (4초)
+            factory.setConnectTimeout(2000); // 연결 timeout
+            factory.setReadTimeout(2000);    // 응답 대기 timeout
             return new RestTemplate(factory);
     }
 
@@ -53,10 +53,9 @@ public class NaverApiUtil {
     }
 
     public Map<String,String> getTokens(String code) {
-        log.info("Util 계층 진입");
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         String state = generateEncodedState();
 
@@ -68,12 +67,10 @@ public class NaverApiUtil {
         params.add("state", state);
 
         log.info("code: {}", code);
-        log.info("state: {}", state);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        log.info("request: {}", request);
 
-        int maxRetries = 2; // 최대 재시도 횟수
+        int maxRetries = 3; // 최대 재시도 횟수
         int attempt = 0;
         while (attempt < maxRetries) {
             try {
@@ -94,14 +91,15 @@ public class NaverApiUtil {
                 if (e.getCause() instanceof SocketTimeoutException ||
                         e.getMessage().contains("Connection reset") ||
                         e.getMessage().contains("I/O error")) {
+                    log.info("네이버 API 요청 메시지: {}", e.getMessage());
                     log.info("네이버 API 요청 Timeout 발생 -> {}번째 재시도", attempt + 1);
                     attempt++;
-                    try {
-                        Thread.sleep(1000); // 1초 대기 후 재시도
-                    } catch (InterruptedException interruptedException) {
-                        Thread.currentThread().interrupt();
-                        throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
-                    }
+//                    try { // 추후 network 부하 고려
+//                        Thread.sleep(500); // 대기 후 재시도
+//                    } catch (InterruptedException interruptedException) {
+//                        Thread.currentThread().interrupt();
+//                        throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+//                    }
                 } else {
                     log.error("네이버 API 요청 중 오류 발생: {}", e.getMessage());
                     throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
