@@ -16,7 +16,7 @@ public class StationHomeDto {
     private String name;
     private String intro;
     private int numOfUsers;
-    private String backgroundImg;
+    private String stationBackground;
     private Time reportNoticeTime;
     private boolean reportWritten;
     private List<StationMemberDto> stationMembers;

@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StarBackgroundDto {
-    @JsonProperty("backgroundName")
+    @JsonProperty("starBackground")
     private String backgroundName;
 }

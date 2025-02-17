@@ -9,7 +9,6 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.StationRepository;
-import com.pleiades.repository.UserRepository;
 
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.strings.ValidationStatus;
@@ -82,7 +81,7 @@ public class StationService {
 
         User adminUser = userService.getUserByEmail(email);
         String stationId = generateUniqueStationCode();
-        StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getBackgroundName()).orElse(null);
+        StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getStationBackground()).orElse(null);
         if (stationBackground == null) {
             stationBackground = new StationBackground(null, "station_01", null);
         }

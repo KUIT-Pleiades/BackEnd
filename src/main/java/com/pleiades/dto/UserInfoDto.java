@@ -23,7 +23,7 @@ public class UserInfoDto {
     @JsonProperty("birthDate")
     private LocalDate birthDate;
 
-    @JsonProperty("backgroundName")
+    @JsonProperty("starBackground")
     private String backgroundName;
 
     @JsonProperty("profile")

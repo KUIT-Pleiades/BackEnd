@@ -9,5 +9,5 @@ public class StationDto {
     private String stationId;
     private String name;
     private int numOfUsers;
-    private String backgroundImg;
+    private String stationBackground;
 }

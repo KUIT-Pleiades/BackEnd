@@ -11,7 +11,7 @@ import java.sql.Time;
 @NoArgsConstructor
 public class StationCreateDto {
 
-    private String backgroundName;
+    private String stationBackground;
     private String name;
     private String intro;
     private Time reportNoticeTime;
