@@ -3,15 +3,12 @@ package com.pleiades.controller;
 import com.pleiades.dto.CharacterDto;
 import com.pleiades.dto.StarBackgroundDto;
 import com.pleiades.entity.User;
-import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.UserService;
-import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +25,17 @@ import java.util.*;
 @RequestMapping("/home")
 public class HomeController {
     private final UserRepository userRepository;
-    private final FriendRepository friendRepository;
 
     AuthService authService;
     UserService userService;
     JwtUtil jwtUtil;
 
     @Autowired
-    public HomeController(AuthService authService, UserService userService, JwtUtil jwtUtil, UserRepository userRepository, FriendRepository friendRepository) {
+    public HomeController(AuthService authService, UserService userService, JwtUtil jwtUtil, UserRepository userRepository) {
         this.authService = authService;
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
-        this.friendRepository = friendRepository;
     }
 
     @GetMapping("")
@@ -60,6 +55,7 @@ public class HomeController {
 
         // 사용자 존재 여부
         String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
@@ -69,6 +65,7 @@ public class HomeController {
     @PostMapping("/settings/character")
     public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @RequestBody @Validated CharacterDto characterDto) {
         String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
 
         ValidationStatus setCharacter = userService.setCharacter(email, characterDto);
 
@@ -84,6 +81,7 @@ public class HomeController {
     @PostMapping("/settings/background")
     public ResponseEntity<Map<String, Object>> backgroundSetting(HttpServletRequest request, @RequestBody StarBackgroundDto starBackgroundDto) {
         String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
 
         String backgroundName = starBackgroundDto.getBackgroundName();
         log.info("backgroundName: " + backgroundName);

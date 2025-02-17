@@ -19,7 +19,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class ReportService {
-    private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
     private final ReportRepository reportRepository;
     private final UserStationRepository userStationRepository;
@@ -27,8 +26,7 @@ public class ReportService {
     private final StationReportRepository stationReportRepository;
 
     @Autowired
-    ReportService(UserRepository userRepository, QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository, StationReportRepository stationReportRepository) {
-        this.userRepository = userRepository;
+    ReportService(QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository, StationReportRepository stationReportRepository) {
         this.questionRepository = questionRepository;
         this.reportRepository = reportRepository;
         this.userStationRepository = userStationRepository;
@@ -58,7 +56,8 @@ public class ReportService {
     public ValidationStatus updateReport(User user, Long reportId, String answer) {
         Optional<Report> report = reportRepository.findById(reportId);
         if (report.isEmpty()) { return ValidationStatus.NONE; }
-        if (answer.isEmpty()) { return ValidationStatus.NOT_VALID; }
+
+        if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
 
         report.get().setAnswer(answer);
         report.get().setModifiedAt(LocalDateTime.now());
@@ -72,12 +71,14 @@ public class ReportService {
         Optional<Report> report = reportRepository.findById(reportId);
         if (report.isEmpty()) { return ValidationStatus.NONE; }
 
+        if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime createdAt = report.get().getCreatedAt();
 
         Duration duration = Duration.between(createdAt, now);
 
-        if (duration.toHours() < 24) { return ValidationStatus.NOT_VALID; }
+        if (duration.toHours() < 24) { return ValidationStatus.DUPLICATE; }
 
         reportRepository.delete(report.get());
         return ValidationStatus.VALID;
@@ -202,8 +203,6 @@ public class ReportService {
         return question;
     }
 
-    // 오늘 리포트를 안 쓴 건지 - 이건 메서드 밖에서 검증하는 게 좋을 듯 - userStation의 todayReport가 false일 때만 호출
-    // 해당 질문을 이전에 답변한 적 있는지 그럼 오늘의 리포트가 아니잖아..true자나... 젠장... false로 바꿔?..
     public Report createReport(User user, Station station) {
         log.info("createReport");
         UserStationId userStationId = new UserStationId(user.getId(), station.getId());
