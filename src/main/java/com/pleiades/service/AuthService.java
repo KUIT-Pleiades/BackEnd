@@ -7,6 +7,8 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.strings.FriendStatus;
@@ -267,22 +269,18 @@ public class AuthService {
         return token.getSubject();
     }
 
-    public ResponseEntity<Map<String, Object>> userInStation(String stationId, String authorization) {
-        if (stationId == null || stationId.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        String email = getEmailByAuthorization(authorization);
+    public void userInStation(String stationId, String email) {
+        if (stationId == null || stationId.isEmpty()) { throw new CustomException(ErrorCode.INVALID_STATION_ID); }
+
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
+        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
 
         Optional<Station> station = stationRepository.findById(stationId);
-        if (station.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "station not found")); }
+        if (station.isEmpty()) { throw new CustomException(ErrorCode.STATION_NOT_FOUND); }
 
         UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
 
-        if (userStation.isEmpty()) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "user is not in station")); }
-
-        return null;
+        if (userStation.isEmpty()) { throw new CustomException(ErrorCode.FORBIDDEN_MEMBER); }
     }
 }

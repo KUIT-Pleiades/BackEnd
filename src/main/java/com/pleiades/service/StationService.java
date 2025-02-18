@@ -129,14 +129,8 @@ public class StationService {
         return code.toString();
     }
 
-    public ValidationStatus setBackground(String stationId, String backgroundName) {
+    public ValidationStatus setBackground(Station station, String backgroundName) {
         log.info("setBackground");
-        Optional<Station> station = stationRepository.findById(stationId);
-
-        if (station.isEmpty()) {
-            log.info("station not found");
-            return ValidationStatus.NONE;
-        }
 
         Optional<StationBackground> background = stationBackgroundRepository.findByName(backgroundName);
         if (background.isEmpty()) {
@@ -144,24 +138,20 @@ public class StationService {
             return ValidationStatus.NOT_VALID;
         }
 
-        background.ifPresent(station.get()::setBackground);
+        background.ifPresent(station::setBackground);
 
-        stationRepository.save(station.get());
+        stationRepository.save(station);
 
         return ValidationStatus.VALID;
     }
 
-    public ValidationStatus stationSettings(String stationId, StationSettingDto settingDto) {
+    public void stationSettings(Station station, StationSettingDto settingDto) {
         log.info("stationSettings");
-        Optional<Station> station = stationRepository.findById(stationId);
-        if (station.isEmpty()) { return ValidationStatus.NONE; }
 
-        station.get().setName(settingDto.getName());
-        station.get().setIntro(settingDto.getIntro());
-        station.get().setReportNoticeTime(settingDto.getReportNoticeTime());
+        station.setName(settingDto.getName());
+        station.setIntro(settingDto.getIntro());
+        station.setReportNoticeTime(settingDto.getReportNoticeTime());
 
-        stationRepository.save(station.get());
-
-        return ValidationStatus.VALID;
+        stationRepository.save(station);
     }
 }

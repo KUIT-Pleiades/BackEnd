@@ -81,17 +81,16 @@ public class StationController {
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
-
         String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
         User user = userRepository.findByEmail(email).get();
 
         Station station = stationRepository.findById(stationId).get();
         Report report = reportService.searchTodaysReport(user, station);
 
         // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
-        if (report == null) { return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("message","user needs to enter station")); }
+        if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
 
         ReportDto reportDto = reportService.reportToDto(report);
 
@@ -102,10 +101,10 @@ public class StationController {
     public ResponseEntity<Map<String,Object>> updateReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("PATCH /stations/{}/report", stationId);
 
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
-
         String email = authService.getEmailByAuthorization(authorization);
+
+        authService.userInStation(stationId, email);
+
         User user = userRepository.findByEmail(email).get();
 
         Station station = stationRepository.findById(stationId).get();
@@ -115,10 +114,10 @@ public class StationController {
         ValidationStatus updateReport = reportService.updateTodaysReport(user, station, answer);
 
         if (updateReport == ValidationStatus.NONE) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","today's report not created"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created"));
         }
         if (updateReport == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","today's report not created - same question answered before"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created - Same question answered before"));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
@@ -128,19 +127,17 @@ public class StationController {
     @PatchMapping("/{station_id}/background")
     public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("/stations/"+stationId+"/background");
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
 
         String backgroundName = body.get("backgroundName").toString();
         log.info("backgroundName: " + backgroundName);
 
-        ValidationStatus setBackground = stationService.setBackground(stationId, backgroundName);
-
-        // station 없음
-        if (setBackground == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+        Station station = stationRepository.findById(stationId).get();
+        ValidationStatus setBackground = stationService.setBackground(station, backgroundName);
 
         // background 없음
-        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+        if (setBackground == ValidationStatus.NOT_VALID) { throw new CustomException(ErrorCode.IMAGE_NOT_FOUND); }
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background editted"));
     }
@@ -148,12 +145,11 @@ public class StationController {
     @PatchMapping("/{stationId}/settings")
     public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationId+"/settings");
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
 
-        ValidationStatus setStation = stationService.stationSettings(stationId, settingDto);
-
-        if (setStation == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+        Station station  = stationRepository.findById(stationId).get();
+        stationService.stationSettings(station, settingDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Info editted"));
     }
@@ -161,10 +157,9 @@ public class StationController {
     @GetMapping("/{stationId}/report/create")
     public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/"+stationId+"/report/create");
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
-
         String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
         User user = userRepository.findByEmail(email).get();
         Station station = stationRepository.findById(stationId).get();
 
