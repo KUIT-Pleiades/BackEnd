@@ -1,18 +1,8 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
-import com.pleiades.entity.*;
-import com.pleiades.exception.CustomException;
-import com.pleiades.exception.ErrorCode;
-import com.pleiades.repository.StationQuestionRepository;
-import com.pleiades.repository.StationReportRepository;
-import com.pleiades.repository.StationRepository;
-import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
-import com.pleiades.service.ReportService;
 import com.pleiades.service.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Controller

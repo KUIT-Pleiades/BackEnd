@@ -34,7 +34,6 @@ public class StationReportController {
     private final StationReportRepository stationReportRepository;
     private final UserStationRepository userStationRepository;
 
-
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);

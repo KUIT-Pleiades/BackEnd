@@ -1,5 +1,6 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.*;
 import com.pleiades.entity.Report;
 import com.pleiades.entity.Station;
@@ -74,6 +75,10 @@ public class UserStationService {
         // 사용자가 정거장 멤버인지 확인 (403)
         UserStation userStation = userStationRepository.findById(new UserStationId(user.getId(), stationId))
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
+
+        // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
+        Report todaysReport = reportService.searchTodaysReport(user, station);
+        if (todaysReport == null) { reportService.createReport(user, station); }
 
         // response DTO 생성
         return buildStationHomeDto(station, userStation.isTodayReport(), user);
