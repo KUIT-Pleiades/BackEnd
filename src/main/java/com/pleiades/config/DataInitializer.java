@@ -120,7 +120,7 @@ public class DataInitializer {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
                 new UserStation(new UserStationId("user1", "ABCDEF"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), true, 25f, 50f),
 
                 new UserStation(new UserStationId("user2", "ABCDEF"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
