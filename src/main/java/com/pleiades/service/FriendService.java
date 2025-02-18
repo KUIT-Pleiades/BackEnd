@@ -129,8 +129,11 @@ public class FriendService {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> updateFriendStatus(String email, Long friendId, FriendStatus newStatus) {
-        Optional<Friend> optionalFriend = friendRepository.findById(friendId);
+    public ResponseEntity<Map<String, String>> updateFriendStatus(String email, String userId, FriendStatus newStatus) {
+        User currentUser = getUserByEmail(email);
+        User friendUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Optional<Friend> optionalFriend = friendRepository.findBySenderAndReceiver(friendUser, currentUser);
 
         if (optionalFriend.isPresent()) {
             Friend friend = optionalFriend.get();
@@ -155,13 +158,18 @@ public class FriendService {
                         .body(Map.of("message","Friend request rejected"));
             }
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message","Friend request not found"));
+        throw new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
     }
 
     @Transactional
-    public ResponseEntity<Map<String, String>> deleteFriend(String email, Long friendId) {
-        Optional<Friend> optionalFriend = friendRepository.findById(friendId);
+    public ResponseEntity<Map<String, String>> deleteFriend(String email, String userId) {
+        User currentUser = getUserByEmail(email);
+        User friendUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Optional<Friend> optionalFriend = friendRepository.findBySenderAndReceiver(currentUser, friendUser);
+        if (optionalFriend.isEmpty()) {
+            optionalFriend = friendRepository.findBySenderAndReceiver(friendUser, currentUser);
+        }
 
         if (optionalFriend.isPresent()) {
             Friend friend = optionalFriend.get();
@@ -175,7 +183,7 @@ public class FriendService {
                 }
                 friendRepository.delete(friend);
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                return ResponseEntity.status(HttpStatus.OK)
                         .body(Map.of("message","Friend request canceled"));
             }
 
@@ -183,12 +191,11 @@ public class FriendService {
             if(friend.getStatus() == FriendStatus.ACCEPTED){
                 friendRepository.delete(friend);
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                return ResponseEntity.status(HttpStatus.OK)
                         .body(Map.of("message","Friend deleted"));
             }
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message","Friend request not found"));
+        throw new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
     }
 
     private User getUserByEmail(String email) {

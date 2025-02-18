@@ -60,8 +60,8 @@ public class FriendController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/requests/{friend_id}")
-    public ResponseEntity<Map<String, String>> handleFriendRequest(HttpServletRequest request, @RequestBody Map<String, Object> requestBody, @PathVariable("friend_id") Long friend_id) {
+    @PatchMapping("/requests/{user_id}")
+    public ResponseEntity<Map<String, String>> handleFriendRequest(HttpServletRequest request, @RequestBody Map<String, Object> requestBody, @PathVariable("user_id") String user_id) {
         log.info("handle request controller 진입");
 
         String email = (String) request.getAttribute("email");
@@ -69,16 +69,16 @@ public class FriendController {
 
         FriendStatus status = FriendStatus.valueOf(requestBody.get("status").toString().toUpperCase());
 
-        return friendService.updateFriendStatus(email, friend_id, status);
+        return friendService.updateFriendStatus(email, user_id, status);
     }
 
-    @DeleteMapping("/requests/{friend_id}")
-    public ResponseEntity<Map<String, String>> deleteFriend(HttpServletRequest request, @PathVariable("friend_id") Long friend_id) {
+    @DeleteMapping("/requests/{user_id}")
+    public ResponseEntity<Map<String, String>> deleteFriend(HttpServletRequest request, @PathVariable("user_id") String user_id) {
         log.info("delete request controller 진입");
 
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
 
-        return friendService.deleteFriend(email, friend_id);
+        return friendService.deleteFriend(email, user_id);
     }
 }
