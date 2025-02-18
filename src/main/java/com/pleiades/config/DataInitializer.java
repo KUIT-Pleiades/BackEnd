@@ -76,6 +76,7 @@ public class DataInitializer {
     private final ReportRepository reportRepository;
     private final StationBackgroundRepository stationBackgroundRepository;
     private final StationQuestionRepository stationQuestionRepository;
+    private final StationReportRepository stationReportRepository;
 
 
     @PostConstruct
@@ -95,6 +96,7 @@ public class DataInitializer {
         saveUserStation();
         saveStationQuestion();
         saveUserHistory();
+        saveStationReport();
     }
 
     private void saveNaverToken(){
@@ -120,7 +122,7 @@ public class DataInitializer {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
                 new UserStation(new UserStationId("user1", "ABCDEF"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), true, 25f, 50f),
 
                 new UserStation(new UserStationId("user2", "ABCDEF"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
@@ -323,7 +325,14 @@ public class DataInitializer {
     }
 
     private void saveReport() {
-        User user = userRepository.findById("user1").orElseThrow(null);
+        User user1 = userRepository.findById("user1").orElseThrow(null);
+        User user2 = userRepository.findById("user2").orElseThrow(null);
+        User user3 = userRepository.findById("user3").orElseThrow(null);
+        User user4 = userRepository.findById("user4").orElseThrow(null);
+        User user5 = userRepository.findById("user5").orElseThrow(null);
+        User user6 = userRepository.findById("user6").orElseThrow(null);
+        User user7 = userRepository.findById("user7").orElseThrow(null);
+
         Question question1 = questionRepository.findById(1L).orElseThrow(null);
         Question question2 = questionRepository.findById(2L).orElseThrow(null);
         Question question3 = questionRepository.findById(3L).orElseThrow(null);
@@ -331,11 +340,47 @@ public class DataInitializer {
         Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                Report.builder().user(user).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question5).written(false).createdAt(LocalDateTime.now()).build()
+                Report.builder().user(user1).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user2).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user3).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user4).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user5).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user6).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user7).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question5).written(false).createdAt(LocalDateTime.now()).build()
         );
         reportRepository.saveAll(reports);
     }
@@ -351,6 +396,28 @@ public class DataInitializer {
                 StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDate.now()).build()
         );
         stationQuestionRepository.saveAll(stationQuestions);
+    }
+
+    private void saveStationReport() {
+        List<Station> stations = stationRepository.findAll();
+        List<Report> reports = reportRepository.findAll();
+
+        List<StationReport> stationReports = List.of(
+                StationReport.builder().station(stations.get(0)).report(reports.get(0)).build(),
+                StationReport.builder().station(stations.get(0)).report(reports.get(5)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(1)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(6)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(11)).build(),
+                StationReport.builder().station(stations.get(2)).report(reports.get(2)).build(),
+                StationReport.builder().station(stations.get(2)).report(reports.get(12)).build(),
+                StationReport.builder().station(stations.get(3)).report(reports.get(3)).build(),
+                StationReport.builder().station(stations.get(3)).report(reports.get(8)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(4)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(19)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(24)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(34)).build()
+        );
+       stationReportRepository.saveAll(stationReports);
     }
 
     // 초기 데이터
