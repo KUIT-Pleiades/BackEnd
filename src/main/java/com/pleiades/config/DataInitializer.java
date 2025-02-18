@@ -116,23 +116,23 @@ public class DataInitializer {
     private void saveUserStation() {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
-                new UserStation(new UserStationId("woogie", "ABCDEF"), userRepository.findById("woogie").orElseThrow(),
+                new UserStation(new UserStationId("user1", "ABCDEF"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
 
-                new UserStation(new UserStationId("yuna1217", "ABCDEF"), userRepository.findById("yuna1217").orElseThrow(),
+                new UserStation(new UserStationId("user2", "ABCDEF"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 new UserStation(new UserStationId("danpung628", "ABCDEF"), userRepository.findById("danpung628").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 두 번째 정거장 (BC123D)
-                new UserStation(new UserStationId("woogie", "BC123D"), userRepository.findById("woogie").orElseThrow(),
+                new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
-                new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
+                new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), true, LocalDateTime.now(), false, 50f, 50f),
 
-                new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
+                new UserStation(new UserStationId("user3", "BC123D"), userRepository.findById("user3").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 세 번째 정거장 (OPQ4R5)
@@ -147,7 +147,7 @@ public class DataInitializer {
                         stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 // 다섯 번째 정거장 (LYHENO)
-                new UserStation(new UserStationId("user2", "LYHENO"), userRepository.findById("user2").orElseThrow(),
+                new UserStation(new UserStationId("user1", "LYHENO"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
                 new UserStation(new UserStationId("user4", "LYHENO"), userRepository.findById("user4").orElseThrow(),
@@ -274,22 +274,28 @@ public class DataInitializer {
         Question question1 = questionRepository.findById(1L).orElseThrow(null);
         Question question2 = questionRepository.findById(2L).orElseThrow(null);
         Question question3 = questionRepository.findById(3L).orElseThrow(null);
+        Question question4 = questionRepository.findById(4L).orElseThrow(null);
+        Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                Report.builder().user(user).question(question1).answer("qwer").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question2).answer("asdf").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question3).answer("zxcv").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build()
+                Report.builder().user(user).question(question1).answer("첫 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question2).answer("두 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question3).answer("세 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question4).answer("네 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question5).answer("다섯 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build()
         );
         reportRepository.saveAll(reports);
     }
 
     private void saveStationQuestion() {
-        Station station = stationRepository.findById("BC123D").orElseThrow(null);
+        List<Station> stations = stationRepository.findAll();
         List<Question> questions = questionRepository.findAll();
         List<StationQuestion> stationQuestions = List.of(
-                StationQuestion.builder().station(station).question(questions.get(0)).createdAt(LocalDate.of(2024, 12, 12)).build(),
-                StationQuestion.builder().station(station).question(questions.get(1)).createdAt(LocalDate.of(2025, 1, 15)).build(),
-                StationQuestion.builder().station(station).question(questions.get(2)).createdAt(LocalDate.of(2025, 2, 18)).build()
+                StationQuestion.builder().station(stations.get(0)).question(questions.get(0)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(1)).question(questions.get(1)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(2)).question(questions.get(2)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(3)).question(questions.get(3)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDate.now()).build()
         );
         stationQuestionRepository.saveAll(stationQuestions);
     }
