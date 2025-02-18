@@ -215,7 +215,16 @@ public class DataInitializer {
         List<Friend> friends = List.of(
                 Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
                         .sender(userRepository.findById("user2").orElseThrow())
-                        .receiver(userRepository.findById("user1").orElseThrow()).build(),
+                        .receiver(userRepository.findById("hyungyu").orElseThrow()).build(),
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("user1").orElseThrow())
+                        .receiver(userRepository.findById("hyungyu").orElseThrow()).build(),
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("user3").orElseThrow()).build(),
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("user4").orElseThrow()).build(),
 
                 Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 19, 46, 5))
                         .sender(userRepository.findById("user3").orElseThrow())
