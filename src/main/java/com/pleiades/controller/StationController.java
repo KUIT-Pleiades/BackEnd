@@ -6,6 +6,8 @@ import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.ReportService;
@@ -20,6 +22,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -76,7 +79,7 @@ public class StationController {
     }
 
     @GetMapping("/{stationId}/report")
-    public ResponseEntity<Map<String, Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
         ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
         if (response != null) { return response; }
@@ -85,14 +88,14 @@ public class StationController {
         User user = userRepository.findByEmail(email).get();
 
         Station station = stationRepository.findById(stationId).get();
+        Report report = reportService.searchTodaysReport(user, station);
 
-        Question question = reportService.todaysQuestion(station);
-        Report report = reportService.searchUserQuestion(user, question);
-
-        if (report == null) { return ResponseEntity.status(HttpStatus.OK).build(); }
+        // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
+        if (report == null) { return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("message","user needs to enter station")); }
 
         ReportDto reportDto = reportService.reportToDto(report);
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report",reportDto));
     }
 
     @PatchMapping("/{stationId}/report")

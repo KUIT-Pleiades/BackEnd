@@ -14,9 +14,7 @@ import com.pleiades.service.ReportService;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
-import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,14 +58,12 @@ public class ReportController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","no user")); }
 
         List<ReportDto> reports = reportService.getAllReports(user.get());
 
@@ -75,12 +71,12 @@ public class ReportController {
     }
 
     @GetMapping(params = "query")
-    public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query, HttpServletRequest request) {
+    public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         Set<ReportDto> result = reportService.searchResult(user.get(), query);
 
@@ -92,13 +88,12 @@ public class ReportController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User is Empty")); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         List<ReportHistory> histories = reportHistoryRepository.findByUser(user.get());
         log.info("histories: {}", histories);
@@ -122,7 +117,7 @@ public class ReportController {
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User is Empty")); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         return reportHistoryService.deleteById(historyId);
     }
@@ -133,15 +128,15 @@ public class ReportController {
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         String answer = body.get("answer").toString();
-
         ValidationStatus update = reportService.updateReport(user.get(), reportId, answer);
 
-        if (!update.equals(ValidationStatus.VALID)) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build(); }
+        if (update.equals(ValidationStatus.NONE)) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","no report")); }
+        if (update.equals(ValidationStatus.NOT_VALID)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not the owner of the report")); }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", "report editted"));
     }
 
     @DeleteMapping("/{reportId}")
@@ -154,8 +149,9 @@ public class ReportController {
 
         ValidationStatus delete = reportService.deleteReport(user.get(), reportId);
 
-        if (delete.equals(ValidationStatus.NONE)) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message", "No existing report")); }
-        if (delete.equals(ValidationStatus.NOT_VALID)) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "Can't delete Today's report")); }
+        if (delete.equals(ValidationStatus.NONE)) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "No existing report")); }
+        if (delete.equals(ValidationStatus.NOT_VALID)) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","Not the owner of the report")); }
+        if (delete.equals(ValidationStatus.DUPLICATE)) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "Can't delete Today's report")); }
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "report deleted"));
     }
@@ -164,18 +160,18 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, HttpServletRequest request) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
-        if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
+        if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }
 
         // 친구 관계에 있는지 검증
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
         boolean relationship = friendRepository.isFriend(user.get(), friend.get(), FriendStatus.ACCEPTED);
 
-        if (!relationship) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
         List<ReportDto> reports = reportService.getAllReports(friend.get());
 
@@ -186,18 +182,18 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query, HttpServletRequest request) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
-        if (friend.isEmpty()) { return ResponseEntity.notFound().build(); }
+        if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }
 
         // 친구 관계에 있는지 검증
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
         boolean relationship = friendRepository.isFriend(user.get(), friend.get(), FriendStatus.ACCEPTED);
 
-        if (!relationship) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
+        if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
         // report 검색
         Set<ReportDto> result = reportService.searchResult(friend.get(), query);

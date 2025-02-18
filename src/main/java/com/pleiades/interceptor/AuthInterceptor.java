@@ -40,7 +40,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String authorization = request.getHeader("Authorization");
         if(authorization == null || authorization.isEmpty()) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setStatus(HttpStatus.PRECONDITION_REQUIRED.value());
             return false;
         }
 
@@ -55,8 +55,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         log.info("Authorization: {}", authorization);
         if (!authorization.startsWith("Bearer ")) {
-            log.info("AuthInterceptor preHandle 428 - no authorization");
-            response.sendError(428, "Precondition Required");      // 428
+            log.info("AuthInterceptor preHandle 401 - no authorization");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);       // 401
             return false;
         }
 
@@ -65,8 +65,8 @@ public class AuthInterceptor implements HandlerInterceptor {
         ValidationStatus tokenStatus = authService.checkToken(accessToken);
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
-            log.info("AuthInterceptor preHandle 428 - no token");
-            response.sendError(428, "Precondition Required");      // 428
+            log.info("AuthInterceptor preHandle 401 - no token");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);       // 401
             return false;
         }
 

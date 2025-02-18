@@ -23,8 +23,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,6 +72,7 @@ public class DataInitializer {
     private final StationRepository stationRepository;
     private final ReportRepository reportRepository;
     private final StationBackgroundRepository stationBackgroundRepository;
+    private final StationQuestionRepository stationQuestionRepository;
 
 
     @PostConstruct
@@ -81,12 +82,15 @@ public class DataInitializer {
         saveSkin(); saveExpression(); saveHair();
         saveItem();
         saveTop(); saveBottom(); saveShoes();
-        saveQuestion();
-//        saveReport();
         saveStarBackground();
+        saveStar();
+
+        saveQuestion();
+        saveReport();
         saveStationBackground();
         saveStation();
         saveUserStation();
+        saveStationQuestion();
     }
 
     private void saveNaverToken(){
@@ -112,23 +116,23 @@ public class DataInitializer {
     private void saveUserStation() {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
-                new UserStation(new UserStationId("woogie", "ABCDEF"), userRepository.findById("woogie").orElseThrow(),
+                new UserStation(new UserStationId("user1", "ABCDEF"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
 
-                new UserStation(new UserStationId("yuna1217", "ABCDEF"), userRepository.findById("yuna1217").orElseThrow(),
+                new UserStation(new UserStationId("user2", "ABCDEF"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 new UserStation(new UserStationId("danpung628", "ABCDEF"), userRepository.findById("danpung628").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 두 번째 정거장 (BC123D)
-                new UserStation(new UserStationId("woogie", "BC123D"), userRepository.findById("woogie").orElseThrow(),
+                new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
-                new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
+                new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), true, LocalDateTime.now(), false, 50f, 50f),
 
-                new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
+                new UserStation(new UserStationId("user3", "BC123D"), userRepository.findById("user3").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 세 번째 정거장 (OPQ4R5)
@@ -143,7 +147,7 @@ public class DataInitializer {
                         stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 // 다섯 번째 정거장 (LYHENO)
-                new UserStation(new UserStationId("user2", "LYHENO"), userRepository.findById("user2").orElseThrow(),
+                new UserStation(new UserStationId("user1", "LYHENO"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
                 new UserStation(new UserStationId("user4", "LYHENO"), userRepository.findById("user4").orElseThrow(),
@@ -153,6 +157,25 @@ public class DataInitializer {
                         stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTime.now(), false, 75f, 50f)
         );
         userStationRepository.saveAll(userStations);
+    }
+
+    private void saveStar() {
+        List<User> users = userRepository.findAll();
+        List<StarBackground> starBackgrounds = starBackgroundRepository.findAll();
+        List<Star> stars = List.of(
+                Star.builder().user(users.get(0)).background(starBackgrounds.get(0)).build(),
+                Star.builder().user(users.get(1)).background(starBackgrounds.get(1)).build(),
+                Star.builder().user(users.get(2)).background(starBackgrounds.get(2)).build(),
+                Star.builder().user(users.get(3)).background(starBackgrounds.get(3)).build(),
+                Star.builder().user(users.get(4)).background(starBackgrounds.get(4)).build(),
+                Star.builder().user(users.get(5)).background(starBackgrounds.get(0)).build(),
+                Star.builder().user(users.get(6)).background(starBackgrounds.get(1)).build(),
+                Star.builder().user(users.get(7)).background(starBackgrounds.get(2)).build(),
+                Star.builder().user(users.get(8)).background(starBackgrounds.get(3)).build(),
+                Star.builder().user(users.get(9)).background(starBackgrounds.get(4)).build(),
+                Star.builder().user(users.get(10)).background(starBackgrounds.get(0)).build(),
+                Star.builder().user(users.get(11)).background(starBackgrounds.get(1)).build()
+        );
     }
 
     private void saveStation() {
@@ -234,15 +257,6 @@ public class DataInitializer {
         friendRepository.saveAll(friends);
     }
 
-//    private void saveStation() {
-//        List<Station> stations = List.of(
-//                new Station("qwe123", "station1", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
-//                new Station("asd456", "station2", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null),
-//                new Station("zxc789", "station3", "hi", 1, LocalDateTime.now(), "yuna1217", Time.valueOf("09:00:00"), null)
-//        );
-//        stationRepository.saveAll(stations);
-//    }
-
     private void saveQuestion() throws IOException {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("questions.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
@@ -256,19 +270,37 @@ public class DataInitializer {
     }
 
     private void saveReport() {
-        Optional<User> wonwoo = userRepository.findById("danpung628");
-        Optional<Question> question1 = questionRepository.findById(1L);
-        Optional<Question> question2 = questionRepository.findById(2L);
-        Optional<Question> question3 = questionRepository.findById(3L);
+        User user = userRepository.findById("user1").orElseThrow(null);
+        Question question1 = questionRepository.findById(1L).orElseThrow(null);
+        Question question2 = questionRepository.findById(2L).orElseThrow(null);
+        Question question3 = questionRepository.findById(3L).orElseThrow(null);
+        Question question4 = questionRepository.findById(4L).orElseThrow(null);
+        Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                new Report(1L, wonwoo.get(), question1.get(), "qwer", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(2L, wonwoo.get(), question2.get(), "asdf", true, LocalDateTime.now(), LocalDateTime.now()),
-                new Report(3L, wonwoo.get(), question3.get(), "zxcv", true, LocalDateTime.now(), LocalDateTime.now())
+                Report.builder().user(user).question(question1).answer("첫 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question2).answer("두 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question3).answer("세 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question4).answer("네 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question5).answer("다섯 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build()
         );
         reportRepository.saveAll(reports);
     }
 
+    private void saveStationQuestion() {
+        List<Station> stations = stationRepository.findAll();
+        List<Question> questions = questionRepository.findAll();
+        List<StationQuestion> stationQuestions = List.of(
+                StationQuestion.builder().station(stations.get(0)).question(questions.get(0)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(1)).question(questions.get(1)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(2)).question(questions.get(2)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(3)).question(questions.get(3)).createdAt(LocalDate.now()).build(),
+                StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDate.now()).build()
+        );
+        stationQuestionRepository.saveAll(stationQuestions);
+    }
+
+    // 초기 데이터
     private void saveSkin() {
         String[] skins = {"skin_01", "skin_02", "skin_03", "skin_04", "skin_05", "skin_06", "skin_07"};
         for (String name : skins) {
@@ -296,8 +328,10 @@ public class DataInitializer {
     private void saveItem() {
         String[] items = {"acc1_01", "acc2_01", "acc3_01", "acc4_01", "acc5_01", "acc7_01", "acc1_02", "fas1_01", "fas1_02", "fas1_03", "fas4_01"};        // acc6_01이 없음
         for (String name : items) {
-            String number = name.substring(name.indexOf("acc")+3, name.length()-3);
-            switch (number) {
+            String number = null;
+            if (name.startsWith("acc")) { number = name.substring(name.indexOf("acc")+3, name.length()-3); }
+            if (name.startsWith("fas")) { number = name.substring(name.indexOf("fas")+3, name.length()-3); }
+            switch (Objects.requireNonNull(number)) {
                 case "1":
                     Head head = new Head();
                     head.setName(name);
@@ -375,7 +409,6 @@ public class DataInitializer {
             starBackgroundRepository.save(bgimg);
         }
     }
-
     private void saveStationBackground() {
         String[] bgimgs = {"station_01", "station_02", "station_03", "station_04"};
         for (String name : bgimgs) {
