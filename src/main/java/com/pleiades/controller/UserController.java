@@ -21,14 +21,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("")
-    public ResponseEntity<List<SearchUserDto>> searchUser(HttpServletRequest request, @RequestParam("user_id") String userId) {
+    public ResponseEntity<Map<String, Object>>  searchUser(HttpServletRequest request, @RequestParam("user_id") String userId) {
         log.info("search user controller 진입: user_id = {}", userId);
 
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
         List<SearchUserDto> searchResult = userService.searchUser(userId, email);
 
-        return ResponseEntity.ok(searchResult);
+        return ResponseEntity.ok(Map.of("users",searchResult));
     }
 
     @GetMapping("/histories")
