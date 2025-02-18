@@ -1,35 +1,24 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.ReportDto;
-import com.pleiades.dto.SearchUserDto;
 import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.User_Station.UserStation;
-import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
-import com.pleiades.service.ReportService;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
-import com.pleiades.util.HeaderUtil;
 
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.service.StationService;
-import com.pleiades.service.UserStationService;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.*;
 import java.util.Map;
 
 @Slf4j
@@ -42,14 +31,7 @@ public class StationController {
     private final AuthService authService;
 
     private final StationRepository stationRepository;
-    private final UserStationRepository userStationRepository;
-    private final UserRepository userRepository;
-    private final ReportRepository reportRepository;
-    private final ReportService reportService;
     private final StationService stationService;
-    private final QuestionRepository questionRepository;
-    private final StationQuestionRepository stationQuestionRepository;
-    private final StationBackgroundRepository stationBackgroundRepository;
 
     @PostMapping("")
     public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @RequestBody StationCreateDto requestDto) {
@@ -76,55 +58,6 @@ public class StationController {
         log.info("사용자 email = {}", email);
 
         return stationService.deleteStation(email, station_id);
-    }
-
-    @GetMapping("/{stationId}/report")
-    public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
-        log.info("/stations/{}/report", stationId);
-        String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationId, email);
-
-        User user = userRepository.findByEmail(email).get();
-
-        Station station = stationRepository.findById(stationId).get();
-        Report report = reportService.searchTodaysReport(user, station);
-
-        // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
-        if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
-
-        ReportDto reportDto = reportService.reportToDto(report);
-
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report",reportDto));
-    }
-
-    @PatchMapping("/{stationId}/report")
-    public ResponseEntity<Map<String,Object>> updateReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
-        log.info("PATCH /stations/{}/report", stationId);
-
-        String email = authService.getEmailByAuthorization(authorization);
-
-        authService.userInStation(stationId, email);
-
-        User user = userRepository.findByEmail(email).get();
-
-        Station station = stationRepository.findById(stationId).get();
-
-        String answer = body.get("answer").toString();
-
-        ValidationStatus updateReport = reportService.updateTodaysReport(user, station, answer);
-
-        if (updateReport == ValidationStatus.NONE) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created"));
-        }
-        if (updateReport == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created - Same question answered before"));
-        }
-
-        Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, user.getId());
-        userStation.get().setTodayReport(true);     // todo: false로 전환 필요
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
-
     }
 
     @PatchMapping("/{station_id}/background")
@@ -157,27 +90,4 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Info editted"));
     }
 
-    @GetMapping("/{stationId}/report/create")
-    public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
-        log.info("/stations/"+stationId+"/report/create");
-        String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationId, email);
-
-        User user = userRepository.findByEmail(email).get();
-        Station station = stationRepository.findById(stationId).get();
-
-        Report report = reportService.createReport(user, station);
-
-        if (report == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
-
-        ReportDto reportDto = new ReportDto();
-        reportDto.setReportId(report.getId());
-        reportDto.setQuestionId(report.getQuestion().getId());
-        reportDto.setQuestion(report.getQuestion().getQuestion());
-        reportDto.setAnswer(report.getAnswer());
-        reportDto.setCreatedAt(report.getCreatedAt());
-        reportDto.setModifiedAt(LocalDateTime.now());
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
-    }
 }

@@ -344,7 +344,7 @@ public class DataInitializer {
         friendRepository.saveAll(friends);
     }
 
-    private void saveQuestion() throws IOException {
+    private void saveQuestion() {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("questions.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
 

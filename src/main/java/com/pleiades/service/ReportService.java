@@ -139,6 +139,7 @@ public class ReportService {
         return result;
     }
 
+    // 이 정거장에서 해당 사용자가 작성한 투데이 리포트 반환
     public Report searchTodaysReport(User user, Station station) {
         log.info("searchTodaysReport");
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
@@ -177,6 +178,7 @@ public class ReportService {
         return question;
     }
 
+    // 정거장의 오늘의 질문 설정
     private Question setTodaysStationQuesiton(Station station) {
         Question question = null;
         Optional<StationQuestion> existingStationQuesiton;
@@ -203,6 +205,7 @@ public class ReportService {
         return question;
     }
 
+    // 투데이 리포트 생성 (생성만, 작성은 안 됨)
     public Report createReport(User user, Station station) {
         log.info("createReport");
         UserStationId userStationId = new UserStationId(user.getId(), station.getId());
@@ -218,7 +221,7 @@ public class ReportService {
         // 이전에 답변한 적 있는 질문
         if (existingReport != null) {
             // existingReport.setCreatedAt(LocalDateTime.now());
-            existingReport.setModifiedAt(LocalDateTime.now());
+            // existingReport.setModifiedAt(LocalDateTime.now());
             reportRepository.save(existingReport);
             stationReport.setReport(existingReport);
             stationReportRepository.save(stationReport);
@@ -226,7 +229,7 @@ public class ReportService {
             return existingReport;
         }
 
-        Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build();
+        Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTime.now()).build();
         reportRepository.save(report);
         stationReport.setStation(station);
         stationReport.setReport(report);
@@ -242,6 +245,7 @@ public class ReportService {
         return question.orElse(null);
     }
 
+    // 해당 사용자가 헤당 질문에 대해 답변한 리포트 반환
     public Report searchUserQuestion(User user, Question question) {
         log.info("searchUserQuestion");
         List<Report> reports = reportRepository.findByUser(user);
@@ -251,6 +255,7 @@ public class ReportService {
         return null;
     }
 
+    // 걍 업데이트랑 뭐가 다름? UserStation -> true 가 다름
     public ValidationStatus updateTodaysReport(User user, Station station, String answer) {
         log.info("updateTodaysReport");
 

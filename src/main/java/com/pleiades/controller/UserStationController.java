@@ -1,18 +1,8 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
-import com.pleiades.entity.*;
-import com.pleiades.exception.CustomException;
-import com.pleiades.exception.ErrorCode;
-import com.pleiades.repository.StationQuestionRepository;
-import com.pleiades.repository.StationReportRepository;
-import com.pleiades.repository.StationRepository;
-import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
-import com.pleiades.service.ReportService;
 import com.pleiades.service.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -34,34 +21,6 @@ import java.util.Optional;
 public class UserStationController {
 
     private final UserStationService userStationService;
-    private final AuthService authService;
-    private final StationQuestionRepository stationQuestionRepository;
-    private final UserRepository userRepository;
-    private final ReportService reportService;
-    private final StationRepository stationRepository;
-    private final StationReportRepository stationReportRepository;
-
-    @GetMapping("/{stationId}/users/{userId}/report")
-    public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationId, email);
-
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
-
-        Station station = stationRepository.findById(stationId).get();
-        Question question = reportService.todaysQuestion(station);
-
-        Report report = reportService.searchUserQuestion(user.get(), question);
-        if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "User never responded this question")); }
-
-        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(stationId, report.getId());
-        if (stationReport.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
-
-        ReportDto reportDto = reportService.reportToDto(report);
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
-    }
 
     @PatchMapping("/{station_id}/users/{user_id}/position")
     public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
