@@ -132,9 +132,6 @@ public class DataInitializer {
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 25f, 70f),
 
                 // 두 번째 정거장 (BC123D)
-                new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 50f, 70f),
-
                 new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
@@ -144,12 +141,18 @@ public class DataInitializer {
                 new UserStation(new UserStationId("user3", "BC123D"), userRepository.findById("user3").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
+                new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 70f),
+
                 // 세 번째 정거장 (OPQ4R5)
                 new UserStation(new UserStationId("user3", "OPQ4R5"), userRepository.findById("user3").orElseThrow(),
                         stationRepository.findById("OPQ4R5").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
 
-                new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
+                new UserStation(new UserStationId("hyungyu", "OPQ4R5"), userRepository.findById("hyungyu").orElseThrow(),
                         stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
+
+                new UserStation(new UserStationId("user1", "OPQ4R5"), userRepository.findById("user1").orElseThrow(),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 네 번째 정거장 (VW0XYZ)
                 new UserStation(new UserStationId("hyungyu", "VW0XYZ"), userRepository.findById("hyungyu").orElseThrow(),
@@ -157,6 +160,9 @@ public class DataInitializer {
 
                 new UserStation(new UserStationId("user2", "VW0XYZ"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
+
+                new UserStation(new UserStationId("user1", "VW0XYZ"), userRepository.findById("user1").orElseThrow(),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
                 // 다섯 번째 정거장 (LYHENO)
                 new UserStation(new UserStationId("user7", "LYHENO"), userRepository.findById("user7").orElseThrow(),
@@ -166,7 +172,10 @@ public class DataInitializer {
                         stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 new UserStation(new UserStationId("user5", "LYHENO"), userRepository.findById("user5").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTime.now(), false, 75f, 50f)
+                        stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTime.now(), false, 75f, 50f),
+
+                new UserStation(new UserStationId("user1", "LYHENO"), userRepository.findById("user1").orElseThrow(),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 25f, 70f)
         );
         userStationRepository.saveAll(userStations);
     }
@@ -195,9 +204,9 @@ public class DataInitializer {
         List<Station> stations = List.of(
                 new Station("ABCDEF", "플아데", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0), bgs.get(0)),
                 new Station("BC123D", "플아데", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0),bgs.get(1)),
-                new Station("OPQ4R5", "플아데", "hi", 2, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
-                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(0)),
-                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user7", LocalTime.of(9,0,0),bgs.get(3))
+                new Station("OPQ4R5", "플아데", "hi", 3, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
+                new Station("VW0XYZ", "플아데", "hi", 3, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(0)),
+                new Station("LYHENO", "플아데", "hi", 4, LocalDateTime.now(), "user7", LocalTime.of(9,0,0),bgs.get(3))
             );
         stationRepository.saveAll(stations);
         stationRepository.flush();
