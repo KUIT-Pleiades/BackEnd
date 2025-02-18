@@ -10,6 +10,8 @@ import com.pleiades.entity.character.face.Skin;
 import com.pleiades.entity.character.outfit.Bottom;
 import com.pleiades.entity.character.outfit.Shoes;
 import com.pleiades.entity.character.outfit.Top;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.face.ExpressionRepository;
 import com.pleiades.repository.character.face.HairRepository;
@@ -47,6 +49,7 @@ public class DataInitializer {
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
     private final NaverTokenRepository naverTokenRepository;
+    private final UserHistoryRepository userHistoryRepository;
 
     private final SkinRepository skinRepository;
     private final ExpressionRepository expressionRepository;
@@ -91,6 +94,7 @@ public class DataInitializer {
         saveStation();
         saveUserStation();
         saveStationQuestion();
+        saveUserHistory();
     }
 
     private void saveNaverToken(){
@@ -125,7 +129,13 @@ public class DataInitializer {
                 new UserStation(new UserStationId("danpung628", "ABCDEF"), userRepository.findById("danpung628").orElseThrow(),
                         stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 75f, 50f),
 
+                new UserStation(new UserStationId("hyungyu", "ABCDEF"), userRepository.findById("hyungyu").orElseThrow(),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 25f, 70f),
+
                 // 두 번째 정거장 (BC123D)
+                new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 50f, 70f),
+
                 new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
                         stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
@@ -138,6 +148,9 @@ public class DataInitializer {
                 // 세 번째 정거장 (OPQ4R5)
                 new UserStation(new UserStationId("user3", "OPQ4R5"), userRepository.findById("user3").orElseThrow(),
                         stationRepository.findById("OPQ4R5").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
+
+                new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 // 네 번째 정거장 (VW0XYZ)
                 new UserStation(new UserStationId("user1", "VW0XYZ"), userRepository.findById("user1").orElseThrow(),
@@ -189,6 +202,29 @@ public class DataInitializer {
             );
         stationRepository.saveAll(stations);
         stationRepository.flush();
+    }
+
+    private void saveUserHistory() {
+        User hyungyu = userRepository.findById("hyungyu")
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 최근 검색 기록에 추가할 사용자 목록 (자기 자신 제외)
+        List<User> searchedUsers = userRepository.findAll().stream()
+                .filter(user -> !user.getId().equals("hyungyu"))
+                .toList();
+
+        // UserHistory 엔티티 생성
+        List<UserHistory> userHistories = searchedUsers.stream()
+                .map(user -> UserHistory.builder()
+                        .current(hyungyu)
+                        .searched(user)
+                        .searchCount(1) // 검색 횟수 초기값
+                        .isFriend(friendRepository.isFriend(hyungyu, user, FriendStatus.ACCEPTED))
+                        .updatedAt(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        userHistoryRepository.saveAll(userHistories);
     }
 
     private void saveUser() {
