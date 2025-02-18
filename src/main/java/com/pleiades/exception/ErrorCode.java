@@ -11,6 +11,7 @@ public enum ErrorCode {
     MISSING_AUTH_HEADER(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header"),
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "Access denied"),
     FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "You are not a member of this station."),
+    USER_NOT_IN_STATION(HttpStatus.NOT_FOUND, "Target User is not in a station"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
     USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station"),

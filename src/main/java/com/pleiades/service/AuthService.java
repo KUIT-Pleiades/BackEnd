@@ -281,6 +281,6 @@ public class AuthService {
         UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
 
-        if (userStation.isEmpty()) { throw new CustomException(ErrorCode.FORBIDDEN_MEMBER); }
+        if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }
     }
 }
