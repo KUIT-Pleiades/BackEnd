@@ -34,34 +34,6 @@ import java.util.Optional;
 public class UserStationController {
 
     private final UserStationService userStationService;
-    private final AuthService authService;
-    private final StationQuestionRepository stationQuestionRepository;
-    private final UserRepository userRepository;
-    private final ReportService reportService;
-    private final StationRepository stationRepository;
-    private final StationReportRepository stationReportRepository;
-
-    @GetMapping("/{stationId}/users/{userId}/report")
-    public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationId, email);
-
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
-
-        Station station = stationRepository.findById(stationId).get();
-        Question question = reportService.todaysQuestion(station);
-
-        Report report = reportService.searchUserQuestion(user.get(), question);
-        if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "User never responded this question")); }
-
-        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(stationId, report.getId());
-        if (stationReport.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
-
-        ReportDto reportDto = reportService.reportToDto(report);
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
-    }
 
     @PatchMapping("/{station_id}/users/{user_id}/position")
     public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
