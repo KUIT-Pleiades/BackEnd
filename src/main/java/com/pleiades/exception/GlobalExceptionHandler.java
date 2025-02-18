@@ -9,7 +9,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatusCode().value(), ex.getErrorMessage());
+        ErrorResponse errorResponse = new ErrorResponse(ex.getErrorMessage());
         return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
     }
 }
