@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/histories")
-    public ResponseEntity<List<SearchUserDto>> searchUserHistory(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> searchUserHistory(HttpServletRequest request) {
         log.info("search user history controller 진입");
 
         String email = (String) request.getAttribute("email");
@@ -40,7 +40,7 @@ public class UserController {
 
         List<SearchUserDto> searchResult = userService.searchUserHistory(email);
 
-        return ResponseEntity.ok(searchResult);
+        return ResponseEntity.ok(Map.of("users", searchResult));
     }
 
     @PostMapping("/histories")
