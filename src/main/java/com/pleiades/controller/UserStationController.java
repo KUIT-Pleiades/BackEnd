@@ -4,11 +4,12 @@ import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
-import com.pleiades.entity.Question;
-import com.pleiades.entity.Report;
-import com.pleiades.entity.StationQuestion;
-import com.pleiades.entity.User;
+import com.pleiades.entity.*;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.StationQuestionRepository;
+import com.pleiades.repository.StationReportRepository;
+import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.ReportService;
@@ -37,33 +38,29 @@ public class UserStationController {
     private final StationQuestionRepository stationQuestionRepository;
     private final UserRepository userRepository;
     private final ReportService reportService;
+    private final StationRepository stationRepository;
+    private final StationReportRepository stationReportRepository;
 
     @GetMapping("/{stationId}/users/{userId}/report")
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
-        ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
-
-        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(stationId);
-        List<ReportDto> reportDtos = new ArrayList<>();
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
 
         Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
 
-        for (StationQuestion stationQuestion : stationQuestions) {
-            Question question = stationQuestion.getQuestion();
+        Station station = stationRepository.findById(stationId).get();
+        Question question = reportService.todaysQuestion(station);
 
-            Report report = reportService.searchUserQuestion(user.get(), question);
-            ReportDto reportDto = new ReportDto();
-            reportDto.setReportId(report.getId());
-            reportDto.setReportId(report.getQuestion().getId());
-            reportDto.setQuestion(report.getQuestion().getQuestion());
-            reportDto.setAnswer(report.getAnswer());
-            reportDto.setCreatedAt(report.getCreatedAt());
-            reportDto.setModifiedAt(report.getModifiedAt());
-            reportDtos.add(reportDto);
-        }
+        Report report = reportService.searchUserQuestion(user.get(), question);
+        if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "User never responded this question")); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDtos));
+        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(stationId, report.getId());
+        if (stationReport.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
+
+        ReportDto reportDto = reportService.reportToDto(report);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }
 
     @PatchMapping("/{station_id}/users/{user_id}/position")
