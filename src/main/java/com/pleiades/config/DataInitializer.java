@@ -76,6 +76,7 @@ public class DataInitializer {
     private final ReportRepository reportRepository;
     private final StationBackgroundRepository stationBackgroundRepository;
     private final StationQuestionRepository stationQuestionRepository;
+    private final StationReportRepository stationReportRepository;
 
 
     @PostConstruct
@@ -95,6 +96,7 @@ public class DataInitializer {
         saveUserStation();
         saveStationQuestion();
         saveUserHistory();
+        saveStationReport();
     }
 
     private void saveNaverToken(){
@@ -394,6 +396,28 @@ public class DataInitializer {
                 StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDate.now()).build()
         );
         stationQuestionRepository.saveAll(stationQuestions);
+    }
+
+    private void saveStationReport() {
+        List<Station> stations = stationRepository.findAll();
+        List<Report> reports = reportRepository.findAll();
+
+        List<StationReport> stationReports = List.of(
+                StationReport.builder().station(stations.get(0)).report(reports.get(0)).build(),
+                StationReport.builder().station(stations.get(0)).report(reports.get(5)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(1)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(6)).build(),
+                StationReport.builder().station(stations.get(1)).report(reports.get(11)).build(),
+                StationReport.builder().station(stations.get(2)).report(reports.get(2)).build(),
+                StationReport.builder().station(stations.get(2)).report(reports.get(12)).build(),
+                StationReport.builder().station(stations.get(3)).report(reports.get(3)).build(),
+                StationReport.builder().station(stations.get(3)).report(reports.get(8)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(4)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(19)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(24)).build(),
+                StationReport.builder().station(stations.get(4)).report(reports.get(34)).build()
+        );
+       stationReportRepository.saveAll(stationReports);
     }
 
     // 초기 데이터
