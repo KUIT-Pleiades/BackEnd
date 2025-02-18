@@ -95,7 +95,7 @@ public class StationController {
         Question question = reportService.todaysQuestion(station);
         Report report = reportService.searchUserQuestion(user, question);
 
-        if (report == null) { return ResponseEntity.status(HttpStatus.OK).build(); }
+        if (report == null) { return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").build(); }
 
         ReportDto reportDto = reportService.reportToDto(report);
 
