@@ -20,6 +20,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -92,7 +93,7 @@ public class StationController {
         if (report == null) { return ResponseEntity.status(HttpStatus.OK).build(); }
 
         ReportDto reportDto = reportService.reportToDto(report);
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report", reportDto));
     }
 
     @PatchMapping("/{stationId}/report")
