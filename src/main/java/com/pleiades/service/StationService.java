@@ -83,7 +83,7 @@ public class StationService {
         String stationId = generateUniqueStationCode();
         StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getStationBackground()).orElse(null);
         if (stationBackground == null) {
-            stationBackground = new StationBackground(null, "station_01", null);
+            stationBackground = stationBackgroundRepository.findByName("station_01").orElseThrow();
         }
 
         Station station = Station.builder()
