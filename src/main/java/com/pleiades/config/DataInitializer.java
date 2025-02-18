@@ -323,7 +323,14 @@ public class DataInitializer {
     }
 
     private void saveReport() {
-        User user = userRepository.findById("user1").orElseThrow(null);
+        User user1 = userRepository.findById("user1").orElseThrow(null);
+        User user2 = userRepository.findById("user2").orElseThrow(null);
+        User user3 = userRepository.findById("user3").orElseThrow(null);
+        User user4 = userRepository.findById("user4").orElseThrow(null);
+        User user5 = userRepository.findById("user5").orElseThrow(null);
+        User user6 = userRepository.findById("user6").orElseThrow(null);
+        User user7 = userRepository.findById("user7").orElseThrow(null);
+
         Question question1 = questionRepository.findById(1L).orElseThrow(null);
         Question question2 = questionRepository.findById(2L).orElseThrow(null);
         Question question3 = questionRepository.findById(3L).orElseThrow(null);
@@ -331,11 +338,47 @@ public class DataInitializer {
         Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                Report.builder().user(user).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question5).written(false).createdAt(LocalDateTime.now()).build()
+                Report.builder().user(user1).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user2).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user3).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user4).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user5).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user6).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+
+                Report.builder().user(user7).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user7).question(question5).written(false).createdAt(LocalDateTime.now()).build()
         );
         reportRepository.saveAll(reports);
     }
