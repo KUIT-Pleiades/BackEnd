@@ -6,6 +6,8 @@ import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.ReportService;
@@ -77,10 +79,13 @@ public class StationController {
     }
 
     @GetMapping("/{stationId}/report")
-    public ResponseEntity<Map<String, Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<ReportDto> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
         ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) { return response; }
+        if (response != null) {
+            throw new CustomException(ErrorCode.REPORT_REQUIRED);
+//            return response;
+        }
 
         String email = authService.getEmailByAuthorization(authorization);
         User user = userRepository.findByEmail(email).get();
@@ -93,7 +98,8 @@ public class StationController {
         if (report == null) { return ResponseEntity.status(HttpStatus.OK).build(); }
 
         ReportDto reportDto = reportService.reportToDto(report);
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report", reportDto));
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(reportDto);
     }
 
     @PatchMapping("/{stationId}/report")
