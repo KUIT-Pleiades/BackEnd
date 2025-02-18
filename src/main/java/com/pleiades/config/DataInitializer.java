@@ -116,7 +116,6 @@ public class DataInitializer {
         naverTokenRepository.saveAll(naverTokens);
         naverTokenRepository.flush();
     }
-
     private void saveUserStation() {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
@@ -153,14 +152,14 @@ public class DataInitializer {
                         stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 // 네 번째 정거장 (VW0XYZ)
-                new UserStation(new UserStationId("user1", "VW0XYZ"), userRepository.findById("user1").orElseThrow(),
+                new UserStation(new UserStationId("hyungyu", "VW0XYZ"), userRepository.findById("hyungyu").orElseThrow(),
                         stationRepository.findById("VW0XYZ").orElseThrow(), true, LocalDateTime.now(), false, 25f, 50f),
 
                 new UserStation(new UserStationId("user2", "VW0XYZ"), userRepository.findById("user2").orElseThrow(),
                         stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 50f, 50f),
 
                 // 다섯 번째 정거장 (LYHENO)
-                new UserStation(new UserStationId("user1", "LYHENO"), userRepository.findById("user1").orElseThrow(),
+                new UserStation(new UserStationId("user7", "LYHENO"), userRepository.findById("user7").orElseThrow(),
                         stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 25f, 50f),
 
                 new UserStation(new UserStationId("user4", "LYHENO"), userRepository.findById("user4").orElseThrow(),
@@ -194,11 +193,11 @@ public class DataInitializer {
     private void saveStation() {
         List<StationBackground> bgs = stationBackgroundRepository.findAll();
         List<Station> stations = List.of(
-                new Station("ABCDEF", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", LocalTime.of(9,0,0), bgs.get(0)),
-                new Station("BC123D", "플아데", "hi", 3, LocalDateTime.now(), "yuna1217", LocalTime.of(9,0,0),bgs.get(1)),
-                new Station("OPQ4R5", "플아데", "hi", 1, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
-                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "user1", LocalTime.of(9,0,0),bgs.get(0)),
-                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user2", LocalTime.of(9,0,0),bgs.get(3))
+                new Station("ABCDEF", "플아데", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0), bgs.get(0)),
+                new Station("BC123D", "플아데", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0),bgs.get(1)),
+                new Station("OPQ4R5", "플아데", "hi", 2, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
+                new Station("VW0XYZ", "플아데", "hi", 2, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(0)),
+                new Station("LYHENO", "플아데", "hi", 3, LocalDateTime.now(), "user7", LocalTime.of(9,0,0),bgs.get(3))
             );
         stationRepository.saveAll(stations);
         stationRepository.flush();
@@ -229,18 +228,18 @@ public class DataInitializer {
 
     private void saveUser() {
         List<User> users = List.of(
-                new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("yuna1217", "yuna569@naver.com", "yuna", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh", 0L),
-                new User("lylylylh", "yh81260@naver.com", "yoonhee", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1", 0L),
-                new User("hyungyu", "yona0209@naver.com", "현규", LocalDate.of(2002, 2, 9), LocalDate.of(2025, 2, 16), "profile_01", "character_01", "refresh", 0L),
-                new User("user1", "user1@naver.com", "person", LocalDate.of(2002, 1, 1), LocalDate.of(2025, 2, 1), "profile_02", "character_02", "refresh2", 0L),
-                new User("user2", "user2@naver.com", "jeongyoon", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_02", "character_02", "refresh2", 0L),
-                new User("user3", "user3@naver.com", "sejin", LocalDate.of(2002, 4, 17), LocalDate.of(2025, 2, 5), "profile_03", "character_03", "refresh3", 0L),
-                new User("user4", "user4@naver.com", "youngeun", LocalDate.of(2002, 12, 2), LocalDate.of(2025, 2, 3), "profile_04", "character_04", "refresh4", 0L),
-                new User("user5", "user5@naver.com", "sangeun", LocalDate.of(2002, 9, 27), LocalDate.of(2025, 2, 6), "profile_05", "character_05", "refresh5", 0L),
-                new User("user6", "user6@naver.com", "taeun", LocalDate.of(2002, 1, 3), LocalDate.of(2025, 2, 7), "profile_06", "character_06", "refresh6", 0L),
-                new User("user7", "user7@naver.com", "hayeon", LocalDate.of(2002, 11, 14), LocalDate.of(2025, 2, 4), "profile_07", "character_07", "refresh7", 0L)
+                new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
+                new User("yuna1217", "yuna569@naver.com", "윤아", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
+                new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
+                new User("lylylylh", "yh81260@naver.com", "윤희", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1"),
+                new User("hyungyu", "yona0209@naver.com", "현규", LocalDate.of(2002, 2, 9), LocalDate.of(2025, 2, 16), "profile_01", "character_01", "refresh"),
+                new User("user1", "user1@naver.com", "나연", LocalDate.of(2003, 9, 1), LocalDate.of(2025, 2, 1), "profile_02", "character_02", "refresh2"),
+                new User("user2", "user2@naver.com", "정윤", LocalDate.of(2002, 1, 29), LocalDate.of(2025, 2, 4), "profile_02", "character_02", "refresh2"),
+                new User("user3", "user3@naver.com", "세진", LocalDate.of(2002, 4, 17), LocalDate.of(2025, 2, 5), "profile_03", "character_03", "refresh3"),
+                new User("user4", "user4@naver.com", "영은", LocalDate.of(2002, 12, 2), LocalDate.of(2025, 2, 3), "profile_04", "character_04", "refresh4"),
+                new User("user5", "user5@naver.com", "상은", LocalDate.of(2002, 9, 27), LocalDate.of(2025, 2, 6), "profile_05", "character_05", "refresh5"),
+                new User("user6", "user6@naver.com", "태은", LocalDate.of(2002, 1, 3), LocalDate.of(2025, 2, 7), "profile_06", "character_06", "refresh6"),
+                new User("user7", "user7@naver.com", "하연", LocalDate.of(2002, 11, 14), LocalDate.of(2025, 2, 4), "profile_07", "character_07", "refresh7")
         );
 
         userRepository.saveAll(users);
@@ -323,11 +322,11 @@ public class DataInitializer {
         Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                Report.builder().user(user).question(question1).answer("첫 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question2).answer("두 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question3).answer("세 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question4).answer("네 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build(),
-                Report.builder().user(user).question(question5).answer("다섯 번째 답").written(true).createdAt(LocalDateTime.now()).modifiedAt(LocalDateTime.now()).build()
+                Report.builder().user(user).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user).question(question5).written(false).createdAt(LocalDateTime.now()).build()
         );
         reportRepository.saveAll(reports);
     }

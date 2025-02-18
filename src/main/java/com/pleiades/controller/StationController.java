@@ -120,6 +120,9 @@ public class StationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created - Same question answered before"));
         }
 
+        Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, user.getId());
+        userStation.get().setTodayReport(true);     // todo: false로 전환 필요
+
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
 
     }

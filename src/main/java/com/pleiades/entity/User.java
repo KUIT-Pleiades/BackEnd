@@ -45,6 +45,4 @@ public class User implements Serializable {
     @Column
     private String refreshToken;
 
-    @Column
-    Long answerNumber = 0L;
 }
