@@ -272,6 +272,26 @@ public class DataInitializer {
                         .sender(userRepository.findById("hyungyu").orElseThrow())
                         .receiver(userRepository.findById("user4").orElseThrow()).build(),
 
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("user5").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.PENDING).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("user6").orElseThrow())
+                        .receiver(userRepository.findById("hyungyu").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("user7").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("woogie").orElseThrow()).build(),
+
+                Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 9, 46, 5))
+                        .sender(userRepository.findById("hyungyu").orElseThrow())
+                        .receiver(userRepository.findById("danpung628").orElseThrow()).build(),
+
                 Friend.builder().status(FriendStatus.ACCEPTED).createdAt(LocalDateTime.of(2025, 2, 11, 19, 46, 5))
                         .sender(userRepository.findById("user3").orElseThrow())
                         .receiver(userRepository.findById("user1").orElseThrow()).build(),
