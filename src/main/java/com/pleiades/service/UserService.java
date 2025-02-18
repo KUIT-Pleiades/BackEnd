@@ -131,17 +131,7 @@ public class UserService {
     public List<SearchUserDto> searchUser(String userId, String email) {
         List<User> users = userRepository.findByIdContainingIgnoreCase(userId);
         User currentUser = getUserByEmail(email);
-
-        return users.stream()
-                .map(user -> {
-                    return new SearchUserDto(
-                            user.getId(),
-                            user.getUserName(),
-                            user.getProfileUrl(),
-                            null
-                    );
-                })
-                .toList();
+        return buildSearchUserDto(users, currentUser, true); // FriendStatus 포함
     }
 
     // 최근 검색 기록
@@ -154,36 +144,36 @@ public class UserService {
                 .map(UserHistory::getSearched)
                 .toList();
 
-        List<Friend> friends = searchedUsers.isEmpty() ? new ArrayList<>() :
-                friendRepository.findAllByUsersIn(currentUser, searchedUsers);
+        return buildSearchUserDto(searchedUsers, currentUser, false);
+    }
 
+    private List<SearchUserDto> buildSearchUserDto(List<User> users, User currentUser, boolean includeFriendStatus) {
         Map<User, String> friendStatusMap = new HashMap<>();
-        for (Friend friend : friends) {
-            if (friend.getSender().equals(currentUser)) {
-                if(friend.getStatus()==FriendStatus.PENDING)
-                    friendStatusMap.put(friend.getReceiver(), "SENT");
-                else if(friend.getStatus()==FriendStatus.ACCEPTED)
-                    friendStatusMap.put(friend.getReceiver(), "FRIEND");
-            }
-            else if(friend.getReceiver().equals(currentUser)) {
-                if(friend.getStatus()==FriendStatus.PENDING)
-                    friendStatusMap.put(friend.getSender(), "RECEIVED");
-                else if(friend.getStatus()==FriendStatus.ACCEPTED)
-                    friendStatusMap.put(friend.getSender(), "FRIEND");
+
+        if (includeFriendStatus) {
+            List<Friend> friends = users.isEmpty() ? new ArrayList<>() : friendRepository.findAllByUsersIn(currentUser, users);
+            for (Friend friend : friends) {
+                if (friend.getSender().equals(currentUser)) {
+                    if (friend.getStatus() == FriendStatus.PENDING)
+                        friendStatusMap.put(friend.getReceiver(), "SENT");
+                    else if (friend.getStatus() == FriendStatus.ACCEPTED)
+                        friendStatusMap.put(friend.getReceiver(), "FRIEND");
+                } else if (friend.getReceiver().equals(currentUser)) {
+                    if (friend.getStatus() == FriendStatus.PENDING)
+                        friendStatusMap.put(friend.getSender(), "RECEIVED");
+                    else if (friend.getStatus() == FriendStatus.ACCEPTED)
+                        friendStatusMap.put(friend.getSender(), "FRIEND");
+                }
             }
         }
-        return histories.stream()
-                .map(history -> {
-                    User searchedUser = history.getSearched();
-                    String status = friendStatusMap.getOrDefault(searchedUser, "JUSTHUMAN");
 
-                    return new SearchUserDto(
-                            searchedUser.getId(),
-                            searchedUser.getUserName(),
-                            searchedUser.getProfileUrl(),
-                            status
-                    );
-                })
+        return users.stream()
+                .map(user -> new SearchUserDto(
+                        user.getId(),
+                        user.getUserName(),
+                        user.getProfileUrl(),
+                        includeFriendStatus ? friendStatusMap.getOrDefault(user, "JUSTHUMAN") : null
+                ))
                 .toList();
     }
 

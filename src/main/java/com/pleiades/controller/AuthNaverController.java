@@ -7,6 +7,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.NaverLoginService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth/login")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "접속 권한 API")
 public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
