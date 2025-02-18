@@ -79,27 +79,23 @@ public class StationController {
     }
 
     @GetMapping("/{stationId}/report")
-    public ResponseEntity<ReportDto> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
         ResponseEntity<Map<String, Object>> response = authService.userInStation(stationId, authorization);
-        if (response != null) {
-            throw new CustomException(ErrorCode.REPORT_REQUIRED);
-//            return response;
-        }
+        if (response != null) { return response; }
 
         String email = authService.getEmailByAuthorization(authorization);
         User user = userRepository.findByEmail(email).get();
 
         Station station = stationRepository.findById(stationId).get();
+        Report report = reportService.searchTodaysReport(user, station);
 
-        Question question = reportService.todaysQuestion(station);
-        Report report = reportService.searchUserQuestion(user, question);
-
-        if (report == null) { return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").build(); }
+        // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
+        if (report == null) { return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("message","user needs to enter station")); }
 
         ReportDto reportDto = reportService.reportToDto(report);
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(reportDto);
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report",reportDto));
     }
 
     @PatchMapping("/{stationId}/report")
