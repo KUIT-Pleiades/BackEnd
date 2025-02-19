@@ -38,6 +38,7 @@ public class ReportService {
         List<Report> reports = reportRepository.findByUser(user);
         List<ReportDto> reportDtos = new ArrayList<>();
         for (Report report : reports) {
+            if (!report.isWritten()) continue;
             ReportDto reportDto = new ReportDto();
 
             reportDto.setReportId(report.getId());
