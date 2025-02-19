@@ -1,6 +1,7 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.CharacterDto;
+import com.pleiades.dto.ProfileSettingDto;
 import com.pleiades.dto.StarBackgroundDto;
 import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
@@ -76,6 +77,15 @@ public class HomeController {
         if (setCharacter == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no character")); }
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/settings/profile")
+    public ResponseEntity<Map<String, String>> profileSetting(HttpServletRequest request, @RequestBody ProfileSettingDto profileSettingDto) {
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
+        Map<String, String> response = userService.setProfile(email, profileSettingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/settings/background")

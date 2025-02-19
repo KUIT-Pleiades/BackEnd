@@ -19,7 +19,8 @@ public enum ErrorCode {
     REPORT_REQUIRED(HttpStatus.ACCEPTED, "You must submit a report before entering this station."),
     STATION_FULL(HttpStatus.CONFLICT, "Station Full. You cannot enter the station."),
     USER_NEVER_ENTERED_STATION(HttpStatus.NOT_ACCEPTABLE, "User never entered the station."),
-    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found");
+    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
+    INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information");
 
     private final HttpStatus status;
     private final String message;

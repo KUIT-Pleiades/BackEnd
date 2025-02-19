@@ -1,5 +1,6 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.ProfileSettingDto;
 import com.pleiades.dto.SearchUserDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
@@ -67,7 +68,24 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+    }
+
+    @Transactional
+    public Map<String, String> setProfile(String email, ProfileSettingDto profileSettingDto){
+        User user = getUserByEmail(email);
+        if (profileSettingDto.getUserId() != null
+        && profileSettingDto.getUserName() != null
+        && profileSettingDto.getBirthDate() != null) {
+            user.setId(profileSettingDto.getUserId());
+            user.setUserName(profileSettingDto.getUserName());
+            user.setBirthDate(profileSettingDto.getBirthDate());
+        }
+        else{
+            throw new CustomException(ErrorCode.INFORMATION_NOT_VALID);
+        }
+        userRepository.save(user);
+        return Map.of("message","profile setting success");
     }
 
     @Transactional
