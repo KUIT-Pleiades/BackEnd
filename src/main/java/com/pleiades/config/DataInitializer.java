@@ -21,6 +21,7 @@ import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -123,72 +124,72 @@ public class DataInitializer {
         List<UserStation> userStations = List.of(
                 // 첫 번째 정거장 (ABCDEF)
                 new UserStation(new UserStationId("user1", "ABCDEF"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("user2", "ABCDEF"), userRepository.findById("user2").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 35f, 40f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 40f),
 
                 new UserStation(new UserStationId("danpung628", "ABCDEF"), userRepository.findById("danpung628").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 60f, 40f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTimeUtil.now(), false, 60f, 40f),
 
                 new UserStation(new UserStationId("hyungyu", "ABCDEF"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTime.now(), false, 10f, 60f),
+                        stationRepository.findById("ABCDEF").orElseThrow(), false, LocalDateTimeUtil.now(), false, 10f, 60f),
 
                 // 두 번째 정거장 (BC123D)
                 new UserStation(new UserStationId("user1", "BC123D"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("BC123D").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("BC123D").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("user2", "BC123D"), userRepository.findById("user2").orElseThrow(),
-                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 35f, 40f),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 40f),
 
                 new UserStation(new UserStationId("user3", "BC123D"), userRepository.findById("user3").orElseThrow(),
-                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 60f, 40f),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTimeUtil.now(), false, 60f, 40f),
 
                 new UserStation(new UserStationId("hyungyu", "BC123D"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTime.now(), false, 10f, 60f),
+                        stationRepository.findById("BC123D").orElseThrow(), false, LocalDateTimeUtil.now(), false, 10f, 60f),
 
                 // 세 번째 정거장 (OPQ4R5)
                 new UserStation(new UserStationId("user3", "OPQ4R5"), userRepository.findById("user3").orElseThrow(),
-                        stationRepository.findById("OPQ4R5").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("hyungyu", "OPQ4R5"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 35f, 40f),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 40f),
 
                 new UserStation(new UserStationId("user1", "OPQ4R5"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTime.now(), false, 60f, 40f),
+                        stationRepository.findById("OPQ4R5").orElseThrow(), false, LocalDateTimeUtil.now(), false, 60f, 40f),
 
                 // 네 번째 정거장 (VW0XYZ)
                 new UserStation(new UserStationId("hyungyu", "VW0XYZ"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("VW0XYZ").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("user2", "VW0XYZ"), userRepository.findById("user2").orElseThrow(),
-                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 35f, 40f),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 40f),
 
                 new UserStation(new UserStationId("user1", "VW0XYZ"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTime.now(), false, 60f, 40f),
+                        stationRepository.findById("VW0XYZ").orElseThrow(), false, LocalDateTimeUtil.now(), false, 60f, 40f),
 
                 // 다섯 번째 정거장 (LYHENO)
                 new UserStation(new UserStationId("user7", "LYHENO"), userRepository.findById("user7").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("LYHENO").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("user4", "LYHENO"), userRepository.findById("user4").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 35f, 40f),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 40f),
 
                 new UserStation(new UserStationId("user5", "LYHENO"), userRepository.findById("user5").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 60f, 40f),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTimeUtil.now(), false, 60f, 40f),
 
                 new UserStation(new UserStationId("user1", "LYHENO"), userRepository.findById("user1").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 10f, 60f),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTimeUtil.now(), false, 10f, 60f),
 
                 new UserStation(new UserStationId("hyungyu", "LYHENO"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTime.now(), false, 35f, 60f),
+                        stationRepository.findById("LYHENO").orElseThrow(), false, LocalDateTimeUtil.now(), false, 35f, 60f),
 
                 // 현규 정거장
                 new UserStation(new UserStationId("hyungyu", "QWERTY"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("QWERTY").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f),
+                        stationRepository.findById("QWERTY").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f),
 
                 new UserStation(new UserStationId("hyungyu", "QWERYT"), userRepository.findById("hyungyu").orElseThrow(),
-                        stationRepository.findById("QWERYT").orElseThrow(), true, LocalDateTime.now(), false, 10f, 40f)
+                        stationRepository.findById("QWERYT").orElseThrow(), true, LocalDateTimeUtil.now(), false, 10f, 40f)
                 );
         userStationRepository.saveAll(userStations);
     }
@@ -216,13 +217,13 @@ public class DataInitializer {
     private void saveStation() {
         List<StationBackground> bgs = stationBackgroundRepository.findAll();
         List<Station> stations = List.of(
-                new Station("ABCDEF", "플아데", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0), bgs.get(0)),
-                new Station("BC123D", "컴공22", "hi", 4, LocalDateTime.now(), "user1", LocalTime.of(9,0,0),bgs.get(1)),
-                new Station("OPQ4R5", "귀요미들", "hi", 3, LocalDateTime.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
-                new Station("VW0XYZ", "넵", "hi", 3, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(0)),
-                new Station("LYHENO", "꺅", "hi", 5, LocalDateTime.now(), "user7", LocalTime.of(9,0,0),bgs.get(3)),
-                new Station("QWERTY", "정거장이다", "hi", 1, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(1)),
-                new Station("QWERYT", "오", "hi", 1, LocalDateTime.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(2))
+                new Station("ABCDEF", "플아데", "hi", 4, LocalDateTimeUtil.now(), "user1", LocalTime.of(9,0,0), bgs.get(0)),
+                new Station("BC123D", "컴공22", "hi", 4, LocalDateTimeUtil.now(), "user1", LocalTime.of(9,0,0),bgs.get(1)),
+                new Station("OPQ4R5", "귀요미들", "hi", 3, LocalDateTimeUtil.now(), "user3", LocalTime.of(9,0,0),bgs.get(2)),
+                new Station("VW0XYZ", "넵", "hi", 3, LocalDateTimeUtil.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(0)),
+                new Station("LYHENO", "꺅", "hi", 5, LocalDateTimeUtil.now(), "user7", LocalTime.of(9,0,0),bgs.get(3)),
+                new Station("QWERTY", "정거장이다", "hi", 1, LocalDateTimeUtil.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(1)),
+                new Station("QWERYT", "오", "hi", 1, LocalDateTimeUtil.now(), "hyungyu", LocalTime.of(9,0,0),bgs.get(2))
         );
         stationRepository.saveAll(stations);
         stationRepository.flush();
@@ -244,7 +245,7 @@ public class DataInitializer {
                         .searched(user)
                         .searchCount(1) // 검색 횟수 초기값
                         .isFriend(friendRepository.isFriend(hyungyu, user, FriendStatus.ACCEPTED))
-                        .updatedAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTimeUtil.now())
                         .build())
                 .toList();
 
@@ -374,47 +375,47 @@ public class DataInitializer {
         Question question5 = questionRepository.findById(5L).orElseThrow(null);
 
         List<Report> reports = List.of(
-                Report.builder().user(user1).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user1).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user1).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user1).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user1).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user1).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user1).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user1).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user1).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user1).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user2).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user2).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user2).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user2).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user2).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user2).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user2).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user2).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user2).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user2).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user3).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user3).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user3).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user3).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user3).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user3).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user3).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user3).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user3).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user3).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user4).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user4).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user4).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user4).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user4).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user4).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user4).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user4).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user4).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user4).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user5).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user5).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user5).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user5).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user5).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user5).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user5).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user5).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user5).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user5).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user6).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user6).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user6).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user6).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user6).question(question5).written(false).createdAt(LocalDateTime.now()).build(),
+                Report.builder().user(user6).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user6).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user6).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user6).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user6).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build(),
 
-                Report.builder().user(user7).question(question1).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user7).question(question2).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user7).question(question3).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user7).question(question4).written(false).createdAt(LocalDateTime.now()).build(),
-                Report.builder().user(user7).question(question5).written(false).createdAt(LocalDateTime.now()).build()
+                Report.builder().user(user7).question(question1).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user7).question(question2).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user7).question(question3).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user7).question(question4).written(false).createdAt(LocalDateTimeUtil.now()).build(),
+                Report.builder().user(user7).question(question5).written(false).createdAt(LocalDateTimeUtil.now()).build()
         );
         reportRepository.saveAll(reports);
     }
@@ -423,11 +424,11 @@ public class DataInitializer {
         List<Station> stations = stationRepository.findAll();
         List<Question> questions = questionRepository.findAll();
         List<StationQuestion> stationQuestions = List.of(
-                StationQuestion.builder().station(stations.get(0)).question(questions.get(0)).createdAt(LocalDate.now()).build(),
-                StationQuestion.builder().station(stations.get(1)).question(questions.get(1)).createdAt(LocalDate.now()).build(),
-                StationQuestion.builder().station(stations.get(2)).question(questions.get(2)).createdAt(LocalDate.now()).build(),
-                StationQuestion.builder().station(stations.get(3)).question(questions.get(3)).createdAt(LocalDate.now()).build(),
-                StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDate.now()).build()
+                StationQuestion.builder().station(stations.get(0)).question(questions.get(0)).createdAt(LocalDateTimeUtil.today()).build(),
+                StationQuestion.builder().station(stations.get(1)).question(questions.get(1)).createdAt(LocalDateTimeUtil.today()).build(),
+                StationQuestion.builder().station(stations.get(2)).question(questions.get(2)).createdAt(LocalDateTimeUtil.today()).build(),
+                StationQuestion.builder().station(stations.get(3)).question(questions.get(3)).createdAt(LocalDateTimeUtil.today()).build(),
+                StationQuestion.builder().station(stations.get(4)).question(questions.get(4)).createdAt(LocalDateTimeUtil.today()).build()
         );
         stationQuestionRepository.saveAll(stationQuestions);
     }
