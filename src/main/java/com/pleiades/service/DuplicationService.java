@@ -21,19 +21,19 @@ public class DuplicationService<T> {
         return object.isPresent()? ValidationStatus.NOT_VALID:ValidationStatus.VALID;
     }
 
-    public ResponseEntity<Map<String, String>> responseIdDuplication(String id) {
-        Map<String, String> body = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> responseIdDuplication(String id) {
+        Map<String, Object> body = new HashMap<>();
         ValidationStatus idValidation = checkIdDuplication(id);
 
         if (idValidation == ValidationStatus.NOT_VALID) {
-            body.put("available", "false");
+            body.put("available", false);
             body.put("message", "The username is already taken.");
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(body);
         }
 
-        body.put("available", "true");
+        body.put("available", true);
         body.put("message", "The username is available.");
         return ResponseEntity
                 .status(HttpStatus.OK)
