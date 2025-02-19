@@ -204,8 +204,8 @@ public class DataInitializer {
                 Star.builder().user(users.get(5)).background(starBackgrounds.get(0)).build(),
                 Star.builder().user(users.get(6)).background(starBackgrounds.get(1)).build(),
                 Star.builder().user(users.get(7)).background(starBackgrounds.get(2)).build(),
-                Star.builder().user(users.get(8)).background(starBackgrounds.get(3)).build(),
-                Star.builder().user(users.get(9)).background(starBackgrounds.get(4)).build()
+                Star.builder().user(users.get(8)).background(starBackgrounds.get(3)).build()
+//                Star.builder().user(users.get(9)).background(starBackgrounds.get(4)).build()
                 // Star.builder().user(users.get(10)).background(starBackgrounds.get(0)).build(),
                 // Star.builder().user(users.get(11)).background(starBackgrounds.get(1)).build()
         );
@@ -252,7 +252,7 @@ public class DataInitializer {
     private void saveUser() {
         List<User> users = List.of(
                 //new User("woogie", "wook2442@naver.com", "강연욱이", LocalDate.of(2000, 2, 4), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
-                new User("yuna1217", "yuna569@naver.com", "윤아", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
+//                new User("yuna1217", "yuna569@naver.com", "윤아", LocalDate.of(2003, 12, 17), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
                 new User("danpung628", "danpung628@gmail.com", "원우", LocalDate.of(2000, 6, 28), LocalDate.of(2025, 2, 14), "profile_01", "character_01", "refresh"),
                 //new User("lylylylh", "yh81260@naver.com", "윤희", LocalDate.of(2002, 10, 4), LocalDate.of(2025, 2, 3), "profile_01", "character_01", "refresh1"),
                 new User("hyungyu", "yona0209@naver.com", "현규", LocalDate.of(2002, 2, 9), LocalDate.of(2025, 2, 16), "profile_01", "character_01", "refresh"),
