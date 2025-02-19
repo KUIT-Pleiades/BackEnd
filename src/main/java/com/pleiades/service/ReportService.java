@@ -151,6 +151,7 @@ public class ReportService {
             if (stationQuestion.getCreatedAt().equals(LocalDate.now())) {
                 Question question = questionRepository.findById(stationQuestion.getQuestion().getId()).get();
                 report = searchUserQuestion(user, question);
+                if (report == null) { return report; }
                 Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
                 if (stationReport.isEmpty()) { return null; }
             }
