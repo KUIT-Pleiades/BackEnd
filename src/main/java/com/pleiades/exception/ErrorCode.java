@@ -20,7 +20,8 @@ public enum ErrorCode {
     STATION_FULL(HttpStatus.CONFLICT, "Station Full. You cannot enter the station."),
     USER_NEVER_ENTERED_STATION(HttpStatus.NOT_ACCEPTABLE, "User never entered the station."),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
-    INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information");
+    INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information"),
+    ALREADY_RECEIVED_FRIEND_REQUEST(HttpStatus.CONFLICT, "You already received a friend request");
 
     private final HttpStatus status;
     private final String message;

@@ -105,10 +105,15 @@ public class FriendService {
         }
 
         // 이미 친구 요청 보낸 경우
-        Optional<Friend> optionalFriend = friendRepository.findBySenderAndReceiver(sender,receiver);
+        Optional<Friend> iamAlreadySender = friendRepository.findBySenderAndReceiver(sender,receiver);
+        Optional<Friend> iamAlreadyReceiver = friendRepository.findBySenderAndReceiver(receiver, sender);
 
-        if(optionalFriend.isPresent()){
-            Friend existingFriend = optionalFriend.get();
+        if(iamAlreadyReceiver.isPresent()){
+            throw new CustomException(ErrorCode.ALREADY_RECEIVED_FRIEND_REQUEST);
+        }
+
+        if(iamAlreadySender.isPresent()){
+            Friend existingFriend = iamAlreadySender.get();
 
             // REJECTED -> PENDING
             if(existingFriend.getStatus().equals(FriendStatus.REJECTED)){
