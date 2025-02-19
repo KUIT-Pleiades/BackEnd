@@ -31,8 +31,6 @@ public class StationReportController {
     private final UserRepository userRepository;
     private final ReportService reportService;
     private final StationRepository stationRepository;
-    private final StationReportRepository stationReportRepository;
-    private final UserStationRepository userStationRepository;
 
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
@@ -58,11 +56,9 @@ public class StationReportController {
         log.info("PATCH /stations/{}/report", stationId);
 
         String email = authService.getEmailByAuthorization(authorization);
-
         authService.userInStation(stationId, email);
 
         User user = userRepository.findByEmail(email).get();
-
         Station station = stationRepository.findById(stationId).get();
 
         String answer = body.get("answer").toString();
@@ -72,9 +68,6 @@ public class StationReportController {
         if (updateReport == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created"));
         }
-
-        Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, user.getId());
-        userStation.get().setTodayReport(true);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
@@ -92,13 +85,7 @@ public class StationReportController {
 
         if (report == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
 
-        ReportDto reportDto = new ReportDto();
-        reportDto.setReportId(report.getId());
-        reportDto.setQuestionId(report.getQuestion().getId());
-        reportDto.setQuestion(report.getQuestion().getQuestion());
-        reportDto.setAnswer(report.getAnswer());
-        reportDto.setCreatedAt(report.getCreatedAt());
-        reportDto.setModifiedAt(LocalDateTime.now());
+        ReportDto reportDto = reportService.reportToDto(report);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }
@@ -112,13 +99,9 @@ public class StationReportController {
         if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
 
         Station station = stationRepository.findById(stationId).get();
-        Question question = reportService.todaysQuestion(station);
+        Report report = reportService.searchTodaysReport(user.get(), station);
 
-        Report report = reportService.searchUserQuestion(user.get(), question);
-        if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message", "User never responded this question")); }
-
-        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(stationId, report.getId());
-        if (stationReport.isEmpty()) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
+        if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 
         ReportDto reportDto = reportService.reportToDto(report);
 
