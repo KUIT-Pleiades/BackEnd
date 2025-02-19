@@ -85,6 +85,11 @@ public class FriendService {
         // receiver
         User receiver = userRepository.findById(receiverId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        // sender == receiver
+        if(sender == receiver){
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+
         // 이미 친구 요청 보낸 경우
         Optional<Friend> optionalFriend = friendRepository.findBySenderAndReceiver(sender,receiver);
 

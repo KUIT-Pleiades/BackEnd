@@ -186,6 +186,7 @@ public class UserService {
         }
 
         return users.stream()
+                .filter(user -> !user.equals(currentUser))
                 .map(user -> new SearchUserDto(
                         user.getId(),
                         user.getUserName(),
