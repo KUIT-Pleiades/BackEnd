@@ -103,7 +103,7 @@ public class DataInitializer {
         List<NaverToken> naverTokens = List.of(
 
                 //new NaverToken(null,null, "wook2442@naver.com", null, "refresh1", 1L),
-                new NaverToken(null, null, "yuna569@naver.com", null, "refresh2", 1L),
+//                new NaverToken(null, null, "yuna569@naver.com", null, "refresh2", 1L),
                 new NaverToken(null, null, "danpung628@gmail.com", null, "refresh3", 1L),
                 // new NaverToken(null, null, "yh81260@naver.com", null, "refresh4", 1L),
                 new NaverToken(null, null, "yona0209@naver.com", null, "refresh5", 1L),
