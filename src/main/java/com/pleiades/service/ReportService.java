@@ -151,6 +151,8 @@ public class ReportService {
             if (stationQuestion.getCreatedAt().equals(LocalDate.now())) {
                 Question question = questionRepository.findById(stationQuestion.getQuestion().getId()).get();
                 report = searchUserQuestion(user, question);
+                Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
+                if (stationReport.isEmpty()) { return null; }
             }
         }
 
@@ -220,8 +222,6 @@ public class ReportService {
 
         // 이전에 답변한 적 있는 질문
         if (existingReport != null) {
-            // existingReport.setCreatedAt(LocalDateTime.now());
-            // existingReport.setModifiedAt(LocalDateTime.now());
             reportRepository.save(existingReport);
             stationReport.setReport(existingReport);
             stationReportRepository.save(stationReport);
@@ -231,7 +231,6 @@ public class ReportService {
 
         Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTime.now()).build();
         reportRepository.save(report);
-        stationReport.setStation(station);
         stationReport.setReport(report);
         stationReportRepository.save(stationReport);
 
@@ -259,12 +258,9 @@ public class ReportService {
     public ValidationStatus updateTodaysReport(User user, Station station, String answer) {
         log.info("updateTodaysReport");
 
+        // 사용자가 오늘의 리포트를 생성한 적 없음
         Report report = searchTodaysReport(user, station);
         if (report == null) { return ValidationStatus.NONE; }
-
-        // 만약에 사용자가 이전에 답변했던 질문이 오늘 떴는데, createReport하기 전에 update를 하게 되면? 안 되니까~ 검증
-        Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
-        if (stationReport.isEmpty()) { return ValidationStatus.NOT_VALID; }
 
         report.setAnswer(answer);
         report.setModifiedAt(LocalDateTime.now());
