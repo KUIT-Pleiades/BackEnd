@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -37,7 +34,7 @@ public class ReportService {
     }
 
     public List<ReportDto> getAllReports(User user) {
-        List<Report> reports = reportRepository.findByUser(user);
+        List<Report> reports = reportRepository.findByUserOrderByCreatedAtDesc(user);
         List<ReportDto> reportDtos = new ArrayList<>();
         for (Report report : reports) {
             if (!report.isWritten()) continue;
@@ -70,9 +67,6 @@ public class ReportService {
         if (report.isEmpty()) { return ValidationStatus.NONE; }
 
         if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
-
-        LocalDateTime now = LocalDateTimeUtil.now();
-        LocalDateTime createdAt = report.get().getCreatedAt();
 
         if (isTodayReport(report.get())) { return ValidationStatus.DUPLICATE; }
 
