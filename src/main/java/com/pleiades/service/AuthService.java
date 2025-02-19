@@ -165,7 +165,7 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(email);
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-        Optional<Characters> character = characterRepository.findByUser(user.get());
+//        Optional<Characters> character = characterRepository.findByUser(user.get());
 
         String profileUrl = user.get().getProfileUrl();
         String characterUrl = user.get().getCharacterUrl();
@@ -174,8 +174,8 @@ public class AuthService {
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
         body.put("backgroundName", starBackground.get().getName());
-        body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
-        body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
+        body.put("profile", profileUrl);
+        body.put("character", characterUrl);
 
         log.info("body: " + body);
 
@@ -197,7 +197,7 @@ public class AuthService {
 
         Optional<Star> star = starRepository.findByUserId(friend.getId());
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-        Optional<Characters> character = characterRepository.findByUser(friend);
+//        Optional<Characters> character = characterRepository.findByUser(friend);
 
         String profileUrl = friend.getProfileUrl();
         String characterUrl = friend.getCharacterUrl();
@@ -205,9 +205,9 @@ public class AuthService {
         body.put("userId", friend.getId());
         body.put("userName", friend.getUserName());
         body.put("birthDate", friend.getBirthDate());
-        body.put("starBackground", "background_01");   // starBackground.get().getName()
-        body.put("profile", "QmURNcGX98UAecKyEELM39117X7RwQZE8B1dtm56B4vxEJ");    // todo: characterUrl
-        body.put("character", "QmWC4899NqLPTqMSVFNZS5qzSUvCH1agcCdRzRrFe1um85");    // todo: profileUrl
+        body.put("starBackground", starBackground.get().getName());
+        body.put("profile", profileUrl);    // todo: characterUrl
+        body.put("character", characterUrl);    // todo: profileUrl
 
         log.info("body: " + body);
 
