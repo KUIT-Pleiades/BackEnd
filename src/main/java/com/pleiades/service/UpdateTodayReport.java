@@ -17,7 +17,7 @@ public class UpdateTodayReport {
         this.userStationRepository = userStationRepository;
     }
 
-    @Scheduled(cron = "0 13 2 * * ?", zone = "Asia/Seoul") // 매일 자정(00:00:00)에 실행
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Seoul") // 매일 자정(00:00:00)에 실행
     public void resetAllFields() {
         userStations = userStationRepository.findAll();
         for (UserStation userStation : userStations) {
