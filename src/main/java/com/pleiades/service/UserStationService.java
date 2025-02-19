@@ -157,8 +157,8 @@ public class UserStationService {
             throw new CustomException(ErrorCode.STATION_FULL);
         }
         // 입장 순서에 따른 X, Y 좌표 설정
-        float[] xPositions = {25f, 50f, 75f};
-        float[] yPositions = {50f, 70f};
+        float[] xPositions = {5f, 35f, 65f};
+        float[] yPositions = {40f, 60f};
 
         float positionX = xPositions[currentMembers % 3];
         float positionY = yPositions[currentMembers / 3];
