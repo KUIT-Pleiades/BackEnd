@@ -6,22 +6,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 public class UpdateTodayReport {
     private final UserStationRepository userStationRepository;
-    private List<UserStation> userStations = new CopyOnWriteArrayList<>();
+    private List<UserStation> userStations;
 
     public UpdateTodayReport(UserStationRepository userStationRepository) {
         userStations = userStationRepository.findAll();
         this.userStationRepository = userStationRepository;
     }
 
-    @Scheduled(cron = "0 51 1 * * ?") // 매일 자정(00:00:00)에 실행
+    @Scheduled(cron = "0 12 2 * * ?", zone = "Asia/Seoul") // 매일 자정(00:00:00)에 실행
     public void resetAllFields() {
-        List<UserStation> instances = userStationRepository.findAll();
-        userStations.addAll(instances);
+        userStations = userStationRepository.findAll();
         for (UserStation userStation : userStations) {
             userStation.setTodayReport(false);
             userStationRepository.save(userStation);
