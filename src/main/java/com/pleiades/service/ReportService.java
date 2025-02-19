@@ -1,6 +1,7 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.ReportDto;
+import com.pleiades.dto.ReportListDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
@@ -12,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -36,20 +34,15 @@ public class ReportService {
     }
 
     public List<ReportDto> getAllReports(User user) {
-        List<Report> reports = reportRepository.findByUser(user);
+        List<Report> reports = reportRepository.findByUserOrderByCreatedAtDesc(user);
         List<ReportDto> reportDtos = new ArrayList<>();
         for (Report report : reports) {
             if (!report.isWritten()) continue;
-            ReportDto reportDto = new ReportDto();
+            ReportDto reportDto = reportToDto(report);
+            ReportListDto reportListDto = new ReportListDto(reportDto);
+            reportListDto.setIsTodayReport(isTodayReport(report));
 
-            reportDto.setReportId(report.getId());
-            reportDto.setQuestionId(report.getQuestion().getId());
-            reportDto.setQuestion(report.getQuestion().getQuestion());
-            reportDto.setAnswer(report.getAnswer());
-            reportDto.setCreatedAt(report.getCreatedAt());
-            reportDto.setModifiedAt(report.getModifiedAt());
-
-            reportDtos.add(reportDto);
+            reportDtos.add(reportListDto);
         }
         return reportDtos;
     }
@@ -75,12 +68,7 @@ public class ReportService {
 
         if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
 
-        LocalDateTime now = LocalDateTimeUtil.now();
-        LocalDateTime createdAt = report.get().getCreatedAt();
-
-        Duration duration = Duration.between(createdAt, now);
-
-        if (duration.toHours() < 24) { return ValidationStatus.DUPLICATE; }
+        if (isTodayReport(report.get())) { return ValidationStatus.DUPLICATE; }
 
         reportRepository.delete(report.get());
         return ValidationStatus.VALID;
@@ -264,6 +252,20 @@ public class ReportService {
         userStationRepository.save(userStation.get());
 
         return ValidationStatus.VALID;
+    }
+
+    public Boolean isTodayReport(Report report) {
+        log.info("isTodayReport");
+        if (report == null) { log.info("no report"); return false; }
+        if (report.getModifiedAt() == null) { log.info("not modified"); return false; }
+        if (!report.getModifiedAt().toLocalDate().equals(LocalDateTimeUtil.today())) { log.info("localDate: {}", report.getModifiedAt().toLocalDate()); log.info("today: {}", LocalDateTimeUtil.today()); return false; }
+
+        List<StationReport> stationReports = stationReportRepository.findByReportId(report.getId());
+        for (StationReport stationReport : stationReports) {
+            if (todaysQuestion(stationReport.getStation()).equals(report.getQuestion())) { log.info("is today's report"); return true; }
+        }
+        log.info("is not today's report");
+        return false;
     }
 
     public ReportDto reportToDto(Report report) {

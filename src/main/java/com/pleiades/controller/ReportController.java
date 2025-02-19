@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportHistoryDto;
+import com.pleiades.dto.ReportListDto;
 import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
