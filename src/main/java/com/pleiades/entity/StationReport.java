@@ -2,6 +2,8 @@ package com.pleiades.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "station_report")
@@ -18,9 +20,11 @@ public class StationReport {
 
     @ManyToOne
     @JoinColumn(name = "station_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Station station;
 
     @ManyToOne
     @JoinColumn(name = "report_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Report report;
 }

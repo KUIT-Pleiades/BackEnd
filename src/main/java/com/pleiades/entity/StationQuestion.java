@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -21,10 +23,12 @@ public class StationQuestion {
 
     @ManyToOne
     @JoinColumn(name = "station_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Station station;
 
     @ManyToOne
     @JoinColumn(name = "question_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Question question;
 
     @Column
