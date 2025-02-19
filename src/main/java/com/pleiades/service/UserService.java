@@ -1,8 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.ProfileSettingDto;
-import com.pleiades.dto.SearchUserDto;
-import com.pleiades.dto.UserInfoDto;
+import com.pleiades.dto.*;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -11,7 +9,6 @@ import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.pleiades.dto.CharacterDto;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.entity.character.Item.Item;
@@ -87,6 +84,17 @@ public class UserService {
         }
         userRepository.save(user);
         return Map.of("message","profile setting success");
+    }
+
+    public ProfileDto getProfile(User user) {
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setProfileUrl(user.getProfileUrl());
+        profileDto.setUserId(user.getId());
+        profileDto.setBirthDate(user.getBirthDate());
+        profileDto.setUserName(user.getUserName());
+        profileDto.setEmail(user.getEmail());
+
+        return profileDto;
     }
 
     @Transactional

@@ -1,10 +1,9 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.CharacterDto;
-import com.pleiades.dto.ProfileSettingDto;
-import com.pleiades.dto.StarBackgroundDto;
-import com.pleiades.dto.UserInfoDto;
+import com.pleiades.dto.*;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.UserService;
@@ -84,6 +83,19 @@ public class HomeController {
         if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "star not found")); }
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/settings/profile")
+    public ResponseEntity<ProfileDto> getProfile(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
+
+        ProfileDto profileDto = userService.getProfile(user.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body(profileDto);
     }
 
     @PostMapping("/settings/profile")

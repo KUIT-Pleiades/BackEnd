@@ -1,6 +1,5 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.ProfileDto;
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.repository.*;
@@ -11,12 +10,10 @@ import com.pleiades.service.SignupService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -110,24 +107,5 @@ public class AuthController {
             log.info("sign-up failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
         }
-    }
-
-    @PostMapping("/profile")
-    public ResponseEntity<Map<String, String>> profile(@RequestHeader("Authorization") String authorization, @RequestBody ProfileDto profileDto) {
-        log.info("/auth/profile");
-
-        Optional<User> user = userRepository.findById(profileDto.getUserId());
-        if (user.isPresent()) {
-            user.get().setProfileUrl(profileDto.getProfileUrl());
-            try {
-                userRepository.save(user.get());
-            } catch (DataIntegrityViolationException e) {
-                return ResponseEntity
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", e.getMessage()));
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
