@@ -92,14 +92,7 @@ public class ReportService {
 
         for (Report report : reports) {
             if (report.getQuestion().getQuestion().contains(query)) {
-                ReportDto reportDto = new ReportDto();
-                reportDto.setReportId(report.getId());
-                reportDto.setQuestionId(report.getQuestion().getId());
-                reportDto.setQuestion(report.getQuestion().getQuestion());
-                reportDto.setAnswer(report.getAnswer());
-                reportDto.setCreatedAt(report.getCreatedAt());
-                reportDto.setModifiedAt(report.getModifiedAt());
-
+                ReportDto reportDto = reportToDto(report);
                 reportDtos.add(reportDto);
             }
         }
@@ -112,15 +105,9 @@ public class ReportService {
         List<ReportDto> reportDtos = new ArrayList<>();
 
         for (Report report : reports) {
+            if (report.getAnswer() == null) continue;
             if (report.getAnswer().contains(query)) {
-                ReportDto reportDto = new ReportDto();
-                reportDto.setReportId(report.getId());
-                reportDto.setQuestionId(report.getQuestion().getId());
-                reportDto.setQuestion(report.getQuestion().getQuestion());
-                reportDto.setAnswer(report.getAnswer());
-                reportDto.setCreatedAt(report.getCreatedAt());
-                reportDto.setModifiedAt(report.getModifiedAt());
-
+                ReportDto reportDto = reportToDto(report);
                 reportDtos.add(reportDto);
             }
         }
