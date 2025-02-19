@@ -6,6 +6,7 @@ import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.repository.*;
 import com.pleiades.strings.ValidationStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class ReportService {
         if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
 
         report.get().setAnswer(answer);
-        report.get().setModifiedAt(LocalDateTime.now());
+        report.get().setModifiedAt(LocalDateTimeUtil.now());
         reportRepository.save(report.get());
 
         return ValidationStatus.VALID;
@@ -74,7 +75,7 @@ public class ReportService {
 
         if (!report.get().getUser().equals(user)) { return ValidationStatus.NOT_VALID; }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTimeUtil.now();
         LocalDateTime createdAt = report.get().getCreatedAt();
 
         Duration duration = Duration.between(createdAt, now);
@@ -136,7 +137,7 @@ public class ReportService {
         Report report = null;
 
         for (StationQuestion stationQuestion : stationQuestions) {
-            if (stationQuestion.getCreatedAt().equals(LocalDate.now())) {
+            if (stationQuestion.getCreatedAt().equals(LocalDateTimeUtil.today())) {
                 Question question = questionRepository.findById(stationQuestion.getQuestion().getId()).get();
                 report = searchUserQuestion(user, question);
                 if (report == null) { return report; }
@@ -157,7 +158,7 @@ public class ReportService {
         Question question = null;
 
         for (StationQuestion stationQuestion : stationQuestions) {
-            if (stationQuestion.getCreatedAt().equals(LocalDate.now())) {
+            if (stationQuestion.getCreatedAt().equals(LocalDateTimeUtil.today())) {
                 log.info("stationQuestion: {}", stationQuestion);
                 question = questionRepository.findById(stationQuestion.getQuestion().getId()).get();
             }
@@ -190,7 +191,7 @@ public class ReportService {
         StationQuestion stationQuestion = new StationQuestion();
         stationQuestion.setStation(station);
         stationQuestion.setQuestion(question);
-        stationQuestion.setCreatedAt(LocalDate.now());
+        stationQuestion.setCreatedAt(LocalDateTimeUtil.today());
         stationQuestionRepository.save(stationQuestion);
 
         return question;
@@ -218,7 +219,7 @@ public class ReportService {
             return existingReport;
         }
 
-        Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTime.now()).build();
+        Report report = Report.builder().user(user).question(question).written(false).createdAt(LocalDateTimeUtil.now()).build();
         reportRepository.save(report);
         stationReport.setReport(report);
         stationReportRepository.save(stationReport);
@@ -252,7 +253,7 @@ public class ReportService {
         if (report == null) { return ValidationStatus.NONE; }
 
         report.setAnswer(answer);
-        report.setModifiedAt(LocalDateTime.now());
+        report.setModifiedAt(LocalDateTimeUtil.now());
         report.setWritten(true);
         reportRepository.save(report);
 

@@ -72,13 +72,13 @@ public class AuthController {
     }
 
     @GetMapping("/checkId")
-    public ResponseEntity<Map<String, String>> checkId(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> checkId(HttpServletRequest request) {
         log.info("/auth/checkId");
-        Map<String, String> body = new HashMap<>();
+        Map<String, Object> body = new HashMap<>();
         String id = request.getParameter("userId");
 
         if (id == null || id.isEmpty()) {
-            body.put("available", "false");
+            body.put("available", false);
             body.put("message", "UserId is required.");
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
