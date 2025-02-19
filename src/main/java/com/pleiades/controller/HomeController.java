@@ -3,6 +3,7 @@ package com.pleiades.controller;
 import com.pleiades.dto.CharacterDto;
 import com.pleiades.dto.ProfileSettingDto;
 import com.pleiades.dto.StarBackgroundDto;
+import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.AuthService;
@@ -64,17 +65,23 @@ public class HomeController {
     }
 
     @PostMapping("/settings/character")
-    public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @RequestBody @Validated CharacterDto characterDto) {
+    public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @RequestBody UserInfoDto userInfoDto) {
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
 
+        CharacterDto characterDto = userService.userInfoDto2CharacterDto(userInfoDto);
+
         ValidationStatus setCharacter = userService.setCharacter(email, characterDto);
+        ValidationStatus setBackground = userService.setBackground(email, userInfoDto.getBackgroundName());
 
         // user 없음
         if (setCharacter == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
         // character 없음
         if (setCharacter == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no character")); }
+
+        // star 없음
+        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "star not found")); }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -86,24 +93,5 @@ public class HomeController {
 
         Map<String, String> response = userService.setProfile(email, profileSettingDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @PostMapping("/settings/background")
-    public ResponseEntity<Map<String, Object>> backgroundSetting(HttpServletRequest request, @RequestBody StarBackgroundDto starBackgroundDto) {
-        String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
-
-        String backgroundName = starBackgroundDto.getBackgroundName();
-        log.info("backgroundName: " + backgroundName);
-
-        ValidationStatus setBackground = userService.setBackground(email, backgroundName);
-
-        // user 없음
-        if (setBackground == ValidationStatus.NONE) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "user not found")); }
-
-        // star 없음
-        if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "star not found")); }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -7,7 +7,9 @@ import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)

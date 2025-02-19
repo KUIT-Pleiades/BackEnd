@@ -2,6 +2,7 @@ package com.pleiades.service;
 
 import com.pleiades.dto.ProfileSettingDto;
 import com.pleiades.dto.SearchUserDto;
+import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -311,5 +312,17 @@ public class UserService {
         item.setRightHand(rightHandRepository.findByName(characterDto.getItem().getRightHandImg()).orElse(null));
 
         return item;
+    }
+
+    public CharacterDto userInfoDto2CharacterDto(UserInfoDto userInfoDto) {
+        CharacterDto newCharacterDto = new CharacterDto();
+
+        newCharacterDto.setProfile(userInfoDto.getProfile());
+        newCharacterDto.setCharacter(userInfoDto.getCharacter());
+        newCharacterDto.setItem(userInfoDto.getItem());
+        newCharacterDto.setFace(userInfoDto.getFace());
+        newCharacterDto.setOutfit(userInfoDto.getOutfit());
+
+        return newCharacterDto;
     }
 }
