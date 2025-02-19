@@ -108,7 +108,7 @@ public class FriendService {
         Optional<Friend> iamAlreadySender = friendRepository.findBySenderAndReceiver(sender,receiver);
         Optional<Friend> iamAlreadyReceiver = friendRepository.findBySenderAndReceiver(receiver, sender);
 
-        if(iamAlreadyReceiver.isPresent()){
+        if(iamAlreadyReceiver.isPresent () &&iamAlreadyReceiver.get().getStatus()==FriendStatus.PENDING){
             throw new CustomException(ErrorCode.ALREADY_RECEIVED_FRIEND_REQUEST);
         }
 
