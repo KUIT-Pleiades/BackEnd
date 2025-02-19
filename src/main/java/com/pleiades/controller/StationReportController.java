@@ -72,9 +72,6 @@ public class StationReportController {
         if (updateReport == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created"));
         }
-        if (updateReport == ValidationStatus.NOT_VALID) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created - Same question answered before"));
-        }
 
         Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, user.getId());
         userStation.get().setTodayReport(true);
