@@ -173,7 +173,7 @@ public class AuthService {
         body.put("userId", user.get().getId());
         body.put("userName", user.get().getUserName());
         body.put("birthDate", user.get().getBirthDate());
-        body.put("backgroundName", starBackground.get().getName());
+        body.put("starBackground", starBackground.get().getName());
         body.put("profile", profileUrl);
         body.put("character", characterUrl);
 
