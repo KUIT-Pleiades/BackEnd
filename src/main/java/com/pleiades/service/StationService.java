@@ -12,6 +12,7 @@ import com.pleiades.repository.StationRepository;
 
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.strings.ValidationStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -91,7 +92,7 @@ public class StationService {
                 .name(requestDto.getName())
                 .intro(requestDto.getIntro())
                 .numberOfUsers(1)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTimeUtil.now())
                 .adminUserId(adminUser.getId())
                 .reportNoticeTime(requestDto.getReportNoticeTime())
                 .background(stationBackground)

@@ -13,13 +13,12 @@ public class UpdateTodayReport {
     private final UserStationRepository userStationRepository;
     private List<UserStation> userStations = new CopyOnWriteArrayList<>();
 
-
     public UpdateTodayReport(UserStationRepository userStationRepository) {
         userStations = userStationRepository.findAll();
         this.userStationRepository = userStationRepository;
     }
 
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정(00:00:00)에 실행
+    @Scheduled(cron = "0 51 1 * * ?") // 매일 자정(00:00:00)에 실행
     public void resetAllFields() {
         List<UserStation> instances = userStationRepository.findAll();
         userStations.addAll(instances);
