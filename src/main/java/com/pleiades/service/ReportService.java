@@ -253,6 +253,7 @@ public class ReportService {
 
         report.setAnswer(answer);
         report.setModifiedAt(LocalDateTime.now());
+        report.setWritten(true);
         reportRepository.save(report);
 
         UserStationId userStationId = new UserStationId(user.getId(), station.getId());
