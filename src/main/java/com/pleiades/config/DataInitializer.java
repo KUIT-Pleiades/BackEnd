@@ -77,6 +77,7 @@ public class DataInitializer {
     private final StationBackgroundRepository stationBackgroundRepository;
     private final StationQuestionRepository stationQuestionRepository;
     private final StationReportRepository stationReportRepository;
+    private final StarRepository starRepository;
 
 
     @PostConstruct
@@ -209,6 +210,7 @@ public class DataInitializer {
                 // Star.builder().user(users.get(10)).background(starBackgrounds.get(0)).build(),
                 // Star.builder().user(users.get(11)).background(starBackgrounds.get(1)).build()
         );
+        starRepository.saveAll(stars);
     }
 
     private void saveStation() {
