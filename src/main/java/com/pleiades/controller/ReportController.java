@@ -96,7 +96,7 @@ public class ReportController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
-        List<ReportHistory> histories = reportHistoryRepository.findByUser(user.get());
+        List<ReportHistory> histories = reportHistoryRepository.findByUserOrderByCreatedAtAsc(user.get());
         log.info("histories: {}", histories);
         List<ReportHistoryDto> historyDtos = new ArrayList<>();
         for (ReportHistory history : histories) {
