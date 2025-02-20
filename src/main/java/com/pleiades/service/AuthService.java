@@ -12,6 +12,7 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.face.Face;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -195,23 +196,23 @@ public class AuthService {
 
         CharacterItemDto characterItemDto = new CharacterItemDto();
 
-        String head = character.get().getItem().getHead().getName();
-        String eyes = character.get().getItem().getEyes().getName();
-        String ears = character.get().getItem().getEars().getName();
-        String neck = character.get().getItem().getNeck().getName();
-        String leftWrist = character.get().getItem().getLeftWrist().getName();
-        String rightWrist = character.get().getItem().getRightWrist().getName();
-        String leftHand = character.get().getItem().getLeftHand().getName();
-        String rightHand = character.get().getItem().getRightHand().getName();
+        Head head = character.get().getItem().getHead();
+        Eyes eyes = character.get().getItem().getEyes();
+        Ears ears = character.get().getItem().getEars();
+        Neck neck = character.get().getItem().getNeck();
+        LeftWrist leftWrist = character.get().getItem().getLeftWrist();
+        RightWrist rightWrist = character.get().getItem().getRightWrist();
+        LeftHand leftHand = character.get().getItem().getLeftHand();
+        RightHand rightHand = character.get().getItem().getRightHand();
 
-        if (head != null) characterItemDto.setHeadImg(head);
-        if (eyes != null) characterItemDto.setEyesImg(eyes);
-        if (ears != null) characterItemDto.setEarsImg(ears);
-        if (neck != null) characterItemDto.setNeckImg(neck);
-        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist);
-        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist);
-        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand);
-        if (rightHand != null) characterItemDto.setRightHandImg(rightHand);
+        if (head != null) characterItemDto.setHeadImg(head.getName());
+        if (eyes != null) characterItemDto.setEyesImg(eyes.getName());
+        if (ears != null) characterItemDto.setEarsImg(ears.getName());
+        if (neck != null) characterItemDto.setNeckImg(neck.getName());
+        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist.getName());
+        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist.getName());
+        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand.getName());
+        if (rightHand != null) characterItemDto.setRightHandImg(rightHand.getName());
 
         userInfoDto.setItem(characterItemDto);
 
