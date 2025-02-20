@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.SignalResponseDto;
 import com.pleiades.service.SignalService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +20,19 @@ public class SignalController {
     private final SignalService signalService;
 
     @GetMapping("")
-    public ResponseEntity<List<Map<String, String>>> getReceivedSignals(HttpServletRequest request) {
+    public ResponseEntity<Map<String, List<SignalResponseDto>>> getReceivedSignals(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
         log.info("시그널: received signals for user: {}", email);
-        return ResponseEntity.ok(signalService.getReceivedSignals(email));
+        return signalService.getReceivedSignals(email);
     }
 
     @PostMapping("")
     public ResponseEntity<Map<String, String>> sendSignal(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) {
         String email = (String) request.getAttribute("email");
         String receiverId = requestBody.get("receiverId").toString();
+        int imageIndex = (int) requestBody.get("imageIndex");
         log.info("시그널: User {} sending signal to {}", email, receiverId);
-        return signalService.sendSignal(email, receiverId);
+        return signalService.sendSignal(email, receiverId, imageIndex);
     }
 
     @DeleteMapping("/{user_id}")

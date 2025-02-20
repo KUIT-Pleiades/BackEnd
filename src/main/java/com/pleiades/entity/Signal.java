@@ -18,6 +18,8 @@ public class Signal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int imageIndex; // 0,1,2
+
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "sender_id", nullable = false)

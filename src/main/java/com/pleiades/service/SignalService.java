@@ -1,5 +1,6 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.SignalResponseDto;
 import com.pleiades.entity.Signal;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +29,7 @@ public class SignalService {
     private final FriendRepository friendRepository;
 
     @Transactional
-    public ResponseEntity<Map<String, String>> sendSignal(String email, String receiverId) {
+    public ResponseEntity<Map<String, String>> sendSignal(String email, String receiverId, int imageIndex) {
         User sender = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
         User receiver = userRepository.findById(receiverId)
@@ -42,6 +44,7 @@ public class SignalService {
         }
 
         Signal signal = Signal.builder()
+                .imageIndex(imageIndex)
                 .sender(sender)
                 .receiver(receiver)
                 .createdAt(LocalDateTime.now())
@@ -52,29 +55,34 @@ public class SignalService {
     }
 
     @Transactional
-    public List<Map<String, String>> getReceivedSignals(String email) {
+    public ResponseEntity<Map<String, List<SignalResponseDto>>> getReceivedSignals(String email) {
         User receiver = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
-        return signalRepository.findByReceiver(receiver).stream()
-                .map(signal -> Map.of(
-                        "userId", signal.getSender().getId(),
-                        "userName", signal.getSender().getUserName()
-                ))
-                .collect(Collectors.toList());
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+
+        List<SignalResponseDto> signals = signalRepository.findByReceiver(receiver).stream()
+                .map(signal -> {
+                    SignalResponseDto dto = new SignalResponseDto();
+                    dto.setUserId(signal.getSender().getId());
+                    dto.setUserName(signal.getSender().getUserName());
+                    dto.setImageIndex(signal.getImageIndex());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(Map.of("signals", signals));
     }
 
     @Transactional
     public ResponseEntity<Map<String, String>> deleteSignal(String email, String senderId) {
         User receiver = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_USER_EMAIL));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!signalRepository.existsBySenderAndReceiver(sender, receiver)) {
             throw new CustomException(ErrorCode.SIGNAL_NOT_FOUND);
         }
-
         signalRepository.deleteBySenderAndReceiver(sender, receiver);
-        return ResponseEntity.ok(Map.of("message", "Signal deleted"));
+        return ResponseEntity.ok(Map.of("message", "Signal received and deleted"));
     }
 }

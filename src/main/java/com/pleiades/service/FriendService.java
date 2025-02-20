@@ -75,20 +75,6 @@ public class FriendService {
                 ))
                 .collect(Collectors.toList());
     }
-    // TODO: signal
-//    @Transactional
-//    public ResponseEntity<Map<String, Object>> sendSignal(String email, String receiverId){
-//        User currentUser = getUserByEmail(email);
-//
-//        // receiver
-//        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-//
-//        // 친구가 아닌 경우
-//        if(!friendRepository.isFriend(currentUser, receiver, FriendStatus.ACCEPTED)){
-//            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
-//        }
-//
-//    }
 
     @Transactional
     public ResponseEntity<Map<String, Object>> sendFriendRequest(String email, String receiverId) {
