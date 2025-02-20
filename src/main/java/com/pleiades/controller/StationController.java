@@ -66,16 +66,18 @@ public class StationController {
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationId, email);
 
-        String backgroundName = body.get("backgroundName").toString();
-        log.info("backgroundName: " + backgroundName);
+        Object stationBackground = body.get("stationBackground");
+        if (stationBackground == null) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message","Station Background required.")); }
+        String background = stationBackground.toString();
+        log.info("stationBackground: " + background);
 
         Station station = stationRepository.findById(stationId).get();
-        ValidationStatus setBackground = stationService.setBackground(station, backgroundName);
+        ValidationStatus setBackground = stationService.setBackground(station, background);
 
         // background 없음
         if (setBackground == ValidationStatus.NOT_VALID) { throw new CustomException(ErrorCode.IMAGE_NOT_FOUND); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background editted"));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background edited"));
     }
 
     @PatchMapping("/{stationId}/settings")
