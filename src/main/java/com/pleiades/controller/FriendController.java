@@ -29,19 +29,6 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    // TODO: signal
-//    @PostMapping("/signals")
-//    public ResponseEntity<Map<String, String>> sendSignals(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) {
-//        log.info("send signal controller 진입");
-//
-//        String email = (String) request.getAttribute("email");
-//        log.info("사용자 email = {}", email);
-//
-//        String receiverId = requestBody.get("receiverId").toString();
-//
-//        //return friendService.sendSignal(email, receiverId);
-//    }
-
     @PostMapping("/requests")
     public ResponseEntity<Map<String, Object>> friendRequest(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) {
         log.info("friend-request controller 진입");

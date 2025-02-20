@@ -14,6 +14,7 @@ public enum ErrorCode {
     USER_NOT_IN_STATION(HttpStatus.NOT_FOUND, "Target User is not in a station"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     FRIEND_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Friend request not found"),
+    SIGNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "Signal not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
     USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station"),
     REPORT_REQUIRED(HttpStatus.ACCEPTED, "You must submit a report before entering this station."),
@@ -21,7 +22,8 @@ public enum ErrorCode {
     USER_NEVER_ENTERED_STATION(HttpStatus.NOT_ACCEPTABLE, "User never entered the station."),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
     INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information"),
-    ALREADY_RECEIVED_FRIEND_REQUEST(HttpStatus.CONFLICT, "You already received a friend request");
+    ALREADY_RECEIVED_FRIEND_REQUEST(HttpStatus.CONFLICT, "You already received a friend request"),
+    ALREADY_SENT_SIGNAL(HttpStatus.CONFLICT, "You already sent a signal");
 
     private final HttpStatus status;
     private final String message;
