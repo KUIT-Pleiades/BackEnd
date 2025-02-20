@@ -133,27 +133,27 @@ public class AuthKakaoController {
         }
 
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
-//        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+        String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
         log.info("accessToken: " + accessToken);
-//        log.info("refreshToken: " + refreshToken);
+        log.info("refreshToken: " + refreshToken);
 
         body.put("accessToken", accessToken);
-//        Cookie cookie = authService.setRefreshToken(refreshToken);
+        Cookie cookie = authService.setRefreshToken(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        /*headers.add(HttpHeaders.SET_COOKIE, String.format(
-                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; %sSameSite=None",       // Strict -> None
+        headers.add(HttpHeaders.SET_COOKIE, String.format(
+                "%s=%s; Path=%s; HttpOnly; Max-Age=%d; %sSameSite=None",
                 cookie.getName(),
                 cookie.getValue(),
                 cookie.getPath(),
                 cookie.getMaxAge(),
                 cookie.getSecure() ? "Secure; " : ""
-        ));*/
+        ));
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         log.info("headers: " + headers);
-//        log.info("cookie: " + cookie);
+        log.info("cookie: " + cookie);
         log.info("body: " + body.get("accessToken"));
 
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);   // 200

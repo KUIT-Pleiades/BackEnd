@@ -221,7 +221,7 @@ public class AuthService {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);        // 추후 true로 변경
+        cookie.setSecure(true);        // 추후 true로 변경
         cookie.setMaxAge(7 * 24 * 60 * 60);
 
         return cookie;

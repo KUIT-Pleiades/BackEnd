@@ -30,6 +30,7 @@ import java.util.Map;
 public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;
+    private final AuthService authService;
 
     @PostMapping("/naver")
     public ResponseEntity<Map<String,String>> handleNaverLogin(@RequestBody NaverLoginRequestDto loginRequest, HttpServletResponse response) {
@@ -44,9 +45,9 @@ public class AuthNaverController {
         }
         LoginResponseDto loginResponse = naverLoginService.handleNaverLoginCallback(authCode);
         String accessToken = loginResponse.getAccessToken();
-//        String refreshToken = loginResponse.getRefreshToken();
+        String refreshToken = loginResponse.getRefreshToken();
 
-//        authService.addRefreshTokenCookie(response, refreshToken);
+        authService.addRefreshTokenCookie(response, refreshToken);
         long endTime = System.currentTimeMillis();
         double elapsedTime = (endTime - startTime) / 1000.0;
         log.info("Naver Login 수행 시간: {} ms",  String.format("%.1f", elapsedTime));
