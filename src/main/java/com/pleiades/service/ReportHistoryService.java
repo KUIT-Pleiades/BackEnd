@@ -5,6 +5,7 @@ import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
 import com.pleiades.repository.ReportHistoryRepository;
 import com.pleiades.repository.ReportRepository;
+import com.pleiades.util.LocalDateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,14 @@ public class ReportHistoryService {
         Optional<ReportHistory> history = reportHistoryRepository.findByQuery(noSpaceQuery);
         if (history.isPresent()) {
             log.info("history exists");
-            history.get().setCreatedAt(LocalDateTime.now());
+            history.get().setCreatedAt(LocalDateTimeUtil.now());
             reportHistoryRepository.save(history.get());
+            return;
         }
         ReportHistory newReportHistory = new ReportHistory();
         newReportHistory.setUser(user);
         newReportHistory.setQuery(query);
-        newReportHistory.setCreatedAt(LocalDateTime.now());
+        newReportHistory.setCreatedAt(LocalDateTimeUtil.now());
         reportHistoryRepository.save(newReportHistory);
         log.info("report history: {}", newReportHistory);
     }
@@ -58,7 +60,7 @@ public class ReportHistoryService {
     protected void deleteOldReportHistory(User user) {
         log.info("deleteOldReportHistory");
         List<ReportHistory> reportHistories = reportHistoryRepository.findByUser(user);
-        LocalDateTime oldest = LocalDateTime.now();
+        LocalDateTime oldest = LocalDateTimeUtil.now();
         ReportHistory oldestReportHistory = reportHistories.get(0);
         for (ReportHistory reportHistory : reportHistories) {
             if (reportHistory.getCreatedAt().isBefore(oldest)) {
