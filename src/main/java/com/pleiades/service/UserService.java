@@ -1,7 +1,11 @@
 package com.pleiades.service;
 
 import com.pleiades.dto.*;
+import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.CharacterItemDto;
+import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.*;
+import com.pleiades.entity.character.Item.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
@@ -11,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.Item.Item;
 import com.pleiades.entity.character.face.Expression;
 import com.pleiades.entity.character.face.Face;
 import com.pleiades.entity.character.face.Hair;
@@ -203,6 +206,80 @@ public class UserService {
                         includeFriendStatus ? friendStatusMap.getOrDefault(user, "JUSTHUMAN") : null
                 ))
                 .toList();
+    }
+
+    public UserInfoDto buildUserInfoDto(User user) {
+        Optional<Star> star = starRepository.findByUserId(user.getId());
+        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+        Optional<Characters> character = characterRepository.findByUser(user);
+
+        UserInfoDto userInfoDto = new UserInfoDto();
+
+        setUserBasicInfo(userInfoDto, user);
+        userInfoDto.setBackgroundName(starBackground.get().getName());
+
+        CharacterFaceDto characterFaceDto = buildCharacterFaceDto(character.get());
+        userInfoDto.setFace(characterFaceDto);
+
+        CharacterOutfitDto characterOutfitDto = buildCharacterOutfitDto(character.get());
+        userInfoDto.setOutfit(characterOutfitDto);
+
+        CharacterItemDto characterItemDto = buildCharacterItemDto(character.get());
+        userInfoDto.setItem(characterItemDto);
+
+        return userInfoDto;
+    }
+
+    private void setUserBasicInfo(UserInfoDto userInfoDto, User user) {
+        userInfoDto.setUserId(user.getId());
+        userInfoDto.setUserName(user.getUserName());
+        userInfoDto.setBirthDate(user.getBirthDate());
+        userInfoDto.setCharacter(user.getCharacterUrl());
+        userInfoDto.setProfile(user.getProfileUrl());
+    }
+
+    private CharacterFaceDto buildCharacterFaceDto(Characters character) {
+        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
+
+        characterFaceDto.setSkinImg(character.getFace().getSkin().getName());
+        characterFaceDto.setExpressionImg(character.getFace().getExpression().getName());
+        characterFaceDto.setHairImg(character.getFace().getHair().getName());
+
+        return characterFaceDto;
+    }
+
+    private CharacterOutfitDto buildCharacterOutfitDto(Characters character) {
+        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
+
+        characterOutfitDto.setTopImg(character.getOutfit().getTop().getName());
+        characterOutfitDto.setBottomImg(character.getOutfit().getBottom().getName());
+        characterOutfitDto.setShoesImg(character.getOutfit().getShoes().getName());
+
+        return characterOutfitDto;
+    }
+
+    private CharacterItemDto buildCharacterItemDto(Characters character) {
+        CharacterItemDto characterItemDto = new CharacterItemDto();
+
+        Head head = character.getItem().getHead();
+        Eyes eyes = character.getItem().getEyes();
+        Ears ears = character.getItem().getEars();
+        Neck neck = character.getItem().getNeck();
+        LeftWrist leftWrist = character.getItem().getLeftWrist();
+        RightWrist rightWrist = character.getItem().getRightWrist();
+        LeftHand leftHand = character.getItem().getLeftHand();
+        RightHand rightHand = character.getItem().getRightHand();
+
+        if (head != null) characterItemDto.setHeadImg(head.getName());
+        if (eyes != null) characterItemDto.setEyesImg(eyes.getName());
+        if (ears != null) characterItemDto.setEarsImg(ears.getName());
+        if (neck != null) characterItemDto.setNeckImg(neck.getName());
+        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist.getName());
+        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist.getName());
+        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand.getName());
+        if (rightHand != null) characterItemDto.setRightHandImg(rightHand.getName());
+
+        return characterItemDto;
     }
 
     @Transactional

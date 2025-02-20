@@ -42,6 +42,7 @@ public class AuthService {
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
+    private final UserService userService;
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -52,7 +53,7 @@ public class AuthService {
 
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
@@ -60,6 +61,7 @@ public class AuthService {
         this.stationRepository = stationRepository;
         this.userStationRepository = userStationRepository;
         this.friendRepository = friendRepository;
+        this.userService = userService;
     }
 
 
@@ -167,54 +169,8 @@ public class AuthService {
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-        Optional<Star> star = starRepository.findByUserId(user.get().getId());
-        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-        Optional<Characters> character = characterRepository.findByUser(user.get());
 
-        UserInfoDto userInfoDto = new UserInfoDto();
-
-        userInfoDto.setUserId(user.get().getId());
-        userInfoDto.setUserName(user.get().getUserName());
-        userInfoDto.setBirthDate(user.get().getBirthDate());
-        userInfoDto.setBackgroundName(starBackground.get().getName());
-        userInfoDto.setCharacter(user.get().getCharacterUrl());
-        userInfoDto.setProfile(user.get().getProfileUrl());
-
-        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
-        characterFaceDto.setSkinImg(character.get().getFace().getSkin().getName());
-        characterFaceDto.setExpressionImg(character.get().getFace().getExpression().getName());
-        characterFaceDto.setHairImg(character.get().getFace().getHair().getName());
-
-        userInfoDto.setFace(characterFaceDto);
-
-        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
-        characterOutfitDto.setTopImg(character.get().getOutfit().getTop().getName());
-        characterOutfitDto.setBottomImg(character.get().getOutfit().getBottom().getName());
-        characterOutfitDto.setShoesImg(character.get().getOutfit().getShoes().getName());
-
-        userInfoDto.setOutfit(characterOutfitDto);
-
-        CharacterItemDto characterItemDto = new CharacterItemDto();
-
-        Head head = character.get().getItem().getHead();
-        Eyes eyes = character.get().getItem().getEyes();
-        Ears ears = character.get().getItem().getEars();
-        Neck neck = character.get().getItem().getNeck();
-        LeftWrist leftWrist = character.get().getItem().getLeftWrist();
-        RightWrist rightWrist = character.get().getItem().getRightWrist();
-        LeftHand leftHand = character.get().getItem().getLeftHand();
-        RightHand rightHand = character.get().getItem().getRightHand();
-
-        if (head != null) characterItemDto.setHeadImg(head.getName());
-        if (eyes != null) characterItemDto.setEyesImg(eyes.getName());
-        if (ears != null) characterItemDto.setEarsImg(ears.getName());
-        if (neck != null) characterItemDto.setNeckImg(neck.getName());
-        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist.getName());
-        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist.getName());
-        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand.getName());
-        if (rightHand != null) characterItemDto.setRightHandImg(rightHand.getName());
-
-        userInfoDto.setItem(characterItemDto);
+        UserInfoDto userInfoDto = userService.buildUserInfoDto(user.get());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
