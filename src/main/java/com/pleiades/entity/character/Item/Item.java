@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -21,6 +23,7 @@ public class Item {
 
     // todo: 수정 필요
     @OneToOne(mappedBy = "item")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Characters characters;
 
     @ManyToOne

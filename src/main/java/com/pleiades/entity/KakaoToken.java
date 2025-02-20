@@ -20,8 +20,8 @@ public class KakaoToken {
     private Long id;
 
     @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Column(nullable = false, unique = true)

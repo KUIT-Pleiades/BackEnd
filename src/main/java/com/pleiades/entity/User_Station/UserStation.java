@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -23,11 +25,13 @@ public class UserStation {
 
     @ManyToOne
     @MapsId("userId")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
     @MapsId("stationId")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "station_id", nullable = false)
     private Station station;
 

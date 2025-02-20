@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -32,5 +34,6 @@ public class Outfit {
     private Shoes shoes;
 
     @OneToOne(mappedBy = "outfit")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Characters characters;
 }

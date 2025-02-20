@@ -89,7 +89,7 @@
 //        }
 //    }
 //    private void saveExpression() {
-//        String[] expressions = {"face_01", "face_02", "face_03", "face_04", "face_05", "face_06", "face_07", "face_08", "face_09"};
+//        String[] expressions = {"face_01", "face_02", "face_03", "face_04", "face_05", "face_06", "face_07", "face_08", "face_09", "face_10", "face_11", "face_12", "face_13", "face_14", "face_15", "face_16", "face_17", "face_18", "face_19"};
 //        for (String name : expressions) {
 //            Expression expression = new Expression();
 //            expression.setName(name);
@@ -97,7 +97,7 @@
 //        }
 //    }
 //    private void saveHair() {
-//        String[] hairs = {"hair_01", "hair_02", "hair_03", "hair_04", "hair_05", "hair_06", "hair_07", "hair_08", "hair_09"};
+//        String[] hairs = {"hair_01", "hair_02", "hair_03", "hair_04", "hair_05", "hair_06", "hair_07", "hair_08", "hair_09", "hair_10", "hair_11", "hair_12", "hair_13", "hair_14", "hair_15", "hair_16", "hair_17", "hair_18", "hair_19", "hair_20", "hair_21", "hair_22", "hair_23"};
 //        for (String name : hairs) {
 //            Hair hair = new Hair();
 //            hair.setName(name);
@@ -157,7 +157,7 @@
 //        }
 //    }
 //    private void saveTop() {
-//        String[] tops = {"top_01", "top_02", "top_03", "top_04", "top_05", "top_06", "top_07", "top_08", "top_09"};
+//        String[] tops = {"top_01", "top_02", "top_03", "top_04", "top_05", "top_06", "top_07", "top_08", "top_09", "top_10", "top_11", "top_12"};
 //        for (String name : tops) {
 //            Top top = new Top();
 //            top.setName(name);
@@ -165,7 +165,7 @@
 //        }
 //    }
 //    private void saveBottom() {
-//        String[] bottoms = {"bottom_01", "bottom_02", "bottom_03", "bottom_04", "bottom_05", "bottom_06", "bottom_07", "bottom_08"};
+//        String[] bottoms = {"bottom_01", "bottom_02", "bottom_03", "bottom_04", "bottom_05", "bottom_06", "bottom_07", "bottom_08", "bottom_09", "bottom_10", "bottom_11", "bottom_12", "bottom_13", "bottom_14", "bottom_15", "bottom_16"};
 //        for (String name : bottoms) {
 //            Bottom bottom = new Bottom();
 //            bottom.setName(name);
