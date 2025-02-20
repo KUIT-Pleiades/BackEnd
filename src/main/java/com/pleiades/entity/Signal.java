@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "signals")
+@Builder
 public class Signal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
