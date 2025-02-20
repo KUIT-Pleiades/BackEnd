@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import static io.jsonwebtoken.Jwts.header;
+
 @Slf4j
 @Controller
 @RequestMapping("/home")
@@ -40,7 +42,7 @@ public class HomeController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> home(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
         return authService.responseUserInfo(accessToken);
     }
@@ -82,7 +84,7 @@ public class HomeController {
         // star 없음
         if (setBackground == ValidationStatus.NOT_VALID) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "star not found")); }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "application/json").body(Map.of("message", "character set"));
     }
 
     @GetMapping("/settings/profile")

@@ -1,5 +1,10 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.CharacterDto;
+import com.pleiades.dto.UserInfoDto;
+import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.CharacterItemDto;
+import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.Station;
@@ -7,6 +12,8 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.Item.*;
+import com.pleiades.entity.character.face.Face;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
@@ -35,6 +42,7 @@ public class AuthService {
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
+    private final UserService userService;
     UserRepository userRepository;
     StarRepository starRepository;
     StarBackgroundRepository starBackgroundRepository;
@@ -45,7 +53,7 @@ public class AuthService {
 
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
@@ -53,6 +61,7 @@ public class AuthService {
         this.stationRepository = stationRepository;
         this.userStationRepository = userStationRepository;
         this.friendRepository = friendRepository;
+        this.userService = userService;
     }
 
 
@@ -147,41 +156,25 @@ public class AuthService {
     }
 
     // 회원가입 안 한 경우 -> 202 or 204
-    public ResponseEntity<Map<String, Object>> responseUserInfo(String accessToken) {
+    public ResponseEntity<UserInfoDto> responseUserInfo(String accessToken) {
         log.info("AuthService responseUserInfo");
-
-        Map<String, Object> body = new HashMap<>();
 
         ValidationStatus userValidation = userValidation(accessToken);
 
         if (userValidation.equals(ValidationStatus.NOT_VALID)) {
-            body.put("message", "Need Sign-up");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);     // 202
+            throw new CustomException(ErrorCode.SIGN_UP_REQUIRED);     // 202
         }
 
         Claims claims = jwtUtil.validateToken(accessToken);
         String email = claims.getSubject();
 
         Optional<User> user = userRepository.findByEmail(email);
-        Optional<Star> star = starRepository.findByUserId(user.get().getId());
-        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-//        Optional<Characters> character = characterRepository.findByUser(user.get());
 
-        String profileUrl = user.get().getProfileUrl();
-        String characterUrl = user.get().getCharacterUrl();
-
-        body.put("userId", user.get().getId());
-        body.put("userName", user.get().getUserName());
-        body.put("birthDate", user.get().getBirthDate());
-        body.put("starBackground", starBackground.get().getName());
-        body.put("profile", profileUrl);
-        body.put("character", characterUrl);
-
-        log.info("body: " + body);
+        UserInfoDto userInfoDto = userService.buildUserInfoDto(user.get());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(body);
+                .body(userInfoDto);
     }
 
     public ResponseEntity<Map<String, Object>> responseFriendInfo(User user, User friend) {
