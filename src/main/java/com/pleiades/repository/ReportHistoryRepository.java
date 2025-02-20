@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface ReportHistoryRepository extends JpaRepository<ReportHistory, Long> {
     List<ReportHistory> findByUser(User user);
     List<ReportHistory> findByUserOrderByCreatedAtAsc(User user);
+    List<ReportHistory> findByUserOrderByCreatedAtDesc(User user);
     Optional<ReportHistory> findById(Long id);
     Optional<ReportHistory> findByQuery(String query);
 }
