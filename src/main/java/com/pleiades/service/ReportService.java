@@ -34,7 +34,7 @@ public class ReportService {
     }
 
     public List<ReportDto> getAllReports(User user) {
-        List<Report> reports = reportRepository.findByUserOrderByCreatedAtDesc(user);
+        List<Report> reports = reportRepository.findByUserOrderByCreatedAtAsc(user);
         List<ReportDto> reportDtos = new ArrayList<>();
         for (Report report : reports) {
             if (!report.isWritten()) continue;
