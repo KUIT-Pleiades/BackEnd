@@ -195,14 +195,23 @@ public class AuthService {
 
         CharacterItemDto characterItemDto = new CharacterItemDto();
 
-        characterItemDto.setHeadImg(character.get().getItem().getHead().getName());
-        characterItemDto.setEyesImg(character.get().getItem().getEyes().getName());
-        characterItemDto.setEarsImg(character.get().getItem().getEars().getName());
-        characterItemDto.setNeckImg(character.get().getItem().getNeck().getName());
-        characterItemDto.setLeftWristImg(character.get().getItem().getLeftWrist().getName());
-        characterItemDto.setRightWristImg(character.get().getItem().getRightWrist().getName());
-        characterItemDto.setLeftHandImg(character.get().getItem().getLeftHand().getName());
-        characterItemDto.setRightHandImg(character.get().getItem().getRightHand().getName());
+        String head = character.get().getItem().getHead().getName();
+        String eyes = character.get().getItem().getEyes().getName();
+        String ears = character.get().getItem().getEars().getName();
+        String neck = character.get().getItem().getNeck().getName();
+        String leftWrist = character.get().getItem().getLeftWrist().getName();
+        String rightWrist = character.get().getItem().getRightWrist().getName();
+        String leftHand = character.get().getItem().getLeftHand().getName();
+        String rightHand = character.get().getItem().getRightHand().getName();
+
+        if (head != null) characterItemDto.setHeadImg(head);
+        if (eyes != null) characterItemDto.setEyesImg(eyes);
+        if (ears != null) characterItemDto.setEarsImg(ears);
+        if (neck != null) characterItemDto.setNeckImg(neck);
+        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist);
+        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist);
+        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand);
+        if (rightHand != null) characterItemDto.setRightHandImg(rightHand);
 
         userInfoDto.setItem(characterItemDto);
 
