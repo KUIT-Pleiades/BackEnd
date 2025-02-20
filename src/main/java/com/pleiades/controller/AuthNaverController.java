@@ -26,7 +26,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth/login")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "접속 권한 API")
 public class AuthNaverController {
 
     private final NaverLoginService naverLoginService;

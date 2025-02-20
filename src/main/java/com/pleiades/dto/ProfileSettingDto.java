@@ -13,9 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileSettingDto {
-    @JsonProperty("userId")
-    private String userId;
-
     @JsonProperty("userName")
     private String userName;
 

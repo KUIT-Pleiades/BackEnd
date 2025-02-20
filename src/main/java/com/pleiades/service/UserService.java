@@ -72,10 +72,8 @@ public class UserService {
     @Transactional
     public Map<String, String> setProfile(String email, ProfileSettingDto profileSettingDto){
         User user = getUserByEmail(email);
-        if (profileSettingDto.getUserId() != null
-        && profileSettingDto.getUserName() != null
+        if (profileSettingDto.getUserName() != null
         && profileSettingDto.getBirthDate() != null) {
-            user.setId(profileSettingDto.getUserId());
             user.setUserName(profileSettingDto.getUserName());
             user.setBirthDate(profileSettingDto.getBirthDate());
         }
