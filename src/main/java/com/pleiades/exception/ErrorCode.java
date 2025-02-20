@@ -13,6 +13,7 @@ public enum ErrorCode {
     FORBIDDEN_MEMBER(HttpStatus.FORBIDDEN, "You are not a member of this station."),
     USER_NOT_IN_STATION(HttpStatus.NOT_FOUND, "Target User is not in a station"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+    STAR_NOT_FOUND(HttpStatus.NOT_FOUND, "Star not found"),
     FRIEND_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Friend request not found"),
     SIGNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "Signal not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
@@ -23,7 +24,8 @@ public enum ErrorCode {
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
     INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information"),
     ALREADY_RECEIVED_FRIEND_REQUEST(HttpStatus.CONFLICT, "You already received a friend request"),
-    ALREADY_SENT_SIGNAL(HttpStatus.CONFLICT, "You already sent a signal");
+    ALREADY_SENT_SIGNAL(HttpStatus.CONFLICT, "You already sent a signal"),
+    SIGN_UP_REQUIRED(HttpStatus.ACCEPTED, "Need Sign-up");
 
     private final HttpStatus status;
     private final String message;

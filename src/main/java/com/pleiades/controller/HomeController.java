@@ -42,7 +42,7 @@ public class HomeController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> home(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
         return authService.responseUserInfo(accessToken);
     }

@@ -1,5 +1,10 @@
 package com.pleiades.service;
 
+import com.pleiades.dto.CharacterDto;
+import com.pleiades.dto.UserInfoDto;
+import com.pleiades.dto.character.CharacterFaceDto;
+import com.pleiades.dto.character.CharacterItemDto;
+import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.Station;
@@ -7,6 +12,7 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.face.Face;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
@@ -147,16 +153,13 @@ public class AuthService {
     }
 
     // 회원가입 안 한 경우 -> 202 or 204
-    public ResponseEntity<Map<String, Object>> responseUserInfo(String accessToken) {
+    public ResponseEntity<UserInfoDto> responseUserInfo(String accessToken) {
         log.info("AuthService responseUserInfo");
-
-        Map<String, Object> body = new HashMap<>();
 
         ValidationStatus userValidation = userValidation(accessToken);
 
         if (userValidation.equals(ValidationStatus.NOT_VALID)) {
-            body.put("message", "Need Sign-up");
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(body);     // 202
+            throw new CustomException(ErrorCode.SIGN_UP_REQUIRED);     // 202
         }
 
         Claims claims = jwtUtil.validateToken(accessToken);
@@ -165,23 +168,47 @@ public class AuthService {
         Optional<User> user = userRepository.findByEmail(email);
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-//        Optional<Characters> character = characterRepository.findByUser(user.get());
+        Optional<Characters> character = characterRepository.findByUser(user.get());
 
-        String profileUrl = user.get().getProfileUrl();
-        String characterUrl = user.get().getCharacterUrl();
+        UserInfoDto userInfoDto = new UserInfoDto();
 
-        body.put("userId", user.get().getId());
-        body.put("userName", user.get().getUserName());
-        body.put("birthDate", user.get().getBirthDate());
-        body.put("starBackground", starBackground.get().getName());
-        body.put("profile", profileUrl);
-        body.put("character", characterUrl);
+        userInfoDto.setUserId(user.get().getId());
+        userInfoDto.setUserName(user.get().getUserName());
+        userInfoDto.setBirthDate(user.get().getBirthDate());
+        userInfoDto.setBackgroundName(starBackground.get().getName());
+        userInfoDto.setCharacter(user.get().getCharacterUrl());
+        userInfoDto.setProfile(user.get().getProfileUrl());
 
-        log.info("body: " + body);
+        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
+        characterFaceDto.setSkinImg(character.get().getFace().getSkin().getName());
+        characterFaceDto.setExpressionImg(character.get().getFace().getExpression().getName());
+        characterFaceDto.setHairImg(character.get().getFace().getHair().getName());
+
+        userInfoDto.setFace(characterFaceDto);
+
+        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
+        characterOutfitDto.setTopImg(character.get().getOutfit().getTop().getName());
+        characterOutfitDto.setBottomImg(character.get().getOutfit().getBottom().getName());
+        characterOutfitDto.setShoesImg(character.get().getOutfit().getShoes().getName());
+
+        userInfoDto.setOutfit(characterOutfitDto);
+
+        CharacterItemDto characterItemDto = new CharacterItemDto();
+
+        characterItemDto.setHeadImg(character.get().getItem().getHead().getName());
+        characterItemDto.setEyesImg(character.get().getItem().getEyes().getName());
+        characterItemDto.setEarsImg(character.get().getItem().getEars().getName());
+        characterItemDto.setNeckImg(character.get().getItem().getNeck().getName());
+        characterItemDto.setLeftWristImg(character.get().getItem().getLeftWrist().getName());
+        characterItemDto.setRightWristImg(character.get().getItem().getRightWrist().getName());
+        characterItemDto.setLeftHandImg(character.get().getItem().getLeftHand().getName());
+        characterItemDto.setRightHandImg(character.get().getItem().getRightHand().getName());
+
+        userInfoDto.setItem(characterItemDto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(body);
+                .body(userInfoDto);
     }
 
     public ResponseEntity<Map<String, Object>> responseFriendInfo(User user, User friend) {
