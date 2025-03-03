@@ -15,6 +15,7 @@ import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -168,7 +169,7 @@ public class UserStationService {
                 .user(user)
                 .station(station)
                 .isAdmin(isAdmin)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTimeUtil.now())
                 .todayReport(false)
                 .positionX(positionX) // 기본 위치값 설정
                 .positionY(positionY)

@@ -16,6 +16,7 @@ import com.pleiades.repository.character.outfit.BottomRepository;
 import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +113,7 @@ public class SignupService {
                 .email(email)
                 .userName(userInfoDto.getUserName())
                 .birthDate(userInfoDto.getBirthDate())
-                .createdDate(LocalDate.now())
+                .createdDate(LocalDateTimeUtil.today())
                 .profileUrl(userInfoDto.getProfile())
                 .characterUrl(userInfoDto.getCharacter())
                 .build();

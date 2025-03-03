@@ -11,6 +11,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.pleiades.entity.User;
@@ -323,7 +324,7 @@ public class UserService {
             // 기존 기록 존재 -> searchCount++ & updatedAt 갱신
             UserHistory history = existingHistory.get();
             history.setSearchCount(history.getSearchCount() + 1);
-            history.setUpdatedAt(LocalDateTime.now());
+            history.setUpdatedAt(LocalDateTimeUtil.now());
             userHistoryRepository.save(history);
         } else {
             // 새로운 검색 기록 저장
@@ -332,7 +333,7 @@ public class UserService {
                     .searched(searchedUser)
                     .isFriend(isFriend)
                     .searchCount(1)
-                    .updatedAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTimeUtil.now())
                     .build();
             userHistoryRepository.save(newHistory);
         }

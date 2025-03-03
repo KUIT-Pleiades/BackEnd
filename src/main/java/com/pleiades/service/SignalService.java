@@ -9,6 +9,7 @@ import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.SignalRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class SignalService {
                 .imageIndex(imageIndex)
                 .sender(sender)
                 .receiver(receiver)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTimeUtil.now())
                 .build();
 
         signalRepository.save(signal);

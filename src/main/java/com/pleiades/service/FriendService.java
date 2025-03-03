@@ -8,6 +8,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -105,7 +106,7 @@ public class FriendService {
             if(existingFriend.getStatus().equals(FriendStatus.REJECTED)){
                 log.info("친구 요청: REJECTED -> PENDING");
                 existingFriend.setStatus(FriendStatus.PENDING);
-                existingFriend.setCreatedAt(LocalDateTime.now());
+                existingFriend.setCreatedAt(LocalDateTimeUtil.now());
                 friendRepository.save(existingFriend);
 
                 return ResponseEntity.status(HttpStatus.CREATED)
@@ -129,7 +130,7 @@ public class FriendService {
                 .sender(sender)
                 .receiver(receiver)
                 .status(FriendStatus.PENDING)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTimeUtil.now())
                 .build();
 
         friendRepository.save(friend);
