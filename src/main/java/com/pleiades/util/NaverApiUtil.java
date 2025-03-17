@@ -69,6 +69,7 @@ public class NaverApiUtil {
         log.info("code: {}", code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        dummyGetRequest();
 
         int maxRetries = 3; // 최대 재시도 횟수
         int attempt = 0;
@@ -108,6 +109,20 @@ public class NaverApiUtil {
         }
         log.error("네이버 API 요청 {}번 실패-> 중단", maxRetries);
         throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+    }
+    private void dummyGetRequest() {
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(TOKEN_URL, String.class);
+            log.info("네이버 GET Request 성공: {}", response.getStatusCode());
+        } catch (Exception e) {
+            if (e.getCause() instanceof SocketTimeoutException ||
+                    e.getMessage().contains("Connection reset")) {
+                log.error("네이버 GET Request 실패: {}", e.getMessage());
+            } else {
+                log.error("네이버 GET 오류 : {}", e.getMessage());
+                throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+            }
+        }
     }
 
     public String refreshAccessToken(String refreshToken) {
