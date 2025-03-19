@@ -53,7 +53,6 @@ public class NaverApiUtil {
     }
 
     public Map<String,String> getTokens(String code) {
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
