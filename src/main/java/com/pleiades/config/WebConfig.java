@@ -39,7 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/auth/refresh",
                         "/auth/auth/refresh",
                         "/error",
-                        "/auth/login/**"
+                        "/auth/login/**",
+                        "/redis/**"
 //                        "/auth/login/*",
 //                        "/auth/login",
 //                        "/auth/login/",
