@@ -5,6 +5,7 @@ import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
 import com.pleiades.service.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class UserStationController {
     private final UserStationService userStationService;
 
     @PatchMapping("/{station_id}/users/{user_id}/position")
-    public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
+    public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @Valid @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
         log.info("setUserPosition controller 진입");
 
         String email = (String) request.getAttribute("email");

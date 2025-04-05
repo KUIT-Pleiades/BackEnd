@@ -2,7 +2,6 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportHistoryDto;
-import com.pleiades.dto.ReportListDto;
 import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
@@ -113,7 +112,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/history/{historyId}")
-    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
@@ -124,7 +123,7 @@ public class ReportController {
     }
 
     @PatchMapping("/{reportId}")
-    public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
@@ -141,7 +140,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{reportId}")
-    public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId) {
         String email = authService.getEmailByAuthorization(authorization);
         log.info("사용자 email = {}", email);
 
@@ -158,7 +157,7 @@ public class ReportController {
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
         if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }
@@ -180,7 +179,7 @@ public class ReportController {
     }
 
     @GetMapping(value = "/friends", params = "query")
-    public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query) {
         // 친구 아이디 존재 여부
         Optional<User> friend = userRepository.findById(userId);
         if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }

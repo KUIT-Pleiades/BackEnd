@@ -12,6 +12,7 @@ import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class AuthController {
     AuthController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
                    NaverTokenRepository naverTokenRepository,
                    ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService,
-                   JwtUtil jwtUtil, HeaderUtil headerUtil)
+                   JwtUtil jwtUtil)
     {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
@@ -57,7 +58,7 @@ public class AuthController {
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
         log.info("/auth/refresh");
         log.info("cookie - refreshToken: " + refreshToken);
         if (refreshToken == null) {
@@ -87,7 +88,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @RequestBody UserInfoDto userInfoDto) {
+    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @Valid @RequestBody UserInfoDto userInfoDto) {
         log.info("/auth/signup");
 
         try {

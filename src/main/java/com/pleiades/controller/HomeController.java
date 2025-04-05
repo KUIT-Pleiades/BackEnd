@@ -11,6 +11,7 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,7 +67,7 @@ public class HomeController {
     }
 
     @PostMapping("/settings/character")
-    public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @RequestBody UserInfoDto userInfoDto) {
+    public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @Valid @RequestBody UserInfoDto userInfoDto) {
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
 
@@ -101,7 +102,7 @@ public class HomeController {
     }
 
     @PostMapping("/settings/profile")
-    public ResponseEntity<Map<String, String>> profileSetting(HttpServletRequest request, @RequestBody ProfileSettingDto profileSettingDto) {
+    public ResponseEntity<Map<String, String>> profileSetting(HttpServletRequest request, @Valid @RequestBody ProfileSettingDto profileSettingDto) {
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
 

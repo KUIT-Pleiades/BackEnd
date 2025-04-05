@@ -12,6 +12,7 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.service.StationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class StationController {
     private final StationService stationService;
 
     @PostMapping("")
-    public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @RequestBody StationCreateDto requestDto) {
+    public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @Valid @RequestBody StationCreateDto requestDto) {
         log.info("createStation controller 진입");
 
         String email = (String) request.getAttribute("email");
@@ -81,7 +82,7 @@ public class StationController {
     }
 
     @PatchMapping("/{stationId}/settings")
-    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody StationSettingDto settingDto) {
+    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationId+"/settings");
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationId, email);
