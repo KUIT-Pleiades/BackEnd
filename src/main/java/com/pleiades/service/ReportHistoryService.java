@@ -6,6 +6,7 @@ import com.pleiades.entity.User;
 import com.pleiades.repository.ReportHistoryRepository;
 import com.pleiades.repository.ReportRepository;
 import com.pleiades.util.LocalDateTimeUtil;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,13 @@ public class ReportHistoryService {
     private static final Logger log = LoggerFactory.getLogger(ReportHistoryService.class);
     ReportRepository reportRepository;
     ReportHistoryRepository reportHistoryRepository;
+    ModelMapper modelMapper;
 
     @Autowired
-    public ReportHistoryService(ReportRepository reportRepository, ReportHistoryRepository reportHistoryRepository) {
+    public ReportHistoryService(ReportRepository reportRepository, ReportHistoryRepository reportHistoryRepository, ModelMapper modelMapper) {
         this.reportRepository = reportRepository;
         this.reportHistoryRepository = reportHistoryRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Transactional
@@ -80,10 +83,7 @@ public class ReportHistoryService {
         }
         reportHistoryRepository.delete(reportHistory.get());
 
-        ReportHistoryDto reportHistoryDto = new ReportHistoryDto();
-        reportHistoryDto.setId(id);
-        reportHistoryDto.setQuery(reportHistory.get().getQuery());
-        reportHistoryDto.setCreatedAt(reportHistory.get().getCreatedAt());
+        ReportHistoryDto reportHistoryDto = modelMapper.map(reportHistory.get(), ReportHistoryDto.class);
 
         body.put("history", reportHistoryDto);
         body.put("message", "Report history deleted");

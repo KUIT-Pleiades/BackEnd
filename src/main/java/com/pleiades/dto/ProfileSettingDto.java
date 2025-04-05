@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileSettingDto {
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "영문자와 숫자만 입력 가능합니다.")
+    @Pattern(regexp = "^[\\w가-힣]+$", message = "한글, 영문, 숫자만 입력 가능합니다.")
     @JsonProperty("userName")
     private String userName;
 

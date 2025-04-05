@@ -1,10 +1,6 @@
 package com.pleiades.service;
 
-import com.pleiades.dto.CharacterDto;
 import com.pleiades.dto.UserInfoDto;
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.Station;
@@ -12,8 +8,6 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.Item.*;
-import com.pleiades.entity.character.face.Face;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
@@ -27,6 +21,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -51,9 +46,11 @@ public class AuthService {
     JwtUtil jwtUtil;
     ImageJsonCreator imageJsonCreator;
 
+    ModelMapper modelMapper;
+
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService, ModelMapper modelMapper) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
@@ -62,6 +59,7 @@ public class AuthService {
         this.userStationRepository = userStationRepository;
         this.friendRepository = friendRepository;
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
 

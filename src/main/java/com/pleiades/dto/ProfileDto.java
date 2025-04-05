@@ -19,14 +19,14 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProfileDto {
     @NotBlank
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "영문자와 숫자만 입력 가능합니다.")
-    @Size(min = 3, max = 15)        // id 크기 뭘까~
+    @Pattern(regexp = "^\\w+$", message = "영문자와 숫자만 입력 가능합니다.")
+    @Size(min = 4, max = 10)
     @JsonProperty("userId")
     private String userId;
 
     @NotBlank
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "영문자와 숫자만 입력 가능합니다.") // 숫자 조합 가능?
-    @Size(min = 3, max = 15)        // 이름 크기?
+    @Pattern(regexp = "^[\\w가-힣]+$", message = "한글, 영문, 숫자만 입력 가능합니다.")
+    @Size(min = 2, max = 15)
     @JsonProperty("userName")
     private String userName;
 
@@ -42,5 +42,3 @@ public class ProfileDto {
     @JsonProperty("profile")
     private String profileUrl;
 }
-
-

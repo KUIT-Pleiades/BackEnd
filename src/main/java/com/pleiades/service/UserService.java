@@ -35,17 +35,16 @@ import com.pleiades.repository.character.outfit.ShoesRepository;
 import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
 import jakarta.persistence.EntityManager;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -68,6 +67,8 @@ public class UserService {
 
     private CharacterDto characterDto = null;
 
+    private final ModelMapper modelMapper;
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
@@ -86,17 +87,6 @@ public class UserService {
         }
         userRepository.save(user);
         return Map.of("message","profile setting success");
-    }
-
-    public ProfileDto getProfile(User user) {
-        ProfileDto profileDto = new ProfileDto();
-        profileDto.setProfileUrl(user.getProfileUrl());
-        profileDto.setUserId(user.getId());
-        profileDto.setBirthDate(user.getBirthDate());
-        profileDto.setUserName(user.getUserName());
-        profileDto.setEmail(user.getEmail());
-
-        return profileDto;
     }
 
     @Transactional
@@ -212,73 +202,20 @@ public class UserService {
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
         Optional<Characters> character = characterRepository.findByUser(user);
 
-        UserInfoDto userInfoDto = new UserInfoDto();
+        UserInfoDto userInfoDto = modelMapper.map(user, UserInfoDto.class);
 
-        setUserBasicInfo(userInfoDto, user);
         userInfoDto.setBackgroundName(starBackground.get().getName());
 
-        CharacterFaceDto characterFaceDto = buildCharacterFaceDto(character.get());
+        CharacterFaceDto characterFaceDto = modelMapper.map(character.get(), CharacterFaceDto.class);
         userInfoDto.setFace(characterFaceDto);
 
-        CharacterOutfitDto characterOutfitDto = buildCharacterOutfitDto(character.get());
+        CharacterOutfitDto characterOutfitDto = modelMapper.map(character.get(), CharacterOutfitDto.class);
         userInfoDto.setOutfit(characterOutfitDto);
 
-        CharacterItemDto characterItemDto = buildCharacterItemDto(character.get());
+        CharacterItemDto characterItemDto = modelMapper.map(character.get(), CharacterItemDto.class);
         userInfoDto.setItem(characterItemDto);
 
         return userInfoDto;
-    }
-
-    private void setUserBasicInfo(UserInfoDto userInfoDto, User user) {
-        userInfoDto.setUserId(user.getId());
-        userInfoDto.setUserName(user.getUserName());
-        userInfoDto.setBirthDate(user.getBirthDate());
-        userInfoDto.setCharacter(user.getCharacterUrl());
-        userInfoDto.setProfile(user.getProfileUrl());
-    }
-
-    private CharacterFaceDto buildCharacterFaceDto(Characters character) {
-        CharacterFaceDto characterFaceDto = new CharacterFaceDto();
-
-        characterFaceDto.setSkinImg(character.getFace().getSkin().getName());
-        characterFaceDto.setExpressionImg(character.getFace().getExpression().getName());
-        characterFaceDto.setHairImg(character.getFace().getHair().getName());
-
-        return characterFaceDto;
-    }
-
-    private CharacterOutfitDto buildCharacterOutfitDto(Characters character) {
-        CharacterOutfitDto characterOutfitDto = new CharacterOutfitDto();
-
-        characterOutfitDto.setTopImg(character.getOutfit().getTop().getName());
-        characterOutfitDto.setBottomImg(character.getOutfit().getBottom().getName());
-        characterOutfitDto.setShoesImg(character.getOutfit().getShoes().getName());
-
-        return characterOutfitDto;
-    }
-
-    private CharacterItemDto buildCharacterItemDto(Characters character) {
-        CharacterItemDto characterItemDto = new CharacterItemDto();
-
-        Head head = character.getItem().getHead();
-        Eyes eyes = character.getItem().getEyes();
-        Ears ears = character.getItem().getEars();
-        Neck neck = character.getItem().getNeck();
-        LeftWrist leftWrist = character.getItem().getLeftWrist();
-        RightWrist rightWrist = character.getItem().getRightWrist();
-        LeftHand leftHand = character.getItem().getLeftHand();
-        RightHand rightHand = character.getItem().getRightHand();
-
-        if (head != null) characterItemDto.setHeadImg(head.getName());
-        if (eyes != null) characterItemDto.setEyesImg(eyes.getName());
-        if (ears != null) characterItemDto.setEarsImg(ears.getName());
-        if (neck != null) characterItemDto.setNeckImg(neck.getName());
-        if (leftWrist != null) characterItemDto.setLeftWristImg(leftWrist.getName());
-        if (rightWrist != null) characterItemDto.setRightWristImg(rightWrist.getName());
-        if (leftHand != null) characterItemDto.setLeftHandImg(leftHand.getName());
-        if (rightHand != null) characterItemDto.setRightHandImg(rightHand.getName());
-
-        return characterItemDto;
     }
 
     @Transactional
@@ -396,17 +333,5 @@ public class UserService {
         item.setRightHand(rightHandRepository.findByName(characterDto.getItem().getRightHandImg()).orElse(null));
 
         return item;
-    }
-
-    public CharacterDto userInfoDto2CharacterDto(UserInfoDto userInfoDto) {
-        CharacterDto newCharacterDto = new CharacterDto();
-
-        newCharacterDto.setProfile(userInfoDto.getProfile());
-        newCharacterDto.setCharacter(userInfoDto.getCharacter());
-        newCharacterDto.setItem(userInfoDto.getItem());
-        newCharacterDto.setFace(userInfoDto.getFace());
-        newCharacterDto.setOutfit(userInfoDto.getOutfit());
-
-        return newCharacterDto;
     }
 }

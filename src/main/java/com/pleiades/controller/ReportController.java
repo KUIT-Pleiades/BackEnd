@@ -17,6 +17,7 @@ import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +42,11 @@ public class ReportController {
     FriendRepository friendRepository;
     ReportHistoryRepository reportHistoryRepository;
 
+    ModelMapper modelMapper;
+
     @Autowired
     public ReportController(AuthService authService, UserService userService, ReportService reportService, JwtUtil jwtUtil, UserRepository userRepository, ReportRepository reportRepository, FriendRepository friendRepository,
-                            ReportHistoryService reportHistoryService, ReportHistoryRepository reportHistoryRepository) {
+                            ReportHistoryService reportHistoryService, ReportHistoryRepository reportHistoryRepository, ModelMapper modelMapper) {
         this.authService = authService;
         this.userService = userService;
         this.reportService = reportService;
@@ -55,6 +58,8 @@ public class ReportController {
         this.reportRepository = reportRepository;
         this.friendRepository = friendRepository;
         this.reportHistoryRepository = reportHistoryRepository;
+
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("")
@@ -101,10 +106,9 @@ public class ReportController {
         for (ReportHistory history : histories) {
             log.info("history: {}", history);
             log.info("id: {}", history.getId());
-            ReportHistoryDto dto = new ReportHistoryDto();
-            dto.setId(history.getId());
-            dto.setQuery(history.getQuery());
-            dto.setCreatedAt(history.getCreatedAt());
+
+            ReportHistoryDto dto = modelMapper.map(history, ReportHistoryDto.class);
+
             historyDtos.add(dto);
         }
 

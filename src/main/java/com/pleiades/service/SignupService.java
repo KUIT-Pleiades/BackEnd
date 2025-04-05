@@ -18,14 +18,15 @@ import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @Service
 public class SignupService {
@@ -37,49 +38,25 @@ public class SignupService {
     private final RightWristRepository rightWristRepository;
     private final LeftHandRepository leftHandRepository;
     private final RightHandRepository rightHandRepository;
-    StarBackgroundRepository starBackgroundRepository;
-    UserRepository userRepository;
-    StarRepository starRepository;
-    CharacterRepository characterRepository;
-    SkinRepository skinRepository;
-    ExpressionRepository expressionRepository;
-    HairRepository hairRepository;
-    TopRepository topRepository;
-    BottomRepository bottomRepository;
-    ShoesRepository shoesRepository;
-    ItemRepository itemRepository;
+    private final StarBackgroundRepository starBackgroundRepository;
+    private final UserRepository userRepository;
+    private final StarRepository starRepository;
+    private final CharacterRepository characterRepository;
+    private final SkinRepository skinRepository;
+    private final ExpressionRepository expressionRepository;
+    private final HairRepository hairRepository;
+    private final TopRepository topRepository;
+    private final BottomRepository bottomRepository;
+    private final ShoesRepository shoesRepository;
+    private final ItemRepository itemRepository;
 
-    KakaoTokenRepository kakaoTokenRepository;
-    NaverTokenRepository naverTokenRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
+    private final NaverTokenRepository naverTokenRepository;
 
-    UserInfoDto userInfoDto;
-
-    EntityManager entityManager;
-
-    @Autowired
-    public SignupService(UserRepository userRepository, StarRepository starRepository, CharacterRepository characterRepository,
-                         SkinRepository skinRepository, ExpressionRepository expressionRepository, HairRepository hairRepository,
-                         TopRepository topRepository, BottomRepository bottomRepository, ShoesRepository shoesRepository, ItemRepository itemRepository,
-                         KakaoTokenRepository kakaoTokenRepository, NaverTokenRepository naverTokenRepository, StarBackgroundRepository starBackgroundRepository,
-                         HeadRepository headRepository, EyesRepository eyesRepository, EarsRepository earsRepository, NeckRepository neckRepository,
-                         LeftWristRepository leftWristRepository, RightWristRepository rightWristRepository, LeftHandRepository leftHandRepository, RightHandRepository rightHandRepository,
-                         EntityManager entityManager) {
-        this.userRepository = userRepository; this.starRepository = starRepository; this.characterRepository = characterRepository;
-        this.skinRepository = skinRepository; this.expressionRepository = expressionRepository; this.hairRepository = hairRepository;
-        this.topRepository = topRepository; this.bottomRepository = bottomRepository; this.shoesRepository = shoesRepository;
-        this.itemRepository = itemRepository;
-        this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
-        this.starBackgroundRepository = starBackgroundRepository;
-        this.headRepository = headRepository; this.eyesRepository = eyesRepository; this.earsRepository = earsRepository; this.neckRepository = neckRepository;
-        this.leftWristRepository = leftWristRepository; this.rightWristRepository = rightWristRepository;
-        this.leftHandRepository = leftHandRepository; this.rightHandRepository = rightHandRepository;
-        this.entityManager = entityManager;
-    }
+    private final EntityManager entityManager;
 
     @Transactional
     public ValidationStatus signup(String email, UserInfoDto userInfoDto) {
-        this.userInfoDto = userInfoDto;
-
         log.info("signup으로 온 email: " + email);
 
         // user 중복 생성 방지

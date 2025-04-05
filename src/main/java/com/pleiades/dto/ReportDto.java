@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
 
 import java.time.LocalDateTime;
 
@@ -20,25 +17,25 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportDto {
-    @JsonProperty
+    @JsonProperty("reportId")
     private Long reportId;
 
-    @JsonProperty
+    @JsonProperty("questionId")
     private Long questionId;
 
     @NotEmpty
-    @JsonProperty
+    @JsonProperty("question")
     private String question;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty
+    @JsonProperty("modifiedAt")
     private LocalDateTime modifiedAt;
 
     @NotEmpty
-    @JsonProperty
+    @JsonProperty("answer")
     private String answer;
 }

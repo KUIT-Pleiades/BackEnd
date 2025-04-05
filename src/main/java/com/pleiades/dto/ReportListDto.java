@@ -13,15 +13,6 @@ import lombok.Setter;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportListDto extends ReportDto {
-    @JsonProperty
+    @JsonProperty("isTodayReport")
     Boolean isTodayReport;
-
-    public ReportListDto(ReportDto reportDto) {
-        this.setReportId(reportDto.getReportId());
-        this.setQuestionId(reportDto.getQuestionId());
-        this.setQuestion(reportDto.getQuestion());
-        this.setAnswer(reportDto.getAnswer());
-        this.setCreatedAt(reportDto.getCreatedAt());
-        this.setModifiedAt(reportDto.getModifiedAt());
-    }
 }

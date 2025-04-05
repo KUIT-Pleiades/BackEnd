@@ -13,6 +13,7 @@ import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +34,15 @@ public class HomeController {
     AuthService authService;
     UserService userService;
     JwtUtil jwtUtil;
+    ModelMapper modelMapper;
 
     @Autowired
-    public HomeController(AuthService authService, UserService userService, JwtUtil jwtUtil, UserRepository userRepository) {
+    public HomeController(AuthService authService, UserService userService, JwtUtil jwtUtil, UserRepository userRepository, ModelMapper modelMapper) {
         this.authService = authService;
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("")
@@ -71,7 +74,7 @@ public class HomeController {
         String email = (String) request.getAttribute("email");
         log.info("사용자 email = {}", email);
 
-        CharacterDto characterDto = userService.userInfoDto2CharacterDto(userInfoDto);
+        CharacterDto characterDto = modelMapper.map(userInfoDto, CharacterDto.class);
 
         ValidationStatus setCharacter = userService.setCharacter(email, characterDto);
         ValidationStatus setBackground = userService.setBackground(email, userInfoDto.getBackgroundName());
@@ -96,7 +99,7 @@ public class HomeController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
 
-        ProfileDto profileDto = userService.getProfile(user.get());
+        ProfileDto profileDto = modelMapper.map(user.get(), ProfileDto.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(profileDto);
     }

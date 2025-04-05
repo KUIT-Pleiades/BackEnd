@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -15,13 +14,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportHistoryDto {
-    @JsonProperty
+    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty
+    @JsonProperty("query")
     private String query;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 }

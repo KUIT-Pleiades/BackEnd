@@ -11,6 +11,7 @@ import com.pleiades.service.ReportService;
 import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class StationReportController {
     private final UserRepository userRepository;
     private final ReportService reportService;
     private final StationRepository stationRepository;
+    private final ModelMapper modelMapper;
 
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
@@ -46,7 +48,7 @@ public class StationReportController {
         // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
         if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
 
-        ReportDto reportDto = reportService.reportToDto(report);
+        ReportDto reportDto = modelMapper.map(report, ReportDto.class);
 
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report",reportDto));
     }
@@ -85,7 +87,7 @@ public class StationReportController {
 
         if (report == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
 
-        ReportDto reportDto = reportService.reportToDto(report);
+        ReportDto reportDto = modelMapper.map(report, ReportDto.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }
@@ -103,7 +105,7 @@ public class StationReportController {
 
         if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 
-        ReportDto reportDto = reportService.reportToDto(report);
+        ReportDto reportDto = modelMapper.map(report, ReportDto.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }

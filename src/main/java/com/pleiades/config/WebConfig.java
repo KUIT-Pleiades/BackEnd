@@ -46,6 +46,8 @@ public class WebConfig implements WebMvcConfigurer {
 //                        "/auth/login/",
 //                        "/auth/login/naver"
                         );  // 제외할 경로
+
+
     }
 }
 

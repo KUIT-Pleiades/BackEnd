@@ -9,10 +9,10 @@ import lombok.Data;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchUserDto {
-    @Pattern(regexp = "^[a-zA-Z0-9]+$")
+    @Pattern(regexp = "^\\w+$", message = "영문자와 숫자만 입력 가능합니다.")
     private String userId;
 
-    @Pattern(regexp = "^[a-zA-Z0-9]+$")
+    @Pattern(regexp = "^[\\w가-힣]+$", message = "한글, 영문, 숫자만 입력 가능합니다.")
     private String userName;
 
     @Pattern(regexp = "^https://gateway\\.pinata\\.cloud/ipfs/.+$")

@@ -9,6 +9,7 @@ import com.pleiades.repository.*;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +24,16 @@ public class ReportService {
     private final UserStationRepository userStationRepository;
     private final StationQuestionRepository stationQuestionRepository;
     private final StationReportRepository stationReportRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    ReportService(QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository, StationReportRepository stationReportRepository) {
+    ReportService(QuestionRepository questionRepository, ReportRepository reportRepository, UserStationRepository userStationRepository, StationQuestionRepository stationQuestionRepository, StationReportRepository stationReportRepository, ModelMapper modelMapper) {
         this.questionRepository = questionRepository;
         this.reportRepository = reportRepository;
         this.userStationRepository = userStationRepository;
         this.stationQuestionRepository = stationQuestionRepository;
         this.stationReportRepository = stationReportRepository;
+        this.modelMapper = modelMapper;
     }
 
     public List<ReportDto> getAllReports(User user) {
@@ -38,8 +41,8 @@ public class ReportService {
         List<ReportDto> reportDtos = new ArrayList<>();
         for (Report report : reports) {
             if (!report.isWritten()) continue;
-            ReportDto reportDto = reportToDto(report);
-            ReportListDto reportListDto = new ReportListDto(reportDto);
+
+            ReportListDto reportListDto = modelMapper.map(report, ReportListDto.class);
             reportListDto.setIsTodayReport(isTodayReport(report));
 
             reportDtos.add(reportListDto);
@@ -81,7 +84,7 @@ public class ReportService {
 
         for (Report report : reports) {
             if (report.getQuestion().getQuestion().contains(query)) {
-                ReportDto reportDto = reportToDto(report);
+                ReportDto reportDto = modelMapper.map(report, ReportDto.class);
                 reportDtos.add(reportDto);
             }
         }
@@ -96,7 +99,7 @@ public class ReportService {
         for (Report report : reports) {
             if (report.getAnswer() == null) continue;
             if (report.getAnswer().contains(query)) {
-                ReportDto reportDto = reportToDto(report);
+                ReportDto reportDto = modelMapper.map(report, ReportDto.class);
                 reportDtos.add(reportDto);
             }
         }
@@ -266,19 +269,5 @@ public class ReportService {
         }
         log.info("is not today's report");
         return false;
-    }
-
-    public ReportDto reportToDto(Report report) {
-        log.info("reportToDto");
-        ReportDto reportDto = new ReportDto();
-
-        reportDto.setReportId(report.getId());
-        reportDto.setQuestionId(report.getQuestion().getId());
-        reportDto.setQuestion(report.getQuestion().getQuestion());
-        reportDto.setAnswer(report.getAnswer());
-        reportDto.setCreatedAt(report.getCreatedAt());
-        reportDto.setModifiedAt(report.getModifiedAt());
-
-        return reportDto;
     }
 }
