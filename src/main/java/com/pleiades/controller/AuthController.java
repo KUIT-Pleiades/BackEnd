@@ -5,13 +5,10 @@ import com.pleiades.entity.*;
 import com.pleiades.repository.*;
 import com.pleiades.service.AuthService;
 import com.pleiades.service.DuplicationService;
-import com.pleiades.service.ImageJsonCreator;
 import com.pleiades.service.SignupService;
 import com.pleiades.strings.ValidationStatus;
-import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +31,18 @@ public class AuthController {
     KakaoTokenRepository kakaoTokenRepository;
     NaverTokenRepository naverTokenRepository;
 
-    ImageJsonCreator imageJsonCreator;
-
     SignupService signupService;
     AuthService authService;
 
     @Autowired
     AuthController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
                    NaverTokenRepository naverTokenRepository,
-                   ImageJsonCreator imageJsonCreator, SignupService signupService, AuthService authService,
+                   SignupService signupService, AuthService authService,
                    JwtUtil jwtUtil)
     {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
-        this.imageJsonCreator = imageJsonCreator; this.signupService = signupService; this.authService = authService;
+        this.signupService = signupService; this.authService = authService;
         this.jwtUtil = jwtUtil;
     }
 

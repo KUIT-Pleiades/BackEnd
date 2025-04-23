@@ -44,17 +44,16 @@ public class AuthService {
     CharacterRepository characterRepository;
 
     JwtUtil jwtUtil;
-    ImageJsonCreator imageJsonCreator;
 
     ModelMapper modelMapper;
 
     @Autowired
     AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, ImageJsonCreator imageJsonCreator, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService, ModelMapper modelMapper) {
+                CharacterRepository characterRepository, JwtUtil jwtUtil, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService, ModelMapper modelMapper) {
         this.userRepository = userRepository; this.starRepository = starRepository;
         this.starBackgroundRepository = starBackgroundRepository;
         this.characterRepository = characterRepository;
-        this.jwtUtil = jwtUtil; this.imageJsonCreator = imageJsonCreator;
+        this.jwtUtil = jwtUtil;
         this.stationRepository = stationRepository;
         this.userStationRepository = userStationRepository;
         this.friendRepository = friendRepository;
