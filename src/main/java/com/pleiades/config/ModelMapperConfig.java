@@ -49,7 +49,7 @@ public class ModelMapperConfig {
     private void characterToDto(ModelMapper modelMapper) {
         modelMapper.typeMap(Face.class, CharacterFaceDto.class).addMappings(mapper -> {
             mapper.map(src -> src.getSkin().getName(), CharacterFaceDto::setSkinImg);
-            mapper.map(src -> src.getSkin().getName(), CharacterFaceDto::setHairImg);
+            mapper.map(src -> src.getHair().getName(), CharacterFaceDto::setHairImg);
             mapper.map(src -> src.getExpression().getName(), CharacterFaceDto::setExpressionImg);
         });
 
