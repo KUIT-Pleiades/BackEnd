@@ -48,26 +48,26 @@ public class ModelMapperConfig {
 
     private void characterToDto(ModelMapper modelMapper) {
         modelMapper.typeMap(Face.class, CharacterFaceDto.class).addMappings(mapper -> {
-            mapper.map(Face::getSkin, CharacterFaceDto::setSkinImg);
-            mapper.map(Face::getHair, CharacterFaceDto::setHairImg);
-            mapper.map(Face::getExpression, CharacterFaceDto::setExpressionImg);
+            mapper.map(src -> src.getSkin().getName(), CharacterFaceDto::setSkinImg);
+            mapper.map(src -> src.getSkin().getName(), CharacterFaceDto::setHairImg);
+            mapper.map(src -> src.getExpression().getName(), CharacterFaceDto::setExpressionImg);
         });
 
         modelMapper.typeMap(Outfit.class, CharacterOutfitDto.class).addMappings(mapper -> {
-            mapper.map(Outfit::getTop, CharacterOutfitDto::setTopImg);
-            mapper.map(Outfit::getBottom, CharacterOutfitDto::setBottomImg);
-            mapper.map(Outfit::getShoes, CharacterOutfitDto::setShoesImg);
+            mapper.map(src -> src.getTop().getName(), CharacterOutfitDto::setTopImg);
+            mapper.map(src -> src.getBottom().getName(), CharacterOutfitDto::setBottomImg);
+            mapper.map(src -> src.getShoes().getName(), CharacterOutfitDto::setShoesImg);
         });
 
         modelMapper.typeMap(Item.class, CharacterItemDto.class).addMappings(mapper -> {
-            mapper.map(Item::getEars, CharacterItemDto::setEarsImg);
-            mapper.map(Item::getEyes, CharacterItemDto::setEyesImg);
-            mapper.map(Item::getHead, CharacterItemDto::setHeadImg);
-            mapper.map(Item::getNeck, CharacterItemDto::setNeckImg);
-            mapper.map(Item::getLeftHand, CharacterItemDto::setLeftHandImg);
-            mapper.map(Item::getRightHand, CharacterItemDto::setRightHandImg);
-            mapper.map(Item::getLeftWrist, CharacterItemDto::setLeftWristImg);
-            mapper.map(Item::getRightWrist, CharacterItemDto::setRightWristImg);
+            mapper.map(src -> src.getEars().getName(), CharacterItemDto::setEarsImg);
+            mapper.map(src -> src.getEyes().getName(), CharacterItemDto::setEyesImg);
+            mapper.map(src -> src.getHead().getName(), CharacterItemDto::setHeadImg);
+            mapper.map(src -> src.getNeck().getName(), CharacterItemDto::setNeckImg);
+            mapper.map(src -> src.getLeftHand().getName(), CharacterItemDto::setLeftHandImg);
+            mapper.map(src -> src.getRightHand().getName(), CharacterItemDto::setRightHandImg);
+            mapper.map(src -> src.getLeftWrist().getName(), CharacterItemDto::setLeftWristImg);
+            mapper.map(src -> src.getRightWrist().getName(), CharacterItemDto::setRightWristImg);
         });
     }
 }
