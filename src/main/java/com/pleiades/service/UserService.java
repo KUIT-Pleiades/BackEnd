@@ -206,13 +206,13 @@ public class UserService {
 
         userInfoDto.setBackgroundName(starBackground.get().getName());
 
-        CharacterFaceDto characterFaceDto = modelMapper.map(character.get(), CharacterFaceDto.class);
+        CharacterFaceDto characterFaceDto = modelMapper.map(character.get().getFace(), CharacterFaceDto.class);
         userInfoDto.setFace(characterFaceDto);
 
-        CharacterOutfitDto characterOutfitDto = modelMapper.map(character.get(), CharacterOutfitDto.class);
+        CharacterOutfitDto characterOutfitDto = modelMapper.map(character.get().getOutfit(), CharacterOutfitDto.class);
         userInfoDto.setOutfit(characterOutfitDto);
 
-        CharacterItemDto characterItemDto = modelMapper.map(character.get(), CharacterItemDto.class);
+        CharacterItemDto characterItemDto = modelMapper.map(character.get().getItem(), CharacterItemDto.class);
         userInfoDto.setItem(characterItemDto);
 
         return userInfoDto;
