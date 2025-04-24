@@ -1,17 +1,15 @@
-package com.pleiades.service;
+package com.pleiades.service.report;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportListDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.User_Station.UserStation;
-import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.repository.*;
+import com.pleiades.service.station.StationQuestionService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

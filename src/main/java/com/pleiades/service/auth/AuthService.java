@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.Star;
@@ -12,6 +12,7 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.service.UserService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;

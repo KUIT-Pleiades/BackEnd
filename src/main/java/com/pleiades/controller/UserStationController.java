@@ -3,7 +3,7 @@ package com.pleiades.controller;
 import com.pleiades.dto.station.StationHomeDto;
 import com.pleiades.dto.station.StationListDto;
 import com.pleiades.dto.station.UserPositionDto;
-import com.pleiades.service.UserStationService;
+import com.pleiades.service.station.UserStationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

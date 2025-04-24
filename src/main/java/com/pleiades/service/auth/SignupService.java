@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;

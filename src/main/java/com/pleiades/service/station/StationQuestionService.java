@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.station;
 
 import com.pleiades.entity.Question;
 import com.pleiades.entity.Station;

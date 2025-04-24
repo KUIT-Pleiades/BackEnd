@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.report;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.entity.Report;

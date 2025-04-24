@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.LoginResponseDto;
 import com.pleiades.dto.naver.NaverLoginResponseDto;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service

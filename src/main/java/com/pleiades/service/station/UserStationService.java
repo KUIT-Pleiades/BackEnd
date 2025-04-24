@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.station;
 
 import com.pleiades.dto.station.*;
 import com.pleiades.entity.Report;
@@ -12,6 +12,9 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.service.UserService;
+import com.pleiades.service.report.ReportService;
+import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;

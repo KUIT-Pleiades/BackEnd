@@ -5,7 +5,7 @@ import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.station;
 
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.dto.station.StationSettingDto;
@@ -11,6 +11,8 @@ import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.StationRepository;
 
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.service.UserService;
+import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
