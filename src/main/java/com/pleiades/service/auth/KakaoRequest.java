@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.kakao.KakaoAccessTokenDto;
 import com.pleiades.dto.kakao.KakaoTokenDto;
@@ -6,19 +6,14 @@ import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.strings.KakaoUrl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j

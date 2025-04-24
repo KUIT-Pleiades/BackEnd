@@ -5,21 +5,16 @@ import com.pleiades.dto.naver.NaverLoginRequestDto;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
-import com.pleiades.service.AuthService;
-import com.pleiades.service.NaverLoginService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.pleiades.service.auth.AuthService;
+import com.pleiades.service.auth.NaverLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 
 @Slf4j

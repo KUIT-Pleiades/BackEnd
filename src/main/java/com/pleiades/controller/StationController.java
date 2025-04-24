@@ -5,12 +5,12 @@ import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
-import com.pleiades.service.AuthService;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
 
 import com.pleiades.dto.station.StationCreateDto;
-import com.pleiades.service.StationService;
+import com.pleiades.service.station.StationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.station;
 
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.dto.station.StationSettingDto;
@@ -11,6 +11,8 @@ import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.StationRepository;
 
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.service.UserService;
+import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,7 +35,7 @@ public class StationService {
 
     private final UserStationService userStationService;
     private final UserService userService;
-    private final ReportService reportService;
+    private final TodaysReportService todaysReportService;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
@@ -103,7 +104,7 @@ public class StationService {
         log.info("새로운 정거장 생성 완료: {}", station.getName());
 
         userStationService.addUserStation(adminUser, station, true);
-        Report report = reportService.createReport(adminUser,station);
+        Report report = todaysReportService.createTodaysReport(adminUser,station);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
         return Map.of("stationId", stationId);

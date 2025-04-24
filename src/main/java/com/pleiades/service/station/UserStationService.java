@@ -1,6 +1,5 @@
-package com.pleiades.service;
+package com.pleiades.service.station;
 
-import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.station.*;
 import com.pleiades.entity.Report;
 import com.pleiades.entity.Station;
@@ -12,8 +11,10 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
-import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.service.UserService;
+import com.pleiades.service.report.ReportService;
+import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public class UserStationService {
     private final FriendRepository friendRepository;
 
     private final UserService userService;
-    private final ReportService reportService;
+    private final TodaysReportService todaysReportService;
 
     @Transactional
     public Map<String,String> setUserPosition(String email, String stationId, String userId, UserPositionDto requestBody){
@@ -78,8 +78,8 @@ public class UserStationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
-        Report todaysReport = reportService.searchTodaysReport(user, station);
-        if (todaysReport == null) { reportService.createReport(user, station); }
+        Report todaysReport = todaysReportService.searchTodaysReport(user, station);
+        if (todaysReport == null) { todaysReportService.createTodaysReport(user, station); }
 
         // response DTO 생성
         return buildStationHomeDto(station, userStation.isTodayReport(), user);
@@ -108,7 +108,7 @@ public class UserStationService {
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
         stationRepository.save(station);
 
-        Report report = reportService.createReport(user,station);
+        Report report = todaysReportService.createTodaysReport(user,station);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
         return Map.of("message","Enter Station Success");

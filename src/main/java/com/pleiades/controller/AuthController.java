@@ -3,13 +3,14 @@ package com.pleiades.controller;
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.repository.*;
-import com.pleiades.service.AuthService;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.DuplicationService;
-import com.pleiades.service.SignupService;
+import com.pleiades.service.auth.SignupService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,32 +20,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 @Slf4j
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    UserRepository userRepository;
-    StarRepository starRepository;
+    private final UserRepository userRepository;
+    private final StarRepository starRepository;
 
-    KakaoTokenRepository kakaoTokenRepository;
-    NaverTokenRepository naverTokenRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
+    private final NaverTokenRepository naverTokenRepository;
 
-    SignupService signupService;
-    AuthService authService;
-
-    @Autowired
-    AuthController(UserRepository userRepository, StarRepository starRepository, KakaoTokenRepository kakaoTokenRepository,
-                   NaverTokenRepository naverTokenRepository,
-                   SignupService signupService, AuthService authService,
-                   JwtUtil jwtUtil)
-    {
-        this.userRepository = userRepository; this.starRepository = starRepository;
-        this.kakaoTokenRepository = kakaoTokenRepository; this.naverTokenRepository = naverTokenRepository;
-        this.signupService = signupService; this.authService = authService;
-        this.jwtUtil = jwtUtil;
-    }
+    private final SignupService signupService;
+    private final AuthService authService;
 
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {

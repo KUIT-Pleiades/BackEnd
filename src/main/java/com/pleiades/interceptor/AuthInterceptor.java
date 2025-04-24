@@ -1,8 +1,7 @@
 package com.pleiades.interceptor;
 
-import com.pleiades.entity.User;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
@@ -12,12 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 @Component

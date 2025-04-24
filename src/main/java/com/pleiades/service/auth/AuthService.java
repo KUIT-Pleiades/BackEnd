@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.Star;
@@ -12,6 +12,7 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.service.UserService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
@@ -20,9 +21,9 @@ import com.pleiades.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
@@ -32,35 +33,19 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
     private final UserService userService;
-    UserRepository userRepository;
-    StarRepository starRepository;
-    StarBackgroundRepository starBackgroundRepository;
-    CharacterRepository characterRepository;
+    private final UserRepository userRepository;
+    private final StarRepository starRepository;
+    private final StarBackgroundRepository starBackgroundRepository;
+    private final CharacterRepository characterRepository;
 
-    JwtUtil jwtUtil;
-
-    ModelMapper modelMapper;
-
-    @Autowired
-    AuthService(UserRepository userRepository, StarRepository starRepository, StarBackgroundRepository starBackgroundRepository,
-                CharacterRepository characterRepository, JwtUtil jwtUtil, StationRepository stationRepository, UserStationRepository userStationRepository, FriendRepository friendRepository, UserService userService, ModelMapper modelMapper) {
-        this.userRepository = userRepository; this.starRepository = starRepository;
-        this.starBackgroundRepository = starBackgroundRepository;
-        this.characterRepository = characterRepository;
-        this.jwtUtil = jwtUtil;
-        this.stationRepository = stationRepository;
-        this.userStationRepository = userStationRepository;
-        this.friendRepository = friendRepository;
-        this.userService = userService;
-        this.modelMapper = modelMapper;
-    }
-
+    private final JwtUtil jwtUtil;
 
     public ValidationStatus checkToken(String token) {
         log.info("AuthService checkToken");

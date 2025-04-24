@@ -1,18 +1,18 @@
-package com.pleiades.service;
+package com.pleiades.service.auth;
 
 import com.pleiades.dto.kakao.KakaoTokenDto;
 import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoTokenService {
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    KakaoTokenRepository kakaoTokenRepository;
+    private final UserRepository userRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
 
     public boolean checkAccessTokenValidation(String accessToken, String userId) {
         String foundUserId = null;

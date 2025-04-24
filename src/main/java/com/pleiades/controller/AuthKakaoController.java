@@ -4,21 +4,17 @@ import com.pleiades.dto.kakao.KakaoAccountDto;
 import com.pleiades.dto.kakao.KakaoTokenDto;
 import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
-import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
-import com.pleiades.util.HashStringUtil;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.util.JwtUtil;
-import com.pleiades.service.KakaoRequest;
-import com.pleiades.service.KakaoTokenService;
+import com.pleiades.service.auth.KakaoRequest;
+import com.pleiades.service.auth.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,39 +24,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
-import java.net.URI;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Slf4j
 @Controller
 @RequestMapping("/auth/login/kakao")
 public class AuthKakaoController {
 
-    UserRepository userRepository;
-    KakaoTokenRepository kakaoTokenRepository;
-    KakaoTokenService kakaoTokenService;
-    JwtUtil jwtUtil;
-    AuthService authService;
+    private final UserRepository userRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
+    private final KakaoTokenService kakaoTokenService;
+    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
     @Value("${KAKAO_CLIENT_ID}")
     private String KAKAO_CLIENT_ID;
 
     @Value("${FRONT_ORIGIN}")
     private String FRONT_ORIGIN;
-
-    @Autowired
-    AuthKakaoController(UserRepository userRepository, KakaoTokenRepository kakaoTokenRepository,
-                        KakaoTokenService kakaoTokenService, JwtUtil jwtUtil, AuthService authService) {
-        this.userRepository = userRepository;
-        this.kakaoTokenRepository = kakaoTokenRepository;
-        this.kakaoTokenService = kakaoTokenService;
-        this.jwtUtil = jwtUtil;
-        this.authService = authService;
-    }
 
     // 모든 jwt 토큰 만료 or 최초 로그인
     @GetMapping("")

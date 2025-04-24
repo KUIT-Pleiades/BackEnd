@@ -6,19 +6,16 @@ import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.ReportHistoryRepository;
-import com.pleiades.repository.ReportRepository;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
-import com.pleiades.service.ReportHistoryService;
-import com.pleiades.service.ReportService;
-import com.pleiades.service.UserService;
+import com.pleiades.service.auth.AuthService;
+import com.pleiades.service.report.ReportHistoryService;
+import com.pleiades.service.report.ReportService;
+import com.pleiades.service.report.SearchReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
-import com.pleiades.util.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,39 +25,19 @@ import java.util.*;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/reports")
 public class ReportController {
     private final ReportHistoryService reportHistoryService;
-    AuthService authService;
-    UserService userService;
-    ReportService reportService;
+    private final AuthService authService;
+    private final ReportService reportService;
+    private final SearchReportService searchReportService;
 
-    JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final FriendRepository friendRepository;
+    private final ReportHistoryRepository reportHistoryRepository;
 
-    UserRepository userRepository;
-    ReportRepository reportRepository;
-    FriendRepository friendRepository;
-    ReportHistoryRepository reportHistoryRepository;
-
-    ModelMapper modelMapper;
-
-    @Autowired
-    public ReportController(AuthService authService, UserService userService, ReportService reportService, JwtUtil jwtUtil, UserRepository userRepository, ReportRepository reportRepository, FriendRepository friendRepository,
-                            ReportHistoryService reportHistoryService, ReportHistoryRepository reportHistoryRepository, ModelMapper modelMapper) {
-        this.authService = authService;
-        this.userService = userService;
-        this.reportService = reportService;
-        this.reportHistoryService = reportHistoryService;
-
-        this.jwtUtil = jwtUtil;
-
-        this.userRepository = userRepository;
-        this.reportRepository = reportRepository;
-        this.friendRepository = friendRepository;
-        this.reportHistoryRepository = reportHistoryRepository;
-
-        this.modelMapper = modelMapper;
-    }
+    private final ModelMapper modelMapper;
 
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization) {
@@ -83,7 +60,7 @@ public class ReportController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
 
-        Set<ReportDto> result = reportService.searchResult(user.get(), query);
+        Set<ReportDto> result = searchReportService.searchResult(user.get(), query);
 
         // 문자열 중복 검색 후 ReportHistoryRepository 에 저장
         reportHistoryService.saveReportHistory(query, user.get());
@@ -200,7 +177,7 @@ public class ReportController {
         if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
         // report 검색
-        Set<ReportDto> result = reportService.searchResult(friend.get(), query);
+        Set<ReportDto> result = searchReportService.searchResult(friend.get(), query);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", result));
     }

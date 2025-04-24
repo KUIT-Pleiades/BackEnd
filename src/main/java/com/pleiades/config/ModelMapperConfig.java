@@ -1,6 +1,5 @@
 package com.pleiades.config;
 
-import com.pleiades.dto.CharacterDto;
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportListDto;
 import com.pleiades.dto.character.CharacterFaceDto;

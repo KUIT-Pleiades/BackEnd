@@ -5,45 +5,36 @@ import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.AuthService;
+import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 import static io.jsonwebtoken.Jwts.header;
 
+@RequiredArgsConstructor
 @Slf4j
 @Controller
 @RequestMapping("/home")
 public class HomeController {
     private final UserRepository userRepository;
 
-    AuthService authService;
-    UserService userService;
-    JwtUtil jwtUtil;
-    ModelMapper modelMapper;
-
-    @Autowired
-    public HomeController(AuthService authService, UserService userService, JwtUtil jwtUtil, UserRepository userRepository, ModelMapper modelMapper) {
-        this.authService = authService;
-        this.userService = userService;
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final AuthService authService;
+    private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @GetMapping("")
     public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization) {
