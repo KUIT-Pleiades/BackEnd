@@ -36,7 +36,6 @@ public class UserStationService {
     private final FriendRepository friendRepository;
 
     private final UserService userService;
-    private final ReportService reportService;
     private final TodaysReportService todaysReportService;
 
     @Transactional

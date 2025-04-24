@@ -6,6 +6,7 @@ import com.pleiades.entity.User;
 import com.pleiades.repository.ReportHistoryRepository;
 import com.pleiades.repository.ReportRepository;
 import com.pleiades.util.LocalDateTimeUtil;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +23,11 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ReportHistoryService {
     private static final Logger log = LoggerFactory.getLogger(ReportHistoryService.class);
-    ReportRepository reportRepository;
-    ReportHistoryRepository reportHistoryRepository;
-    ModelMapper modelMapper;
-
-    @Autowired
-    public ReportHistoryService(ReportRepository reportRepository, ReportHistoryRepository reportHistoryRepository, ModelMapper modelMapper) {
-        this.reportRepository = reportRepository;
-        this.reportHistoryRepository = reportHistoryRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final ReportHistoryRepository reportHistoryRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional
     public void saveReportHistory(String query, User user) {

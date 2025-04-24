@@ -58,12 +58,6 @@ public class UserService {
     private final CharacterRepository characterRepository;
     private final SkinRepository skinRepository; private final ExpressionRepository expressionRepository; private final HairRepository hairRepository;
     private final TopRepository topRepository; private final BottomRepository bottomRepository; private final ShoesRepository shoesRepository;
-    private final ItemRepository itemRepository;
-
-    private final KakaoTokenRepository kakaoTokenRepository;
-    private final NaverTokenRepository naverTokenRepository;
-
-    private final EntityManager entityManager;
 
     private CharacterDto characterDto = null;
 
