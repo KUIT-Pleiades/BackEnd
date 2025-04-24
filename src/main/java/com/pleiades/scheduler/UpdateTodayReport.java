@@ -1,4 +1,4 @@
-package com.pleiades.service;
+package com.pleiades.scheduler;
 
 import com.pleiades.entity.Report;
 import com.pleiades.entity.User_Station.UserStation;
