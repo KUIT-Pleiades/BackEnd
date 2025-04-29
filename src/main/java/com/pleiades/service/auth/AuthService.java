@@ -10,6 +10,7 @@ import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
+import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.service.UserService;
@@ -23,7 +24,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
@@ -47,35 +47,24 @@ public class AuthService {
 
     private final JwtUtil jwtUtil;
 
-    public ValidationStatus checkToken(String token) {
-        log.info("AuthService checkToken");
-        if (token == null || token.isEmpty()) { log.info("token is empty"); return ValidationStatus.NONE; }
-
-        Claims tokenClaim = jwtUtil.validateToken(token);
-        if (tokenClaim == null) { log.info("token is not valid"); return ValidationStatus.NOT_VALID; }
-
-        log.info("token is valid");
-        return ValidationStatus.VALID;
-    }
-
     public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
         log.info("AuthService responseRefreshTokenStatus");
 
         Map<String, String> body = new HashMap<>();
-        ValidationStatus tokenStatus = checkToken(refreshToken);
 
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
+        TokenValidateResult tokenStatus = TokenValidateResult.of(refreshToken);
+
+        if (tokenStatus.getValidationStatus() == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
                     .body(Map.of("message","Refresh Token is required"));     // 428
         }
 
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+        if (tokenStatus.getValidationStatus() == ValidationStatus.NOT_VALID) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message","Refresh token is not valid. Social login is required"));     // 403
         }
 
-        Claims claims = jwtUtil.validateToken(refreshToken);
-        String email = claims.getSubject();
+        String email = tokenStatus.getEmail();
 
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
@@ -216,7 +205,7 @@ public class AuthService {
     }
 
     public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
-        ValidationStatus tokenStatus = checkToken(accessToken);
+        TokenValidateResult tokenStatus = TokenValidateResult.of(accessToken);
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428

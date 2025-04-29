@@ -1,5 +1,6 @@
 package com.pleiades.interceptor;
 
+import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.strings.ValidationStatus;
@@ -23,7 +24,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final AuthService authService;
 
     @Autowired
-    public AuthInterceptor(JwtUtil jwtUtil, UserRepository userRepository, AuthService authService) {
+    public AuthInterceptor(JwtUtil jwtUtil, AuthService authService) {
         this.jwtUtil = jwtUtil;
         this.authService = authService;
     }
@@ -59,7 +60,9 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        ValidationStatus tokenStatus = authService.checkToken(accessToken);
+        TokenValidateResult tokenValidateResult = TokenValidateResult.of(accessToken);
+
+        ValidationStatus tokenStatus = tokenValidateResult.getValidationStatus();
 
         if (tokenStatus.equals(ValidationStatus.NONE)) {
             log.info("AuthInterceptor preHandle 401 - no token");

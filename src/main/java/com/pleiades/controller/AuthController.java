@@ -46,11 +46,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
         log.info("/auth/refresh");
         log.info("cookie - refreshToken: " + refreshToken);
-        if (refreshToken == null) {
-            log.info("cookie - refreshToken is null");
-            return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED) //428
-                    .body(Map.of("message","Refresh Token is required"));
-        }
+
         return authService.responseRefreshTokenStatus(refreshToken);
     }
 
