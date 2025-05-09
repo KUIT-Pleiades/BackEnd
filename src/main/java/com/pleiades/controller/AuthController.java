@@ -90,4 +90,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("message","failed to save sign-up information"));   // 422
         }
     }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
+        log.info("/auth/logout");
+        String email = (String) request.getAttribute("email");
+
+        authService.logout(email);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

@@ -259,4 +259,10 @@ public class AuthService {
 
         if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }
     }
+
+    public void logout(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
+        user.get().setRefreshToken(null);
+    }
 }
