@@ -66,6 +66,18 @@ public class AuthService {
 
         String email = tokenStatus.getEmail();
 
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        String savedRefreshToken = user.get().getRefreshToken();
+
+        if (!refreshToken.equals(savedRefreshToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message","Refresh token is not valid. Social login is required"));     // 403 - 401로 바꾸고 싶음
+        }
+
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
