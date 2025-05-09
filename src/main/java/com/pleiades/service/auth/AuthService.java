@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.*;
@@ -47,6 +48,7 @@ public class AuthService {
 
     private final JwtUtil jwtUtil;
 
+    @Transactional
     public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
         log.info("AuthService responseRefreshTokenStatus");
 
@@ -66,8 +68,24 @@ public class AuthService {
 
         String email = tokenStatus.getEmail();
 
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        String savedRefreshToken = user.get().getRefreshToken();
+
+        if (!refreshToken.equals(savedRefreshToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message","Refresh token is not valid. Social login is required"));     // 403 - 401로 바꾸고 싶음
+        }
+
         String newAccessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String newRefreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
+
+
+        user.get().setRefreshToken(newRefreshToken);
+        userRepository.save(user.get());
 
         Cookie cookie = setRefreshToken(newRefreshToken);
         body.put("accessToken", newAccessToken);
@@ -246,5 +264,13 @@ public class AuthService {
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
 
         if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }
+    }
+
+    @Transactional
+    public void logout(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
+        user.get().setRefreshToken(null);
+        userRepository.save(user.get());
     }
 }

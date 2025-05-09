@@ -4,6 +4,7 @@ import com.pleiades.dto.kakao.KakaoAccountDto;
 import com.pleiades.dto.kakao.KakaoTokenDto;
 import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
+import com.pleiades.entity.User;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
@@ -119,8 +120,11 @@ public class AuthKakaoController {
         String accessToken = jwtUtil.generateAccessToken(email, JwtRole.ROLE_USER.getRole());
         String refreshToken = jwtUtil.generateRefreshToken(email, JwtRole.ROLE_USER.getRole());
 
-        log.info("accessToken: " + accessToken);
-        log.info("refreshToken: " + refreshToken);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            user.get().setRefreshToken(refreshToken);
+            userRepository.save(user.get());
+        }
 
         body.put("accessToken", accessToken);
         Cookie cookie = authService.setRefreshToken(refreshToken);
