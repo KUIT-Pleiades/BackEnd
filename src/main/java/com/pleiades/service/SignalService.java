@@ -41,7 +41,9 @@ public class SignalService {
         }
 
         if (signalRepository.existsBySenderAndReceiver(sender, receiver)) {
-            throw new CustomException(ErrorCode.ALREADY_SENT_SIGNAL);
+            // 프론트 요청 -> 중복 시그널 시 요청은 보내고 저장만 안함
+            // throw new CustomException(ErrorCode.ALREADY_SENT_SIGNAL);
+            return ResponseEntity.ok(Map.of("message", "Signal sent successfully"));
         }
 
         Signal signal = Signal.builder()
