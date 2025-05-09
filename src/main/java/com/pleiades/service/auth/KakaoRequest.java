@@ -40,10 +40,8 @@ public class KakaoRequest {
         // 요청 객체
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
-        log.info("2ed");
         try {   // POST 요청
             ResponseEntity<KakaoTokenDto> response = restTemplate.postForEntity(KakaoUrl.TOKEN_URL.getUrl(), entity, KakaoTokenDto.class);
-            log.info("3ed");
             return response.getBody();
         } catch (Exception e) {
             log.error(e.getMessage());

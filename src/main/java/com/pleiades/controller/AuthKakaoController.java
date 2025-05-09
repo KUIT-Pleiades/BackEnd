@@ -72,10 +72,7 @@ public class AuthKakaoController {
 
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code) {
-        log.info("kakao code redirected");
         try {
-            log.info("code: " + code);
-
             KakaoTokenDto responseToken = KakaoRequest.postAccessToken(code);
 
             if (responseToken == null) {
@@ -88,12 +85,16 @@ public class AuthKakaoController {
 
             // 기존 카카오 토큰 삭제
             Optional<KakaoToken> oldToken = kakaoTokenRepository.findByEmail(email);
-            oldToken.ifPresent(kakaoToken -> kakaoTokenRepository.delete(kakaoToken));
+            oldToken.ifPresent(kakaoTokenRepository::delete);
 
             // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
             KakaoToken token = new KakaoToken();
             token.setEmail(email);
             token.setRefreshToken(responseToken.getRefreshToken());
+
+            User user = userRepository.findByEmail(email).orElse(null);
+            token.setUser(user);
+
             kakaoTokenRepository.save(token);
 
             log.info("redirect to front/kakaologin");
