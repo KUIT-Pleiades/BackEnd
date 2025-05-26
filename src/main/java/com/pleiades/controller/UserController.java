@@ -64,5 +64,14 @@ public class UserController {
 
         return userService.deleteOldUserHistory(email, searchedId);
     }
+    @DeleteMapping("/histories")
+    public ResponseEntity<Map<String, Object>> deleteAllUserHistory(HttpServletRequest request) {
+        log.info("delete all user history controller 진입");
+
+        String email = (String) request.getAttribute("email");
+        log.info("사용자 email = {}", email);
+
+        return userService.deleteAllUserHistory(email);
+    }
 }
 

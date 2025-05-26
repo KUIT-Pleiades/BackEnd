@@ -21,12 +21,12 @@ public enum ErrorCode {
 
     FRIEND_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Friend request not found"),
     SIGNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "Signal not found"),
+    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
+    SEARCH_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "Search Id not found"),
 
     USER_ALREADY_IN_STATION(HttpStatus.CONFLICT, "User already in the station"),
     STATION_FULL(HttpStatus.CONFLICT, "Station Full. You cannot enter the station."),
     USER_NEVER_ENTERED_STATION(HttpStatus.NOT_ACCEPTABLE, "User never entered the station."),
-
-    IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found"),
 
     INFORMATION_NOT_VALID(HttpStatus.FORBIDDEN, "Invalid information"),
 

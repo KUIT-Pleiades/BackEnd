@@ -213,6 +213,26 @@ public class UserService {
     }
 
     @Transactional
+    public ResponseEntity<Map<String, Object>> deleteAllUserHistory(String email) {
+        log.info("UserService - delete old UserHistory");
+
+        User currentUser = getUserByEmail(email);
+
+        List<UserHistory> toDelete = userHistoryRepository.findByCurrent(currentUser);
+
+        if(toDelete == null || toDelete.isEmpty()) {
+            log.info("toDelete is null || empty");
+            return ResponseEntity.noContent().build();
+        }
+
+        for (UserHistory history : toDelete) {
+            userHistoryRepository.delete(history);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Transactional
     public ResponseEntity<Map<String, Object>> deleteOldUserHistory(String email, String searchedId) {
         log.info("UserService - delete old UserHistory");
 
@@ -220,14 +240,14 @@ public class UserService {
         User searchedUser = userRepository.findById(searchedId).orElse(null);
 
         if(searchedUser == null){
-            log.info("searchedUser: null");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","searchedId doesn't exist"));
+            log.info("searchedUser == null");
+            throw new CustomException(ErrorCode.SEARCH_ID_NOT_FOUND);
         }
 
         UserHistory toDelete = userHistoryRepository.findByCurrentAndSearched(currentUser, searchedUser).orElse(null);
 
         if(toDelete == null){
-            log.info("toDelete: null");
+            log.info("toDelete == null");
             return ResponseEntity.noContent().build();
         }
         userHistoryRepository.delete(toDelete);
@@ -243,7 +263,7 @@ public class UserService {
 
         if(searchedUser == null){
             log.info("history add: searchedUser == null");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","searchedId doesn't exist"));
+            throw new CustomException(ErrorCode.SEARCH_ID_NOT_FOUND);
         }
 
         // 기존 검색 기록 조회 - 같은 searchedUser 가 있는지 확인
