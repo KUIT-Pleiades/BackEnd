@@ -24,10 +24,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 경로에 대해
-                .allowedOrigins("http://54.252.108.194", FRONT_ORIGIN)
+                .allowedOrigins(FRONT_ORIGIN)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
-                .allowedOriginPatterns("*")
                 .allowCredentials(true);
     }
 
@@ -40,8 +39,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/auth/auth/refresh",
                         "/error",
                         "/auth/login/**",
-                        "/redis/**"
-//                        "/auth/login/*",
+                        "/redis/**",
+                        "/auth/logout"
 //                        "/auth/login",
 //                        "/auth/login/",
 //                        "/auth/login/naver"

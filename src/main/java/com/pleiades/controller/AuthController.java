@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
+import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.DuplicationService;
@@ -91,11 +92,14 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
         log.info("/auth/logout");
-        String email = (String) request.getAttribute("email");
+        String email = TokenValidateResult.of(refreshToken).getEmail();
 
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","unvalid refresh token"));
+        }
         authService.logout(email);
 
         return ResponseEntity.status(HttpStatus.OK).build();
