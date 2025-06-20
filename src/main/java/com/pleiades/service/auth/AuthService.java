@@ -273,4 +273,20 @@ public class AuthService {
         user.get().setRefreshToken(null);
         userRepository.save(user.get());
     }
+
+    @Transactional
+    public void withdraw(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // delete all ...
+        Characters character = characterRepository.findByUser(user).orElseThrow(
+                ()-> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
+        // image URL
+        if (character != null) {
+            // itemRepository.deleteAllByCharacter(character);
+            // faceRepository.deleteByCharacter(character.getFace());
+            // outfitRepository.deleteByCharacter(character.getOutfit());
+            characterRepository.delete(character);
+        }
+    }
 }

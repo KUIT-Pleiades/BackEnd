@@ -16,6 +16,7 @@ public enum ErrorCode {
     USER_NOT_IN_STATION(HttpStatus.NOT_FOUND, "Target User is not in a station"),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+    CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Character not found"),
     STAR_NOT_FOUND(HttpStatus.NOT_FOUND, "Star not found"),
     STATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Station not found"),
 
