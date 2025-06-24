@@ -8,4 +8,4 @@
 
 
 🧠 ERD (Entity Relationship Diagram)
-[🌐 ERD Cloud](https://www.erdcloud.com/d/oR48Cvkhv85pSiepY)
+[🌐 ERD Cloud](https://www.erdcloud.com/d/brvi3iR5RsDJBSRHs)
