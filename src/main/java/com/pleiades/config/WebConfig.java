@@ -40,7 +40,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/error",
                         "/auth/login/**",
                         "/redis/**",
-                        "/auth/logout"
+                        "/auth/logout",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
 //                        "/auth/login",
 //                        "/auth/login/",
 //                        "/auth/login/naver"

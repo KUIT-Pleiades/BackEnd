@@ -11,6 +11,8 @@ import com.pleiades.strings.ValidationStatus;
 
 import com.pleiades.dto.station.StationCreateDto;
 import com.pleiades.service.station.StationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "Station", description = "정거장 관련 API")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/stations")
 public class StationController {
@@ -34,6 +37,7 @@ public class StationController {
     private final StationRepository stationRepository;
     private final StationService stationService;
 
+    @Operation(summary = "정거장 생성", description = "정거장 생성하기")
     @PostMapping("")
     public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @Valid @RequestBody StationCreateDto requestDto) {
         log.info("createStation controller 진입");
@@ -48,6 +52,7 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "정거장 삭제", description = "정거장 삭제하기")
     @DeleteMapping("/{station_id}")
     public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("station_id") String station_id) {
         log.info("deleteStation controller 진입");
@@ -61,6 +66,7 @@ public class StationController {
         return stationService.deleteStation(email, station_id);
     }
 
+    @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{station_id}/background")
     public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("/stations/"+stationId+"/background");
@@ -81,6 +87,7 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background edited"));
     }
 
+    @Operation(summary = "정거장 설정", description = "정거장 설정 변경하기")
     @PatchMapping("/{stationId}/settings")
     public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationId+"/settings");

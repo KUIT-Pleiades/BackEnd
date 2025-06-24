@@ -13,6 +13,8 @@ import com.pleiades.service.auth.KakaoRequest;
 import com.pleiades.service.auth.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "Auth: Kakao", description = "카카오 인증 관련 API")
 @RequiredArgsConstructor
 @Slf4j
 @Controller
@@ -48,6 +51,7 @@ public class AuthKakaoController {
     private String FRONT_ORIGIN;
 
     // 모든 jwt 토큰 만료 or 최초 로그인
+    @Operation(summary = "", description = "")
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect() {
         try {
@@ -70,6 +74,7 @@ public class AuthKakaoController {
         }
     }
 
+    @Operation(summary = "", description = "")
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code) {
         try {
@@ -109,6 +114,7 @@ public class AuthKakaoController {
         }
     }
 
+    @Operation(summary = "", description = "")
     @GetMapping("/temp")
     public ResponseEntity<Map<String, String>> responseToken(@RequestParam("hash") String email, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();

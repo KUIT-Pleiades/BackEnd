@@ -13,6 +13,8 @@ import com.pleiades.service.report.ReportService;
 import com.pleiades.service.report.SearchReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -23,8 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Tag(name = "Report", description = "리포트 관련 API")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/reports")
 public class ReportController {
@@ -39,6 +42,7 @@ public class ReportController {
 
     private final ModelMapper modelMapper;
 
+    @Operation(summary = "리포트 불러오기", description = "리포트 불러오기")
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> reports(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -52,6 +56,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", reports));
     }
 
+    @Operation(summary = "리포트 조회", description = "리포트 검색하기")
     @GetMapping(params = "query")
     public ResponseEntity<Object> searchReport(@RequestHeader("Authorization") String authorization, @RequestParam("query") String query) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -69,6 +74,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", result));
     }
 
+    @Operation(summary = "리포트 검색 기록", description = "리포트 검색 기록 불러오기")
     @GetMapping("/history")
     public ResponseEntity<Map<String, Object>> searchHistory(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -92,6 +98,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("history", historyDtos));
     }
 
+    @Operation(summary = "리포트 검색 기록 삭제", description = "리포트 검색 기록 삭제")
     @DeleteMapping("/history/{historyId}")
     public ResponseEntity<Map<String, Object>> deleteHistory(@RequestHeader("Authorization") String authorization, @PathVariable("historyId") Long historyId) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -103,6 +110,7 @@ public class ReportController {
         return reportHistoryService.deleteById(historyId);
     }
 
+    @Operation(summary = "리포트 수정", description = "리포트 수정하기")
     @PatchMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> updateReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -120,6 +128,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", "report editted"));
     }
 
+    @Operation(summary = "리포트 삭제", description = "리포트 삭제하기")
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> deleteReport(@RequestHeader("Authorization") String authorization, @PathVariable("reportId") Long reportId) {
         String email = authService.getEmailByAuthorization(authorization);
@@ -137,6 +146,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "report deleted"));
     }
 
+    @Operation(summary = "친구 리포트", description = "친구 리포트 불러오기")
     @GetMapping("/friends")
     public ResponseEntity<Map<String, Object>> friendsReports(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId) {
         // 친구 아이디 존재 여부
@@ -159,6 +169,7 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", reports));
     }
 
+    @Operation(summary = "친구 리포트 조회", description = "친구 리포트 검색하기")
     @GetMapping(value = "/friends", params = "query")
     public ResponseEntity<Map<String, Object>> searchFriendsReport(@RequestHeader("Authorization") String authorization, @RequestParam("userId") String userId, @RequestParam("query") String query) {
         // 친구 아이디 존재 여부
