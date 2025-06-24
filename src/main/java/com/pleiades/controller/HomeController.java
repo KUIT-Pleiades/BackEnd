@@ -10,6 +10,8 @@ import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,10 @@ import java.util.*;
 
 import static io.jsonwebtoken.Jwts.header;
 
+@Tag(name = "Home", description = "내 별 관련 API")
 @RequiredArgsConstructor
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/home")
 public class HomeController {
     private final UserRepository userRepository;
@@ -36,12 +39,14 @@ public class HomeController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
+    @Operation(summary = "내 별", description = "내 별")
     @GetMapping("")
     public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization) {
         String accessToken = HeaderUtil.authorizationBearer(authorization);
         return authService.responseUserInfo(accessToken);
     }
 
+    @Operation(summary = "친구 별", description = "친구 별")
     @GetMapping("/{userId}")
     public ResponseEntity<Map<String, Object>> friendHome(HttpServletRequest request, @PathVariable("userId") String userId) {
         // 친구 아이디 존재 여부
@@ -60,6 +65,7 @@ public class HomeController {
         return authService.responseFriendInfo(user.get(), friend.get());
     }
 
+    @Operation(summary = "캐릭터 설정", description = "캐릭터 옷 입히기")
     @PostMapping("/settings/character")
     public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @Valid @RequestBody UserInfoDto userInfoDto) {
         String email = (String) request.getAttribute("email");
@@ -82,6 +88,7 @@ public class HomeController {
         return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "application/json").body(Map.of("message", "character set"));
     }
 
+    @Operation(summary = "설정 보기", description = "프로필 설정 불러오기")
     @GetMapping("/settings/profile")
     public ResponseEntity<ProfileDto> getProfile(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -95,6 +102,7 @@ public class HomeController {
         return ResponseEntity.status(HttpStatus.OK).body(profileDto);
     }
 
+    @Operation(summary = "설정 변경", description = "프로필 설정 변경하기")
     @PostMapping("/settings/profile")
     public ResponseEntity<Map<String, String>> profileSetting(HttpServletRequest request, @Valid @RequestBody ProfileSettingDto profileSettingDto) {
         String email = (String) request.getAttribute("email");
