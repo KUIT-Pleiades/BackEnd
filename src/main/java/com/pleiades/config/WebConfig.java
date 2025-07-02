@@ -42,6 +42,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/redis/**",
                         "/auth/logout",
                         "/swagger-ui/**",
+                        "/swagger-ui.html/**",
                         "/v3/api-docs/**"
 //                        "/auth/login",
 //                        "/auth/login/",
