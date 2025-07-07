@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/redis")
 public class RedisController {
     private final StringRedisTemplate redisTemplate;
+
     @GetMapping("/write")
     public String write() {
         redisTemplate.opsForValue().set("hello", "world");
