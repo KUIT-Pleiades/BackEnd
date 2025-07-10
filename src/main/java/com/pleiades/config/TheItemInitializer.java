@@ -41,13 +41,13 @@ public class TheItemInitializer implements CommandLineRunner {
         insertFrom(bottomRepository.findAllNames(), ItemType.BOTTOM);
         insertFrom(topRepository.findAllNames(), ItemType.TOP);
         insertFrom(shoesRepository.findAllNames(), ItemType.SHOES);
-        insertFrom(expressionRepository.findAllNames(), ItemType.EXPRESSION);
+        insertFrom(expressionRepository.findAllNames(), ItemType.EYES);
         insertFrom(hairRepository.findAllNames(), ItemType.HAIR);
-        insertFrom(skinRepository.findAllNames(), ItemType.SKIN);
+        insertFrom(skinRepository.findAllNames(), ItemType.SKIN_COLOR);
         insertFrom(headRepository.findAllNames(), ItemType.HEAD);
         insertFrom(neckRepository.findAllNames(), ItemType.NECK);
         insertFrom(earsRepository.findAllNames(), ItemType.EARS);
-        insertFrom(eyesRepository.findAllNames(), ItemType.EYES);
+        insertFrom(eyesRepository.findAllNames(), ItemType.EYES_ITEM);
         insertFrom(leftHandRepository.findAllNames(), ItemType.LEFT_HAND);
         insertFrom(leftWristRepository.findAllNames(), ItemType.LEFT_WRIST);
         insertFrom(rightHandRepository.findAllNames(), ItemType.RIGHT_HAND);
