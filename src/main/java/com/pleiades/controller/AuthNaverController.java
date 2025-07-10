@@ -7,6 +7,8 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.NaverRefreshTokenExpiredException;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.auth.NaverLoginService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
+@Tag(name = "Auth: Naver", description = "네이버 인증 관련 API")
 @Slf4j
 @RestController
 @RequestMapping("/auth/login")
@@ -26,6 +29,7 @@ public class AuthNaverController {
     private final NaverLoginService naverLoginService;
     private final AuthService authService;
 
+    @Operation(summary = "", description = "")
     @PostMapping("/naver")
     public ResponseEntity<Map<String,String>> handleNaverLogin(@RequestBody NaverLoginRequestDto loginRequest, HttpServletResponse response) {
         long startTime = System.currentTimeMillis();
