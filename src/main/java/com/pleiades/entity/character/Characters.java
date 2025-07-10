@@ -1,15 +1,6 @@
 package com.pleiades.entity.character;
 
 import com.pleiades.entity.User;
-import com.pleiades.entity.character.Item.Item;
-import com.pleiades.entity.character.face.Expression;
-import com.pleiades.entity.character.face.Face;
-import com.pleiades.entity.character.face.Hair;
-import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.outfit.Bottom;
-import com.pleiades.entity.character.outfit.Outfit;
-import com.pleiades.entity.character.outfit.Shoes;
-import com.pleiades.entity.character.outfit.Top;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,16 +28,12 @@ public class Characters {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="face_id")
-    private Face face;
+    @OneToMany(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CharacterItem> characterItems = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="item_id")
-    private Item item;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="outfit_id")
-    private Outfit outfit;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name="face_id")
+//    private Face face;
+//    // Item, Outfit
 
 }

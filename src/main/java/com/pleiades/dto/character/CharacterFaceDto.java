@@ -14,13 +14,25 @@ import lombok.Setter;
 public class CharacterFaceDto {
     @NotBlank
     @JsonProperty("skinColor")
-    private String skinImg;
+    private String skinColor;
 
     @NotBlank
     @JsonProperty("hair")
-    private String hairImg;
+    private String hair;
 
     @NotBlank
-    @JsonProperty("expression")
-    private String expressionImg;
+    @JsonProperty("eyes")
+    private String eyes;
+
+    @NotBlank
+    @JsonProperty("nose")
+    private String nose;
+
+    @NotBlank
+    @JsonProperty("mouth")
+    private String mouth;
+
+    @NotBlank
+    @JsonProperty("mole")
+    private String mole;
 }

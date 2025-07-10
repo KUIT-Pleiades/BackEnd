@@ -15,27 +15,27 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterItemDto {
     @JsonProperty("head")
-    private String headImg;
+    private String head;
 
-    @JsonProperty("eyes")
-    private String eyesImg;
+    @JsonProperty("eyes_item")
+    private String eyesItem;
 
     @JsonProperty("ears")
-    private String earsImg;
+    private String ears;
 
     @JsonProperty("neck")
-    private String neckImg;
+    private String neck;
 
     @JsonProperty("leftWrist")
-    private String leftWristImg;
+    private String leftWrist;
 
     @JsonProperty("rightWrist")
-    private String rightWristImg;
+    private String rightWrist;
 
     @JsonProperty("leftHand")
-    private String leftHandImg;
+    private String leftHand;
 
     @JsonProperty("rightHand")
-    private String rightHandImg;
+    private String rightHand;
 
 }
