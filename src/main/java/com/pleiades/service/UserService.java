@@ -6,7 +6,6 @@ import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.character.CharacterItem;
-import com.pleiades.entity.character.Item.*;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -226,14 +225,6 @@ public class UserService {
         userInfoDto.setFace(makeCharacterFaceDto(items));
         userInfoDto.setOutfit(makeCharacterOutfitDto(items));
         userInfoDto.setItem(makeCharacterItemDto(items));
-//        CharacterFaceDto characterFaceDto = modelMapper.map(character.get().getFace(), CharacterFaceDto.class);
-//        userInfoDto.setFace(characterFaceDto);
-//
-//        CharacterOutfitDto characterOutfitDto = modelMapper.map(character.get().getOutfit(), CharacterOutfitDto.class);
-//        userInfoDto.setOutfit(characterOutfitDto);
-//
-//        CharacterItemDto characterItemDto = modelMapper.map(character.get().getItem(), CharacterItemDto.class);
-//        userInfoDto.setItem(characterItemDto);
 
         return userInfoDto;
     }
