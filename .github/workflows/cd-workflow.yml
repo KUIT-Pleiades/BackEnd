@@ -2,24 +2,20 @@ name: CD with Gradle and Docker
 
 on:
   push:
-    branches:
-      - 'dev'
-      - 'main'
+    branches: [ 'main', 'dev' ]
   pull_request:
-    branches:
-      - 'dev'
-      - 'main'
+    branches: [ 'main', 'dev' ]
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-      - name: ☕️ set up JDK 17        # 프로젝트의 java 버전에 맞추어 설정
+
+      - name: ☕️ set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
@@ -34,10 +30,10 @@ jobs:
         run: ./gradlew clean build -x test --stacktrace
 
       - name: 🐳 Docker build & push
-        run:  |
+        run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
       - name: 🚀 deploy to server
         uses: appleboy/ssh-action@master
@@ -46,21 +42,55 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
-          envs: GITHUB_SHA
           script: |
-            echo "✋🏻Stopping existing container"
-            sudo docker stop pleiades-server
-            sudo docker rm pleiades-server
-        
-            sudo docker ps -a
-            
-            echo "🥳 Pulling new image"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
-            
-            echo "🌱 Running new container with environment variables"
+            set -e
+
+            if [ "${GITHUB_REF##*/}" = "dev" ]; then
+              echo "🌱 DEV branch detected: deploying to port 8008"
+              sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+              sudo docker stop pleiades-dev  || true
+              sudo docker rm   pleiades-dev  || true
+
+              sudo docker run -d \
+                -p 8008:8080 \
+                --name pleiades-dev \
+                -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+                -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+                -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
+                -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
+                -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
+                -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
+                -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
+                -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+                -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
+                -e IPFS_URL=${{ secrets.IPFS_URL }} \
+                ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+
+              echo "✅ DEV deploy complete (http://<EC2 IP>:8008)"
+              sudo docker image prune -f
+              exit 0
+            fi
+
+            echo "🔎 Determine next color / port"
+            if sudo docker ps --filter "name=pleiades-blue" --format '{{.Names}}' | grep -q pleiades-blue; then
+              NEXT_COLOR=green
+              TARGET_PORT=8001
+              OLD_COLOR=blue
+              OLD_PORT=8000
+            else
+              NEXT_COLOR=blue
+              TARGET_PORT=8000
+              OLD_COLOR=green
+              OLD_PORT=8001
+            fi
+
+            echo "🍀 Deploying $NEXT_COLOR container on port $TARGET_PORT"
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+
             sudo docker run -d \
-              -p 8000:8080 \
-              --name pleiades-server \
+              -p ${TARGET_PORT}:8080 \
+              --name pleiades-${NEXT_COLOR} \
+              --label color=${NEXT_COLOR} \
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
               -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
               -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
@@ -71,7 +101,30 @@ jobs:
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
               -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
               -e IPFS_URL=${{ secrets.IPFS_URL }} \
-              ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
+              ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
-            echo "🚮 Cleaning up old images"
+            echo "⏳ Waiting for health check…"
+            HEALTH_URL="http://localhost:${TARGET_PORT}/actuator/health"
+            for i in {1..20}; do
+              if curl -fs ${HEALTH_URL} | grep -q '"status":"UP"'; then
+                echo "✅ Health check passed"
+                break
+              fi
+              sleep 3
+            done
+
+            if [ "$i" = "20" ]; then
+              echo "❌ Health check failed, rolling back"
+              sudo docker logs pleiades-${NEXT_COLOR} --tail 50
+              sudo docker stop pleiades-${NEXT_COLOR}
+              sudo docker rm   pleiades-${NEXT_COLOR}
+              exit 1
+            fi
+
+            echo "🔄 Switching traffic to ${NEXT_COLOR}"
+            echo "upstream pleiades_backend { server 127.0.0.1:${TARGET_PORT}; }" | sudo tee /etc/nginx/conf.d/active_upstream.conf
+            sudo nginx -s reload
+            echo "🧹 Shutting down old container"
+            sudo docker stop pleiades-${OLD_COLOR} || true
+            sudo docker rm   pleiades-${OLD_COLOR} || true
             sudo docker image prune -f
