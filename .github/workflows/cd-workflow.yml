@@ -75,7 +75,7 @@ jobs:
             fi
 
             echo "🔎 Determine next color / port"
-            if sudo docker ps --filter "name=pleiades-blue" --format '{{.Names}}' | grep -q pleiades-blue; then
+            if sudo docker ps -a --filter "name=pleiades-blue" --format '{{.Names}}' | grep -q pleiades-blue; then
               NEXT_COLOR=green
               TARGET_PORT=8001
               OLD_COLOR=blue
@@ -90,6 +90,7 @@ jobs:
             echo "🍀 Deploying $NEXT_COLOR container on port $TARGET_PORT"
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
+            sudo docker rm -f pleiades-${NEXT_COLOR} 2>/dev/null || true
             sudo docker run -d \
               -p ${TARGET_PORT}:8080 \
               --name pleiades-${NEXT_COLOR} \
