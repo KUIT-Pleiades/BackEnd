@@ -32,7 +32,6 @@ public class CharacterFaceDto {
     @JsonProperty("mouth")
     private String mouth;
 
-    @NotBlank
     @JsonProperty("mole")
     private String mole;
 }
