@@ -2,13 +2,8 @@ package com.pleiades.config;
 
 import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportListDto;
-import com.pleiades.dto.character.CharacterFaceDto;
-import com.pleiades.dto.character.CharacterItemDto;
-import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.Report;
-import com.pleiades.entity.character.Item.Item;
-import com.pleiades.entity.character.face.Face;
-import com.pleiades.entity.character.outfit.Outfit;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;

@@ -49,8 +49,6 @@ public class UserService {
     private final TheItemRepository theItemRepository;
     private final CharacterItemRepository characterItemRepository;
 
-    private CharacterDto characterDto = null;
-
     private final ModelMapper modelMapper;
 
     public User getUserByEmail(String email) {
@@ -75,7 +73,6 @@ public class UserService {
 
     @Transactional
     public ValidationStatus setCharacter(String email, CharacterDto characterDto) {
-        this.characterDto = characterDto;
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Characters character = characterRepository.findByUser(user).orElseThrow(() -> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
