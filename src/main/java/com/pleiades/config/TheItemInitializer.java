@@ -20,7 +20,7 @@ public class TheItemInitializer implements CommandLineRunner {
         insertItems("face_mouth_", 27, ItemType.MOUTH, true);
         insertItems("face_mole_", 1, ItemType.MOLE, false);
         insertItems("face_hair_", 25, ItemType.HAIR, true);
-        insertItems("face_skinColor_", 7, ItemType.SKIN_COLOR, true);
+        insertItems("face_skin_", 7, ItemType.SKIN_COLOR, true);
 
         insertItems("fashion_top_", 15, ItemType.TOP, false);
         insertItems("fashion_bottom_", 17, ItemType.BOTTOM, false);
@@ -39,7 +39,7 @@ public class TheItemInitializer implements CommandLineRunner {
 
     private void insertItems(String prefix, int count, ItemType type, boolean isRequired) {
         for (int i = 1; i <= count; i++) {
-            String name = prefix + String.format("%03d", i);
+            String name = prefix + i;
             if (!theItemRepository.existsByNameAndType(name, type)) {
                 TheItem item = new TheItem(null, name, type, 0L, isRequired, null);
                 theItemRepository.save(item);
