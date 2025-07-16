@@ -2,19 +2,15 @@ package com.pleiades.service.auth;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
+import com.pleiades.entity.character.CharacterItem;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.Item.*;
-import com.pleiades.entity.character.face.Face;
-import com.pleiades.entity.character.outfit.Outfit;
+import com.pleiades.entity.character.TheItem;
+
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
-import com.pleiades.repository.character.face.ExpressionRepository;
-import com.pleiades.repository.character.face.HairRepository;
-import com.pleiades.repository.character.face.SkinRepository;
-import com.pleiades.repository.character.item.*;
-import com.pleiades.repository.character.outfit.BottomRepository;
-import com.pleiades.repository.character.outfit.ShoesRepository;
-import com.pleiades.repository.character.outfit.TopRepository;
+import com.pleiades.repository.character.TheItemRepository;
+
+import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import jakarta.persistence.EntityManager;
@@ -30,25 +26,12 @@ import java.util.*;
 @Slf4j
 @Service
 public class SignupService {
-    private final HeadRepository headRepository;
-    private final EyesRepository eyesRepository;
-    private final EarsRepository earsRepository;
-    private final NeckRepository neckRepository;
-    private final LeftWristRepository leftWristRepository;
-    private final RightWristRepository rightWristRepository;
-    private final LeftHandRepository leftHandRepository;
-    private final RightHandRepository rightHandRepository;
+
     private final StarBackgroundRepository starBackgroundRepository;
     private final UserRepository userRepository;
     private final StarRepository starRepository;
     private final CharacterRepository characterRepository;
-    private final SkinRepository skinRepository;
-    private final ExpressionRepository expressionRepository;
-    private final HairRepository hairRepository;
-    private final TopRepository topRepository;
-    private final BottomRepository bottomRepository;
-    private final ShoesRepository shoesRepository;
-    private final ItemRepository itemRepository;
+    private final TheItemRepository theItemRepository;
 
     private final KakaoTokenRepository kakaoTokenRepository;
     private final NaverTokenRepository naverTokenRepository;
@@ -111,48 +94,56 @@ public class SignupService {
     }
 
     private void createCharacter(User user, UserInfoDto userInfoDto) {
-        Face face = createFace(userInfoDto);
-        Outfit outfit = createOutfit(userInfoDto);
-        Item item = createItem(userInfoDto);
-
         Characters character = new Characters();
         character.setUser(user);
-        character.setFace(face);
-        character.setOutfit(outfit);
-        character.setItem(item);
+        characterRepository.save(character); // 먼저 저장하고 ID 확보
 
+        List<TheItem> items = extractSelectedItems(userInfoDto);
+        List<CharacterItem> characterItems = items.stream()
+                .map(item -> CharacterItem.builder()
+                        .character(character)
+                        .item(item)
+                        .build())
+                .toList();
+
+        character.setCharacterItems(characterItems); // Characters가 characterItems 필드 갖고 있어야 함
         characterRepository.save(character);
+
         log.info("Character 세팅 완료 - id: {}", character.getId());
     }
 
-    private Face createFace(UserInfoDto userInfoDto) {
-        Face face = new Face();
-        face.setSkin(skinRepository.findByName(userInfoDto.getFace().getSkinImg()).orElseThrow());
-        face.setExpression(expressionRepository.findByName(userInfoDto.getFace().getExpressionImg()).orElseThrow());
-        face.setHair(hairRepository.findByName(userInfoDto.getFace().getHairImg()).orElseThrow());
-        return face;
+    private List<TheItem> extractSelectedItems(UserInfoDto dto) {
+        List<TheItem> items = new ArrayList<>();
+
+        addIfPresent(items, dto.getFace().getSkinColor(), ItemType.SKIN_COLOR);
+        addIfPresent(items, dto.getFace().getHair(), ItemType.HAIR);
+        addIfPresent(items, dto.getFace().getEyes(), ItemType.EYES);
+        addIfPresent(items, dto.getFace().getNose(), ItemType.NOSE);
+        addIfPresent(items, dto.getFace().getMouth(), ItemType.MOUTH);
+        addIfPresent(items, dto.getFace().getMole(), ItemType.MOLE);
+
+        addIfPresent(items, dto.getOutfit().getTop(), ItemType.TOP);
+        addIfPresent(items, dto.getOutfit().getBottom(), ItemType.BOTTOM);
+        addIfPresent(items, dto.getOutfit().getSet(), ItemType.SET);
+        addIfPresent(items, dto.getOutfit().getShoes(), ItemType.SHOES);
+
+        addIfPresent(items, dto.getItem().getHead(), ItemType.HEAD);
+        addIfPresent(items, dto.getItem().getEyesItem(), ItemType.EYES_ITEM);
+        addIfPresent(items, dto.getItem().getEars(), ItemType.EARS);
+        addIfPresent(items, dto.getItem().getNeck(), ItemType.NECK);
+        addIfPresent(items, dto.getItem().getLeftHand(), ItemType.LEFT_HAND);
+        addIfPresent(items, dto.getItem().getLeftWrist(), ItemType.LEFT_WRIST);
+        addIfPresent(items, dto.getItem().getRightHand(), ItemType.RIGHT_HAND);
+        addIfPresent(items, dto.getItem().getRightWrist(), ItemType.RIGHT_WRIST);
+
+        return items;
     }
 
-    private Outfit createOutfit(UserInfoDto userInfoDto) {
-        Outfit outfit = new Outfit();
-        outfit.setTop(topRepository.findByName(userInfoDto.getOutfit().getTopImg()).orElseThrow());
-        outfit.setBottom(bottomRepository.findByName(userInfoDto.getOutfit().getBottomImg()).orElseThrow());
-        outfit.setShoes(shoesRepository.findByName(userInfoDto.getOutfit().getShoesImg()).orElseThrow());
-        return outfit;
+    private void addIfPresent(List<TheItem> list, String name, ItemType type) {
+        if (name == null || name.isBlank()) return;
+        theItemRepository.findByNameAndType(name, type).ifPresent(list::add);
     }
 
-    private Item createItem(UserInfoDto userInfoDto) {
-        Item item = new Item();
-        item.setHead(headRepository.findByName(userInfoDto.getItem().getHeadImg()).orElse(null));
-        item.setEyes(eyesRepository.findByName(userInfoDto.getItem().getEyesImg()).orElse(null));
-        item.setEars(earsRepository.findByName(userInfoDto.getItem().getEarsImg()).orElse(null));
-        item.setNeck(neckRepository.findByName(userInfoDto.getItem().getNeckImg()).orElse(null));
-        item.setLeftWrist(leftWristRepository.findByName(userInfoDto.getItem().getLeftWristImg()).orElse(null));
-        item.setRightWrist(rightWristRepository.findByName(userInfoDto.getItem().getRightWristImg()).orElse(null));
-        item.setLeftHand(leftHandRepository.findByName(userInfoDto.getItem().getLeftHandImg()).orElse(null));
-        item.setRightHand(rightHandRepository.findByName(userInfoDto.getItem().getRightHandImg()).orElse(null));
-        return item;
-    }
 
     private void setNaverToken(NaverToken naverToken, User user) {
         naverToken.setUser(user);

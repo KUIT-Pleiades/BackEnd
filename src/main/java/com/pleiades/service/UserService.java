@@ -5,34 +5,24 @@ import com.pleiades.dto.character.CharacterFaceDto;
 import com.pleiades.dto.character.CharacterItemDto;
 import com.pleiades.dto.character.CharacterOutfitDto;
 import com.pleiades.entity.*;
-import com.pleiades.entity.character.Item.*;
+import com.pleiades.entity.character.CharacterItem;
+import com.pleiades.entity.character.TheItem;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.character.CharacterItemRepository;
+import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.strings.ItemType;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.Characters;
-import com.pleiades.entity.character.face.Expression;
-import com.pleiades.entity.character.face.Face;
-import com.pleiades.entity.character.face.Hair;
-import com.pleiades.entity.character.face.Skin;
-import com.pleiades.entity.character.outfit.Bottom;
-import com.pleiades.entity.character.outfit.Outfit;
-import com.pleiades.entity.character.outfit.Shoes;
-import com.pleiades.entity.character.outfit.Top;
+
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
-import com.pleiades.repository.character.face.ExpressionRepository;
-import com.pleiades.repository.character.face.HairRepository;
-import com.pleiades.repository.character.face.SkinRepository;
-import com.pleiades.repository.character.item.*;
-import com.pleiades.repository.character.outfit.BottomRepository;
-import com.pleiades.repository.character.outfit.ShoesRepository;
-import com.pleiades.repository.character.outfit.TopRepository;
 import com.pleiades.strings.ValidationStatus;
 import jakarta.persistence.EntityManager;
 import org.modelmapper.ModelMapper;
@@ -50,16 +40,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository; private final UserHistoryRepository userHistoryRepository;
+    private final UserRepository userRepository;
+    private final UserHistoryRepository userHistoryRepository;
     private final FriendRepository friendRepository;
-    private final HeadRepository headRepository; private final EyesRepository eyesRepository; private final EarsRepository earsRepository; private final NeckRepository neckRepository;
-    private final LeftWristRepository leftWristRepository; private final RightWristRepository rightWristRepository; private final LeftHandRepository leftHandRepository;private final RightHandRepository rightHandRepository;
     private final StarBackgroundRepository starBackgroundRepository; private final StarRepository starRepository;
-    private final CharacterRepository characterRepository;
-    private final SkinRepository skinRepository; private final ExpressionRepository expressionRepository; private final HairRepository hairRepository;
-    private final TopRepository topRepository; private final BottomRepository bottomRepository; private final ShoesRepository shoesRepository;
 
-    private CharacterDto characterDto = null;
+    private final CharacterRepository characterRepository;
+    private final TheItemRepository theItemRepository;
+    private final CharacterItemRepository characterItemRepository;
 
     private final ModelMapper modelMapper;
 
@@ -85,30 +73,58 @@ public class UserService {
 
     @Transactional
     public ValidationStatus setCharacter(String email, CharacterDto characterDto) {
-        this.characterDto = characterDto;
 
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { return ValidationStatus.NONE; }
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Characters character = characterRepository.findByUser(user).orElseThrow(() -> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
 
-        Optional<Characters> characterOpt = characterRepository.findByUser(user.get());
-        if (characterOpt.isEmpty()) { return ValidationStatus.NOT_VALID; }
+        List<TheItem> selectedItems = getSelectedItemsFromDto(characterDto);
 
-        Characters character = characterOpt.get();
+        // 기존 아이템 제거 -> 기존 관계 테이블 삭제
+        characterItemRepository.deleteAllByCharacter(character);
 
-        Face face = makeFace();
-        Outfit outfit = makeOutfit();
-        Item item = makeItem();
+        List<CharacterItem> characterItems = selectedItems.stream()
+                .map(item -> new CharacterItem(character, item))
+                .toList();
 
-        character.setFace(face);
-        character.setOutfit(outfit);
-        character.setItem(item);
+        character.setCharacterItems(characterItems);
         characterRepository.save(character);
 
-        user.get().setProfileUrl(characterDto.getProfile());
-        user.get().setCharacterUrl(characterDto.getCharacter());
-        userRepository.save(user.get());
+        user.setProfileUrl(characterDto.getProfile());
+        user.setCharacterUrl(characterDto.getCharacter());
+        userRepository.save(user);
 
         return ValidationStatus.VALID;
+    }
+
+    private List<TheItem> getSelectedItemsFromDto(CharacterDto dto) {
+        List<TheItem> items = new ArrayList<>();
+        addIfPresent(items, dto.getFace().getSkinColor(), ItemType.SKIN_COLOR);
+        addIfPresent(items, dto.getFace().getHair(), ItemType.HAIR);
+        addIfPresent(items, dto.getFace().getEyes(), ItemType.EYES);
+        addIfPresent(items, dto.getFace().getNose(), ItemType.NOSE);
+        addIfPresent(items, dto.getFace().getMouth(), ItemType.MOUTH);
+        addIfPresent(items, dto.getFace().getMole(), ItemType.MOLE);
+
+        addIfPresent(items, dto.getOutfit().getTop(), ItemType.TOP);
+        addIfPresent(items, dto.getOutfit().getBottom(), ItemType.BOTTOM);
+        addIfPresent(items, dto.getOutfit().getSet(), ItemType.SET);
+        addIfPresent(items, dto.getOutfit().getShoes(), ItemType.SHOES);
+
+        addIfPresent(items, dto.getItem().getHead(), ItemType.HEAD);
+        addIfPresent(items, dto.getItem().getEyesItem(), ItemType.EYES_ITEM);
+        addIfPresent(items, dto.getItem().getNeck(), ItemType.NECK);
+        addIfPresent(items, dto.getItem().getEars(), ItemType.EARS);
+        addIfPresent(items, dto.getItem().getLeftHand(), ItemType.LEFT_HAND);
+        addIfPresent(items, dto.getItem().getRightHand(), ItemType.RIGHT_HAND);
+        addIfPresent(items, dto.getItem().getLeftWrist(), ItemType.LEFT_WRIST);
+        addIfPresent(items, dto.getItem().getRightWrist(), ItemType.RIGHT_WRIST);
+
+        return items;
+    }
+
+    private void addIfPresent(List<TheItem> list, String name, ItemType type) {
+        if (name == null || name.isBlank()) return;
+        theItemRepository.findByNameAndType(name, type).ifPresent(list::add);
     }
 
     public ValidationStatus setBackground(String email, String backgroundName) {
@@ -194,20 +210,18 @@ public class UserService {
     public UserInfoDto buildUserInfoDto(User user) {
         Optional<Star> star = starRepository.findByUserId(user.getId());
         Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
-        Optional<Characters> character = characterRepository.findByUser(user);
+        Characters character = characterRepository.findByUser(user).orElseThrow(() -> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
 
         UserInfoDto userInfoDto = modelMapper.map(user, UserInfoDto.class);
-
         userInfoDto.setBackgroundName(starBackground.get().getName());
 
-        CharacterFaceDto characterFaceDto = modelMapper.map(character.get().getFace(), CharacterFaceDto.class);
-        userInfoDto.setFace(characterFaceDto);
+        List<TheItem> items = character.getCharacterItems().stream()
+                .map(CharacterItem::getItem)
+                .toList();
 
-        CharacterOutfitDto characterOutfitDto = modelMapper.map(character.get().getOutfit(), CharacterOutfitDto.class);
-        userInfoDto.setOutfit(characterOutfitDto);
-
-        CharacterItemDto characterItemDto = modelMapper.map(character.get().getItem(), CharacterItemDto.class);
-        userInfoDto.setItem(characterItemDto);
+        userInfoDto.setFace(makeCharacterFaceDto(items));
+        userInfoDto.setOutfit(makeCharacterOutfitDto(items));
+        userInfoDto.setItem(makeCharacterItemDto(items));
 
         return userInfoDto;
     }
@@ -307,45 +321,68 @@ public class UserService {
         }
     }
 
-    private Face makeFace() {
-        Face face = new Face();
-        Optional<Skin> skin = skinRepository.findByName(characterDto.getFace().getSkinImg());
-        Optional<Expression> expression = expressionRepository.findByName(characterDto.getFace().getExpressionImg());
-        Optional<Hair> hair = hairRepository.findByName(characterDto.getFace().getHairImg());
+    private CharacterFaceDto makeCharacterFaceDto(List<TheItem> items) {
+        CharacterFaceDto dto = new CharacterFaceDto();
+        items.forEach(item -> {
+            switch (item.getType()) {
+                case SKIN_COLOR -> dto.setSkinColor(item.getName());
+                case HAIR -> dto.setHair(item.getName());
+                case EYES -> dto.setEyes(item.getName());
+                case NOSE -> dto.setNose(item.getName());
+                case MOUTH -> dto.setMouth(item.getName());
+                case MOLE -> dto.setMole(item.getName());
+            }
+        });
 
-        skin.ifPresent(face::setSkin);
-        expression.ifPresent(face::setExpression);
-        hair.ifPresent(face::setHair);
-
-        return face;
+        return dto;
     }
 
-    private Outfit makeOutfit() {
-        Outfit outfit = new Outfit();
+    private CharacterOutfitDto makeCharacterOutfitDto(List<TheItem> items) {
+        CharacterOutfitDto dto = new CharacterOutfitDto();
 
-        Optional<Top> top = topRepository.findByName(characterDto.getOutfit().getTopImg());
-        Optional<Bottom> bottom = bottomRepository.findByName(characterDto.getOutfit().getBottomImg());
-        Optional<Shoes> shoes = shoesRepository.findByName(characterDto.getOutfit().getShoesImg());
+        items.forEach(item -> {
+            switch (item.getType()) {
+                case TOP -> dto.setTop(item.getName());
+                case BOTTOM -> dto.setBottom(item.getName());
+                case SET -> dto.setSet(item.getName());
+                case SHOES -> dto.setShoes(item.getName());
+            }
+        });
 
-        top.ifPresent(outfit::setTop);
-        bottom.ifPresent(outfit::setBottom);
-        shoes.ifPresent(outfit::setShoes);
-
-        return outfit;
+        return dto;
     }
 
-    private Item makeItem() {
-        Item item = new Item();
+    private CharacterItemDto makeCharacterItemDto(List<TheItem> items) {
+        CharacterItemDto dto = new CharacterItemDto();
 
-        item.setHead(headRepository.findByName(characterDto.getItem().getHeadImg()).orElse(null));
-        item.setEyes(eyesRepository.findByName(characterDto.getItem().getEyesImg()).orElse(null));
-        item.setEars(earsRepository.findByName(characterDto.getItem().getEarsImg()).orElse(null));
-        item.setNeck(neckRepository.findByName(characterDto.getItem().getNeckImg()).orElse(null));
-        item.setLeftWrist(leftWristRepository.findByName(characterDto.getItem().getLeftWristImg()).orElse(null));
-        item.setRightWrist(rightWristRepository.findByName(characterDto.getItem().getRightWristImg()).orElse(null));
-        item.setLeftHand(leftHandRepository.findByName(characterDto.getItem().getLeftHandImg()).orElse(null));
-        item.setRightHand(rightHandRepository.findByName(characterDto.getItem().getRightHandImg()).orElse(null));
+        items.forEach(item -> {
+            switch (item.getType()) {
+                case HEAD -> dto.setHead(item.getName());
+                case EYES_ITEM -> dto.setEyesItem(item.getName());
+                case EARS -> dto.setEars(item.getName());
+                case NECK -> dto.setNeck(item.getName());
+                case LEFT_HAND -> dto.setLeftHand(item.getName());
+                case LEFT_WRIST -> dto.setLeftWrist(item.getName());
+                case RIGHT_HAND -> dto.setRightHand(item.getName());
+                case RIGHT_WRIST -> dto.setRightWrist(item.getName());
+            }
+        });
 
-        return item;
+        return dto;
     }
+
+    // 캐릭터 생성 예전 버전
+//    private Face makeFace() {
+//        Face face = new Face();
+//        Optional<Skin> skin = skinRepository.findByName(characterDto.getFace().getSkinImg());
+//        Optional<Expression> expression = expressionRepository.findByName(characterDto.getFace().getExpressionImg());
+//        Optional<Hair> hair = hairRepository.findByName(characterDto.getFace().getHairImg());
+//
+//        skin.ifPresent(face::setSkin);
+//        expression.ifPresent(face::setExpression);
+//        hair.ifPresent(face::setHair);
+//
+//        return face;
+//    } // makeOutfit, makeItem
+
 }
