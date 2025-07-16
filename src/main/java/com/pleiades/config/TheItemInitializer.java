@@ -1,65 +1,49 @@
-//package com.pleiades.config;
-//
-//import com.pleiades.entity.character.TheItem;
-//import com.pleiades.repository.character.TheItemRepository;
-//import com.pleiades.repository.character.face.ExpressionRepository;
-//import com.pleiades.repository.character.face.HairRepository;
-//import com.pleiades.repository.character.face.SkinRepository;
-//import com.pleiades.repository.character.item.*;
-//import com.pleiades.repository.character.outfit.BottomRepository;
-//import com.pleiades.repository.character.outfit.ShoesRepository;
-//import com.pleiades.repository.character.outfit.TopRepository;
-//import com.pleiades.strings.ItemType;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.boot.CommandLineRunner;
-//import org.springframework.stereotype.Component;
-//
-//import java.util.List;
-//
-//@Component
-//@RequiredArgsConstructor
-//public class TheItemInitializer implements CommandLineRunner {
-//
-//    private final TheItemRepository theItemRepository;
-//    private final BottomRepository bottomRepository;
-//    private final TopRepository topRepository;
-//    private final ShoesRepository shoesRepository;
-//    private final ExpressionRepository expressionRepository;
-//    private final HairRepository hairRepository;
-//    private final SkinRepository skinRepository;
-//    private final HeadRepository headRepository;
-//    private final NeckRepository neckRepository;
-//    private final EarsRepository earsRepository;
-//    private final EyesRepository eyesRepository;
-//    private final LeftHandRepository leftHandRepository;
-//    private final LeftWristRepository leftWristRepository;
-//    private final RightHandRepository rightHandRepository;
-//    private final RightWristRepository rightWristRepository;
-//
-//    @Override
-//    public void run(String... args) {
-//        insertFrom(bottomRepository.findAllNames(), ItemType.BOTTOM);
-//        insertFrom(topRepository.findAllNames(), ItemType.TOP);
-//        insertFrom(shoesRepository.findAllNames(), ItemType.SHOES);
-//        insertFrom(expressionRepository.findAllNames(), ItemType.EYES);
-//        insertFrom(hairRepository.findAllNames(), ItemType.HAIR);
-//        insertFrom(skinRepository.findAllNames(), ItemType.SKIN_COLOR);
-//        insertFrom(headRepository.findAllNames(), ItemType.HEAD);
-//        insertFrom(neckRepository.findAllNames(), ItemType.NECK);
-//        insertFrom(earsRepository.findAllNames(), ItemType.EARS);
-//        insertFrom(eyesRepository.findAllNames(), ItemType.EYES_ITEM);
-//        insertFrom(leftHandRepository.findAllNames(), ItemType.LEFT_HAND);
-//        insertFrom(leftWristRepository.findAllNames(), ItemType.LEFT_WRIST);
-//        insertFrom(rightHandRepository.findAllNames(), ItemType.RIGHT_HAND);
-//        insertFrom(rightWristRepository.findAllNames(), ItemType.RIGHT_WRIST);
-//    }
-//
-//    private void insertFrom(List<String> names, ItemType type) {
-//        for (String name : names) {
-//            if (!theItemRepository.existsByNameAndType(name, type)) {
-//                TheItem item = new TheItem(null, name, type, 0L, false);
-//                theItemRepository.save(item);
-//            }
-//        }
-//    }
-//}
+package com.pleiades.config;
+
+import com.pleiades.entity.character.TheItem;
+import com.pleiades.repository.character.TheItemRepository;
+import com.pleiades.strings.ItemType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class TheItemInitializer implements CommandLineRunner {
+
+    private final TheItemRepository theItemRepository;
+
+    @Override
+    public void run(String... args) {
+        insertItems("face_eyes_", 32, ItemType.EYES, true);
+        insertItems("face_nose_", 1, ItemType.NOSE, true);
+        insertItems("face_mouth_", 27, ItemType.MOUTH, true);
+        insertItems("face_mole_", 1, ItemType.MOLE, false);
+        insertItems("face_hair_", 25, ItemType.HAIR, false);
+        insertItems("face_skinColor_", 7, ItemType.SKIN_COLOR, true);
+
+        insertItems("fashion_top_", 15, ItemType.TOP, false);
+        insertItems("fashion_bottom_", 17, ItemType.BOTTOM, false);
+        insertItems("fashion_set_", 3, ItemType.SET, false);
+        insertItems("fashion_shoes_", 16, ItemType.SHOES, true);
+
+        insertItems("fashion_acc_head_", 9, ItemType.HEAD, true);
+        insertItems("fashion_acc_eyesItem_", 2, ItemType.EYES_ITEM, false);
+        insertItems("fashion_acc_neck_", 3, ItemType.NECK, false);
+        insertItems("fashion_acc_ears_", 3, ItemType.EARS, false);
+        insertItems("fashion_acc_left_hand_", 7, ItemType.LEFT_HAND, false);
+        insertItems("fashion_acc_right_hand_", 6, ItemType.RIGHT_HAND, false);
+        insertItems("fashion_acc_left_wrist_", 1, ItemType.LEFT_WRIST, false);
+        insertItems("fashion_acc_right_wrist_", 1, ItemType.RIGHT_WRIST, false);
+    }
+
+    private void insertItems(String prefix, int count, ItemType type, boolean isRequired) {
+        for (int i = 1; i <= count; i++) {
+            String name = prefix + String.format("%03d", i);
+            if (!theItemRepository.existsByNameAndType(name, type)) {
+                TheItem item = new TheItem(null, name, type, 0L, isRequired, null);
+                theItemRepository.save(item);
+            }
+        }
+    }
+}
