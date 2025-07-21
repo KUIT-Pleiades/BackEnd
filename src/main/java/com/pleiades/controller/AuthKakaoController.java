@@ -60,8 +60,6 @@ public class AuthKakaoController {
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect() {
         try {
-            log.info("kakao login start");
-
             String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                     "?response_type=code" +
                     "&client_id=" + KAKAO_CLIENT_ID +
