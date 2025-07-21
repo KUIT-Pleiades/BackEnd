@@ -6,6 +6,7 @@ import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.strings.KakaoUrl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,6 +27,9 @@ public class KakaoRequest {
     // @Value
     private static String clientId = System.getenv("KAKAO_CLIENT_ID");
 
+    @Value("${SERVER_DOMAIN}")
+    private static String SERVER_DOMAIN;
+
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
         HttpHeaders headers = new HttpHeaders();
@@ -34,7 +38,7 @@ public class KakaoRequest {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", clientId);
-        body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getUrl());
+        body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getRedirectUri(SERVER_DOMAIN));
         body.add("code", code);
 
         // 요청 객체

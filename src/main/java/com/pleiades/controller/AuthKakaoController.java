@@ -52,6 +52,9 @@ public class AuthKakaoController {
     @Value("${FRONT_ORIGIN}")
     private String FRONT_ORIGIN;
 
+    @Value("${SERVER_DOMAIN}")
+    private String SERVER_DOMAIN;
+
     // 모든 jwt 토큰 만료 or 최초 로그인
     @Operation(summary = "", description = "")
     @GetMapping("")
@@ -62,7 +65,7 @@ public class AuthKakaoController {
             String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                     "?response_type=code" +
                     "&client_id=" + KAKAO_CLIENT_ID +
-                    "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
+                    "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getRedirectUri(SERVER_DOMAIN);
 
             return ResponseEntity
                     .status(HttpStatus.FOUND)
