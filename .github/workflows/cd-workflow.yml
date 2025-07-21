@@ -67,6 +67,7 @@ jobs:
                 -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
                 -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
                 -e IPFS_URL=${{ secrets.IPFS_URL }} \
+                -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
                 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
               echo "✅ DEV deploy complete (http://<EC2 IP>:8008)"
@@ -105,6 +106,7 @@ jobs:
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
               -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
               -e IPFS_URL=${{ secrets.IPFS_URL }} \
+              -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
             echo "⏳ Waiting for health check…"
