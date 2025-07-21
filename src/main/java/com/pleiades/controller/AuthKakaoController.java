@@ -5,6 +5,8 @@ import com.pleiades.dto.kakao.KakaoTokenDto;
 import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
@@ -101,6 +103,11 @@ public class AuthKakaoController {
             token.setUser(user);
 
             kakaoTokenRepository.save(token);
+            kakaoTokenRepository.flush();
+
+            if (kakaoTokenRepository.findByEmail(email).isEmpty()) {
+                throw new CustomException(ErrorCode.DB_ERROR);
+            }
 
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
