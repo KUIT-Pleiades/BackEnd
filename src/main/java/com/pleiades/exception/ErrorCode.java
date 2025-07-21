@@ -34,7 +34,9 @@ public enum ErrorCode {
     ALREADY_RECEIVED_FRIEND_REQUEST(HttpStatus.CONFLICT, "You already received a friend request"),
     ALREADY_SENT_SIGNAL(HttpStatus.CONFLICT, "You already sent a signal"),
 
-    SIGN_UP_REQUIRED(HttpStatus.ACCEPTED, "Need Sign-up");
+    SIGN_UP_REQUIRED(HttpStatus.ACCEPTED, "Need Sign-up"),
+
+    DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error");
 
     private final HttpStatus status;
     private final String message;
