@@ -19,14 +19,18 @@ public enum KakaoUrl {
         this.path = path;
     }
 
-    @Value("${SERVER_DOMAIN}")
-    private String SERVER_DOMAIN;
-
     public String getUrl() {
         if (this == REDIRECT_URI) {
-            log.info("server domain: {}", SERVER_DOMAIN);
-            return "https://"+ SERVER_DOMAIN +"/auth/login/kakao/callback";
+            return null;
         }
         return path;
+    }
+
+    public String getRedirectUri(String SERVER_DOMAIN) {
+        if (this != REDIRECT_URI) {
+            return null;
+        }
+        log.info("server domain: {}", SERVER_DOMAIN);
+        return "https://"+ SERVER_DOMAIN +"/auth/login/kakao/callback";
     }
 }
