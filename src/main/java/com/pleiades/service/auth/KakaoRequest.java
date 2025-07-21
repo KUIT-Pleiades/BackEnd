@@ -24,11 +24,10 @@ public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();
 
-    // @Value
+    // @Value - static에선 정상적으로 동작하지 않음
     private static String clientId = System.getenv("KAKAO_CLIENT_ID");
 
-    @Value("${SERVER_DOMAIN}")
-    private static String SERVER_DOMAIN;
+    private static String SERVER_DOMAIN = System.getenv("SERVER_DOMAIN");
 
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
