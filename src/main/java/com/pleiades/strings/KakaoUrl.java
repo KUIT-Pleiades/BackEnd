@@ -19,7 +19,7 @@ public enum KakaoUrl {
         this.path = path;
     }
 
-    @Value("${server.domain}")
+    @Value("${SERVER_DOMAIN}")
     private String SERVER_DOMAIN;
 
     public String getUrl() {
