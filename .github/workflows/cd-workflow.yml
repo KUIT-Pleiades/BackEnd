@@ -62,7 +62,7 @@ jobs:
                 -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
                 -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
                 -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-                -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
+                -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL_DEV }} \
                 -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
                 -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
                 -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
