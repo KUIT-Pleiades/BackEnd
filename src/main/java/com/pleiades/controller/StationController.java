@@ -121,23 +121,39 @@ public class StationController {
     }
 
     @Operation(summary = "정거장 즐겨찾기", description = "정거장 즐겨찾기 설정")
-    @PatchMapping("/{stationId}/favorite")
+    @PostMapping("/{stationId}/favorite")
     public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, StationFavoriteDto stationFavoriteDto) {
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationId, email);
 
-        Station station  = stationRepository.findById(stationId).get();
         User user = userRepository.findByEmail(email).get();
 
-        boolean favorite = stationFavoriteDto.isFavorite();
-        ValidationStatus status = userStationService.setStationFavorite(stationId, user.getId(), favorite);
+        ValidationStatus status = userStationService.setStationFavorite(stationId, user.getId(), true);
 
         if (status == ValidationStatus.NOT_VALID) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Failed to edit favorite"));
+                    .body(Map.of("message", "Failed to set favorite"));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Favorite Edited:" + favorite));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Favorite Set"));
+    }
+
+    @DeleteMapping("/{stationId}/favorite")
+    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, StationFavoriteDto stationFavoriteDto) {
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
+        User user = userRepository.findByEmail(email).get();
+
+        ValidationStatus status = userStationService.setStationFavorite(stationId, user.getId(), false);
+
+        if (status == ValidationStatus.NOT_VALID) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to delete favorite"));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Favorite Deleted"));
     }
 }
