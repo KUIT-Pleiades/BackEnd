@@ -17,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterDto {
+
     @NotBlank
     @JsonProperty("face")
     private CharacterFaceDto face;

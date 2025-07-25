@@ -6,6 +6,7 @@ import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.strings.KakaoUrl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,8 +24,10 @@ public class KakaoRequest {
     // RestTemplate 객체 생성
     static RestTemplate restTemplate = new RestTemplate();
 
-    // @Value
+    // @Value - static에선 정상적으로 동작하지 않음
     private static String clientId = System.getenv("KAKAO_CLIENT_ID");
+
+    private static String SERVER_DOMAIN = System.getenv("SERVER_DOMAIN");
 
     public static KakaoTokenDto postAccessToken(String code) {
         // 요청 헤더
@@ -34,7 +37,7 @@ public class KakaoRequest {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", clientId);
-        body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getUrl());
+        body.add("redirect_uri", KakaoUrl.REDIRECT_URI.getRedirectUri(SERVER_DOMAIN));
         body.add("code", code);
 
         // 요청 객체
