@@ -1,13 +1,11 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.station.StationFavoriteDto;
 import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
-import com.pleiades.service.UserService;
 import com.pleiades.service.station.UserStationService;
 import com.pleiades.strings.ValidationStatus;
 
@@ -21,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -122,7 +119,7 @@ public class StationController {
 
     @Operation(summary = "정거장 즐겨찾기", description = "정거장 즐겨찾기 설정")
     @PostMapping("/{stationId}/favorite")
-    public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, StationFavoriteDto stationFavoriteDto) {
+    public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationId, email);
 
@@ -140,7 +137,7 @@ public class StationController {
     }
 
     @DeleteMapping("/{stationId}/favorite")
-    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, StationFavoriteDto stationFavoriteDto) {
+    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationId, email);
 
