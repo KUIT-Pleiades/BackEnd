@@ -16,6 +16,7 @@ import com.pleiades.service.UserService;
 import com.pleiades.service.report.ReportService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -173,6 +175,7 @@ public class UserStationService {
                 .todayReport(false)
                 .positionX(positionX) // 기본 위치값 설정
                 .positionY(positionY)
+                .favorite(false)
                 .build();
 
         userStationRepository.save(userStation);
@@ -191,11 +194,25 @@ public class UserStationService {
                             station.getId(),
                             station.getName(),
                             station.getNumberOfUsers(),
-                            station.getBackground().getName()
+                            station.getBackground().getName(),
+                            station.getCreatedAt(),
+                            station.getRecentActivity(),
+                            userStation.isFavorite()
                     );
                 })
                 .collect(Collectors.toList());
 
         return new StationListDto(stationDtos);
+    }
+
+    public ValidationStatus setStationFavorite(String stationId, String userId, boolean isFavorite) {
+        Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, userId);
+
+        if (userStation.isEmpty()) {
+            return ValidationStatus.NOT_VALID;
+        }
+
+        userStation.get().setFavorite(isFavorite);
+        return ValidationStatus.VALID;
     }
 }
