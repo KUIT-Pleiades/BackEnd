@@ -49,4 +49,7 @@ public class UserStation {
 
     @Column(nullable = false)
     private float positionY;
+
+    @Column
+    private boolean favorite = false;
 }

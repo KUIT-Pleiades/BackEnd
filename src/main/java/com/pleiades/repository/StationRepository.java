@@ -11,5 +11,6 @@ public interface StationRepository extends JpaRepository<Station, String> {
     public Optional<Station> findById(String id);
 
     boolean existsById(String stationId);
+    boolean existsByCode(String code);
 
 }
