@@ -213,6 +213,7 @@ public class UserStationService {
         }
 
         userStation.get().setFavorite(isFavorite);
+        userStationRepository.save(userStation.get());
         return ValidationStatus.VALID;
     }
 }
