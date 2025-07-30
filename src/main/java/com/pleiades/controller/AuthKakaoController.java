@@ -5,6 +5,8 @@ import com.pleiades.dto.kakao.KakaoTokenDto;
 import com.pleiades.dto.kakao.KakaoUserDto;
 import com.pleiades.entity.KakaoToken;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.KakaoTokenRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
@@ -13,6 +15,8 @@ import com.pleiades.service.auth.KakaoRequest;
 import com.pleiades.service.auth.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "Auth: Kakao", description = "카카오 인증 관련 API")
 @RequiredArgsConstructor
 @Slf4j
 @Controller
@@ -47,16 +52,18 @@ public class AuthKakaoController {
     @Value("${FRONT_ORIGIN}")
     private String FRONT_ORIGIN;
 
+    @Value("${SERVER_DOMAIN}")
+    private String SERVER_DOMAIN;
+
     // 모든 jwt 토큰 만료 or 최초 로그인
+    @Operation(summary = "", description = "")
     @GetMapping("")
     public ResponseEntity<Map<String, String>> loginRedirect() {
         try {
-            log.info("kakao login start");
-
             String redirectUrl = KakaoUrl.AUTH_URL.getUrl() +
                     "?response_type=code" +
                     "&client_id=" + KAKAO_CLIENT_ID +
-                    "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getUrl();
+                    "&redirect_uri=" + KakaoUrl.REDIRECT_URI.getRedirectUri(SERVER_DOMAIN);
 
             return ResponseEntity
                     .status(HttpStatus.FOUND)
@@ -70,6 +77,7 @@ public class AuthKakaoController {
         }
     }
 
+    @Operation(summary = "", description = "")
     @GetMapping("/callback")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam("code") String code) {
         try {
@@ -96,6 +104,11 @@ public class AuthKakaoController {
             token.setUser(user);
 
             kakaoTokenRepository.save(token);
+            kakaoTokenRepository.flush();
+
+            if (kakaoTokenRepository.findByEmail(email).isEmpty()) {
+                throw new CustomException(ErrorCode.DB_ERROR);
+            }
 
             log.info("redirect to front/kakaologin");
             // 요청이 없는데 응답 본문을 보낼 순 없음 - 프론트에서 다시 요청하면 이메일로 만든 jwt access, refresh 토큰 전달
@@ -109,6 +122,7 @@ public class AuthKakaoController {
         }
     }
 
+    @Operation(summary = "", description = "")
     @GetMapping("/temp")
     public ResponseEntity<Map<String, String>> responseToken(@RequestParam("hash") String email, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();

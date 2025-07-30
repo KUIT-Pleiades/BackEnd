@@ -13,15 +13,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CharacterOutfitDto {
-    @NotBlank
-    @JsonProperty("top")
-    private String topImg;
 
-    @NotBlank
+    @JsonProperty("top")
+    private String top;
+
     @JsonProperty("bottom")
-    private String bottomImg;
+    private String bottom;
 
     @NotBlank
     @JsonProperty("shoes")
-    private String shoesImg;
+    private String shoes;
+
+    @JsonProperty("set")
+    private String set;
 }

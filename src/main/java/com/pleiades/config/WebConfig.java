@@ -24,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 경로에 대해
-                .allowedOrigins(FRONT_ORIGIN)
+                .allowedOrigins(FRONT_ORIGIN, "http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true);
@@ -40,7 +40,10 @@ public class WebConfig implements WebMvcConfigurer {
                         "/error",
                         "/auth/login/**",
                         "/redis/**",
-                        "/auth/logout"
+                        "/auth/logout",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html/**",
+                        "/v3/api-docs/**"
 //                        "/auth/login",
 //                        "/auth/login/",
 //                        "/auth/login/naver"

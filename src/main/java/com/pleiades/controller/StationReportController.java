@@ -8,6 +8,8 @@ import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.ValidationStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,8 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "StationReport", description = "오늘의 리포트 관련 API")
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/stations")
 public class StationReportController {
@@ -32,6 +35,7 @@ public class StationReportController {
     private final ModelMapper modelMapper;
     private final TodaysReportService todaysReportService;
 
+    @Operation(summary = "투데이리포트 조회", description = "정거장에서 작성한 해당 사용자의 투데이리포트 불러오기")
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationId);
@@ -51,6 +55,7 @@ public class StationReportController {
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.CONTENT_TYPE, "application/json").body(Map.of("report",reportDto));
     }
 
+    @Operation(summary = "투데이리포트 수정", description = "정거장에서 작성한 투데이리프토 수정하기")
     @PatchMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> updateReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("PATCH /stations/{}/report", stationId);
@@ -72,6 +77,7 @@ public class StationReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
 
+    @Operation(summary = "투데이리포트 작성", description = "정거장에서 투데이리포트 작성하기")
     @GetMapping("/{stationId}/report/create")
     public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/"+stationId+"/report/create");
@@ -90,6 +96,7 @@ public class StationReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("report", reportDto));
     }
 
+    @Operation(summary = "멤버의 투데이리포트 조회", description = "정거장 멤버의 투데이리포트 불러오기")
     @GetMapping("/{stationId}/users/{userId}/report")
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);

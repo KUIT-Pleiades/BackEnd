@@ -4,6 +4,7 @@ import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
+import com.pleiades.exception.CustomException;
 import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
@@ -11,22 +12,23 @@ import com.pleiades.service.DuplicationService;
 import com.pleiades.service.auth.SignupService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static com.pleiades.exception.ErrorCode.INVALID_TOKEN;
-
+@Tag(name = "Auth", description = "인증 관련 API")
 @RequiredArgsConstructor
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final JwtUtil jwtUtil;
@@ -40,12 +42,13 @@ public class AuthController {
     private final SignupService signupService;
     private final AuthService authService;
 
+    @Operation(summary = "로그인", description = "로그인")
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> login(@RequestHeader("Authorization") String authorization) {
         log.info("/auth");
         return ResponseEntity.status(HttpStatus.OK).build();  // user 존재 여부는 /home 에서
     }
-
+    @Operation(summary = "자동 로그인", description = "리프레시 토큰 확인")
     @GetMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
         log.info("/auth/refresh");
@@ -54,6 +57,7 @@ public class AuthController {
         return authService.responseRefreshTokenStatus(refreshToken);
     }
 
+    @Operation(summary = "중복 체크", description = "아이디 중복 체크")
     @GetMapping("/checkId")
     public ResponseEntity<Map<String, Object>> checkId(HttpServletRequest request) {
         log.info("/auth/checkId");
@@ -72,6 +76,7 @@ public class AuthController {
         return duplicationService.responseIdDuplication(id);
     }
 
+    @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @Valid @RequestBody UserInfoDto userInfoDto) {
         log.info("/auth/signup");
@@ -95,6 +100,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
         log.info("/auth/logout");

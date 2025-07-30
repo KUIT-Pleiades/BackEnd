@@ -37,3 +37,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# 로컬 설정 제외
+application-local.properties
