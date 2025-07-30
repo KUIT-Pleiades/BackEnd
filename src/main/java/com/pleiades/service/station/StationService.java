@@ -98,6 +98,8 @@ public class StationService {
                 .adminUserId(adminUser.getId())
                 .reportNoticeTime(requestDto.getReportNoticeTime())
                 .background(stationBackground)
+                .recentActivity(LocalDateTimeUtil.now())
+                .code(stationId)        // 초기 정거장 코드는 아이디와 동일
                 .build();
 
         stationRepository.save(station);
@@ -156,5 +158,26 @@ public class StationService {
         station.setReportNoticeTime(settingDto.getReportNoticeTime());
 
         stationRepository.save(station);
+    }
+
+    // 정거장 코드 재발급
+    public ValidationStatus reissueStationCode(Station station) {
+        log.info("reissueStationCode");
+
+        String code = null;
+        long count = 0;
+        long stationCount = stationRepository.count();
+        do {
+            if (count > stationCount) { code = null; break; }
+            code = generateStationCode();
+            count++;
+        } while (stationRepository.existsByCode(code)); // 중복 체크
+
+        if (code == null) { return ValidationStatus.NOT_VALID; }
+
+        station.setCode(code);
+        stationRepository.save(station);
+
+        return ValidationStatus.VALID;
     }
 }

@@ -6,7 +6,7 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
-import com.pleiades.service.UserService;
+import com.pleiades.service.station.UserStationService;
 import com.pleiades.strings.ValidationStatus;
 
 import com.pleiades.dto.station.StationCreateDto;
@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -30,12 +29,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/stations")
 public class StationController {
-
-    private final UserService userService;
     private final AuthService authService;
 
     private final StationRepository stationRepository;
     private final StationService stationService;
+    private final UserRepository userRepository;
+    private final UserStationService userStationService;
 
     @Operation(summary = "정거장 생성", description = "정거장 생성하기")
     @PostMapping("")
@@ -100,4 +99,58 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Info editted"));
     }
 
+    @Operation(summary = "정거장 코드 재발급", description = "정거장 코드 재발급하기")
+    @PatchMapping("/{stationId}/code")
+    public ResponseEntity<Map<String, String>> reissueCode(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
+        Station station  = stationRepository.findById(stationId).get();
+        ValidationStatus status = stationService.reissueStationCode(station);
+
+        if (status == ValidationStatus.NOT_VALID) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to reissue station code"));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Successfully reissued station code"));
+    }
+
+    @Operation(summary = "정거장 즐겨찾기", description = "정거장 즐겨찾기 설정")
+    @PostMapping("/{stationId}/favorite")
+    public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
+        User user = userRepository.findByEmail(email).get();
+
+        ValidationStatus status = userStationService.setStationFavorite(stationId, user.getId(), true);
+
+        if (status == ValidationStatus.NOT_VALID) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to set favorite"));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Favorite Set"));
+    }
+
+    @DeleteMapping("/{stationId}/favorite")
+    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationId, @RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        authService.userInStation(stationId, email);
+
+        User user = userRepository.findByEmail(email).get();
+
+        ValidationStatus status = userStationService.setStationFavorite(stationId, user.getId(), false);
+
+        if (status == ValidationStatus.NOT_VALID) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to delete favorite"));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Favorite Deleted"));
+    }
 }
