@@ -213,6 +213,7 @@ public class UserService {
         Characters character = characterRepository.findByUser(user).orElseThrow(() -> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
 
         UserInfoDto userInfoDto = modelMapper.map(user, UserInfoDto.class);
+        log.info("buildUserInfoDTO star BG name: " + starBackground.get().getName());
         userInfoDto.setBackgroundName(starBackground.get().getName());
 
         List<TheItem> items = character.getCharacterItems().stream()

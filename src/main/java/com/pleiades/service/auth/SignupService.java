@@ -42,6 +42,7 @@ public class SignupService {
     @Transactional
     public ValidationStatus signup(String email, UserInfoDto userInfoDto) {
         log.info("signup으로 온 email: " + email);
+        log.info("BG name from front: " + userInfoDto.getBackgroundName());
 
         // user 중복 생성 방지
         if(userRepository.findByEmail(email).isPresent()){ return ValidationStatus.DUPLICATE; }
