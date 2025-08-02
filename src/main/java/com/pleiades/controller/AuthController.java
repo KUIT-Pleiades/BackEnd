@@ -81,7 +81,6 @@ public class AuthController {
 
         try {
             String email = authService.getEmailByAuthorization(authorization);
-
             ValidationStatus signupStatus = signupService.signup(email, userInfoDto);
 
             if (signupStatus == ValidationStatus.NOT_VALID) {

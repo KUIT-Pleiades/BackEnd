@@ -28,12 +28,12 @@ public class Characters {
     @JoinColumn(name="user_id")
     private User user;
 
+    // mappedBy: CharacterItem(Entity)의 field 이름 => 양방향 연관 관계
     @OneToMany(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CharacterItem> characterItems = new ArrayList<>();
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name="face_id")
-//    private Face face;
-//    // Item, Outfit
-
+    public void addCharacterItem(CharacterItem characterItem) {
+        this.characterItems.add(characterItem);
+        characterItem.setCharacter(this); // 양방향 연관관계 동기화
+    }
 }
