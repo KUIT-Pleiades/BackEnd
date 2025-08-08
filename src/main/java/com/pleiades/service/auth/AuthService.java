@@ -12,6 +12,7 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
+import com.pleiades.repository.character.CharacterItemRepository;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.FriendStatus;
@@ -45,6 +46,13 @@ public class AuthService {
     private final StarRepository starRepository;
     private final StarBackgroundRepository starBackgroundRepository;
     private final CharacterRepository characterRepository;
+    private final CharacterItemRepository characterItemRepository;
+    private final UserHistoryRepository userHistoryRepository;
+    private final SignalRepository signalRepository;
+    private final ReportRepository reportRepository;
+    private final ReportHistoryRepository reportHistoryRepository;
+    private final NaverTokenRepository naverTokenRepository;
+    private final KakaoTokenRepository kakaoTokenRepository;
 
     private final JwtUtil jwtUtil;
 
@@ -272,5 +280,40 @@ public class AuthService {
         if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
         user.get().setRefreshToken(null);
         userRepository.save(user.get());
+    }
+
+    @Transactional
+    public void withdraw(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // character, item
+        characterRepository.findByUser(user).ifPresent(character -> {
+            characterItemRepository.deleteAllByCharacter(character);
+            characterRepository.delete(character);
+        });
+
+        // friend, signal
+        friendRepository.deleteAllBySenderOrReceiver(user, user);
+        signalRepository.deleteAllByReceiver(user);
+        signalRepository.deleteAllBySender(user);
+
+        // UserStation (isAdmin -> delete station)
+        List<Station> stationsToDelete = userStationRepository.findStationsWhereUserIsAdmin(user);
+        stationRepository.deleteAll(stationsToDelete);
+        userStationRepository.deleteAllByUser(user);
+
+        // UserHistory
+        userHistoryRepository.deleteAllByCurrent(user);
+
+        // Report (user 비식별 처리), ReportHistory
+        reportHistoryRepository.deleteAllByUser(user);
+        reportRepository.anonymizeUserFromReports(user);
+
+        // star, token
+        starRepository.deleteByUser(user);
+        naverTokenRepository.deleteByUser(user);
+        kakaoTokenRepository.deleteByUser(user);
+
+        userRepository.delete(user);
     }
 }

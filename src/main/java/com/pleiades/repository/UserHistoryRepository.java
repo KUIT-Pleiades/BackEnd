@@ -18,4 +18,6 @@ public interface UserHistoryRepository extends JpaRepository<UserHistory, Long> 
 
     // 검색 기록이 존재 하는 지 확인
     Optional<UserHistory> findByCurrentAndSearched(User current, User searched);
+
+    void deleteAllByCurrent(User user);
 }

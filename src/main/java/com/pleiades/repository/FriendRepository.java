@@ -42,4 +42,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 
     // 보낸 친구 요청 목록
     List<Friend> findBySenderAndStatus(User sender, FriendStatus status);
+
+    void deleteAllBySenderOrReceiver(User sender, User receiver);
 }

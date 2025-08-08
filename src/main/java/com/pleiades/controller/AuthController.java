@@ -2,6 +2,9 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
+import com.pleiades.exception.CustomException;
 import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
@@ -18,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -107,6 +109,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","unvalid refresh token"));
         }
         authService.logout(email);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<Map<String, Object>> withdraw(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
+        log.info("/auth/withdraw");
+        String email = (String) request.getAttribute("email");
+        if(email == null) { throw new CustomException(ErrorCode.INVALID_TOKEN);}
+        authService.withdraw(email);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

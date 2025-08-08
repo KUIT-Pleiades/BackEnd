@@ -4,6 +4,9 @@ import com.pleiades.entity.Question;
 import com.pleiades.entity.Report;
 import com.pleiades.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +19,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByUser(User user);
     List<Report> findByUserOrderByCreatedAtDesc(User user);
     List<Report> findByUserOrderByCreatedAtAsc(User user);
+
+    // 탈퇴할 때 user 비식별 처리
+    @Modifying
+    @Query("UPDATE Report r SET r.user = null WHERE r.user = :user")
+    void anonymizeUserFromReports(@Param("user") User user);
+
 }
