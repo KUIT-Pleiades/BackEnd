@@ -14,5 +14,6 @@ public interface NaverTokenRepository extends JpaRepository<NaverToken, Long> {
 
     Optional<NaverToken> findByRefreshToken(String refreshToken);
     Optional<NaverToken> findByEmail(String email);
+    void deleteByUser(User user);
 }
 

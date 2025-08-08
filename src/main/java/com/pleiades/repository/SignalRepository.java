@@ -12,4 +12,6 @@ public interface SignalRepository extends JpaRepository<Signal, Long> {
     List<Signal> findByReceiver(User receiver);
     boolean existsBySenderAndReceiver(User sender, User receiver);
     void deleteBySenderAndReceiver(User sender, User receiver);
+    void deleteAllBySender(User sender);
+    void deleteAllByReceiver(User receiver);
 }

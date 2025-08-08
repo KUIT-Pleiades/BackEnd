@@ -15,4 +15,5 @@ public interface ReportHistoryRepository extends JpaRepository<ReportHistory, Lo
     List<ReportHistory> findByUserOrderByCreatedAtDesc(User user);
     Optional<ReportHistory> findById(Long id);
     Optional<ReportHistory> findByQuery(String query);
+    void deleteAllByUser(User user);
 }
