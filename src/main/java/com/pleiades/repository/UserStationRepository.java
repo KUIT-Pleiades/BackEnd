@@ -1,5 +1,6 @@
 package com.pleiades.repository;
 
+import com.pleiades.entity.Station;
 import com.pleiades.entity.StationReport;
 import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
@@ -33,4 +34,9 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
 
     @Query("SELECT sr FROM UserStation sr WHERE sr.station.id = :stationId AND sr.user.id = :userId")
     Optional<UserStation> findByStationIdAndUserId(@Param("stationId") String stationId, @Param("userId") String userId);
+
+    @Query("SELECT us.station FROM UserStation us WHERE us.user = :user AND us.isAdmin = true")
+    List<Station> findStationsWhereUserIsAdmin(@Param("user") User user);
+
+    void deleteAllByUser(User user);
 }
