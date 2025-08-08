@@ -7,6 +7,7 @@ import com.pleiades.entity.character.Characters;
 import com.pleiades.entity.character.TheItem;
 
 import com.pleiades.repository.*;
+import com.pleiades.repository.character.CharacterItemRepository;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.TheItemRepository;
 
@@ -41,6 +42,7 @@ public class SignupService {
     @Transactional
     public ValidationStatus signup(String email, UserInfoDto userInfoDto) {
         log.info("signup으로 온 email: " + email);
+        log.info("BG name from front: " + userInfoDto.getBackgroundName());
 
         // user 중복 생성 방지
         if(userRepository.findByEmail(email).isPresent()){ return ValidationStatus.DUPLICATE; }
@@ -98,15 +100,21 @@ public class SignupService {
         character.setUser(user);
         characterRepository.save(character); // 먼저 저장하고 ID 확보
 
+        // DTO로부터 사용자가 고른 item들 추출
         List<TheItem> items = extractSelectedItems(userInfoDto);
-        List<CharacterItem> characterItems = items.stream()
-                .map(item -> CharacterItem.builder()
-                        .character(character)
-                        .item(item)
-                        .build())
-                .toList();
 
-        character.setCharacterItems(characterItems); // Characters가 characterItems 필드 갖고 있어야 함
+        log.info("extractSelectedItems 완료");
+
+        // character랑 item으로 CI에 column 추가
+        items.forEach(item -> {
+            CharacterItem ci = CharacterItem.builder()
+                    .item(item)
+                    .build(); 
+            character.addCharacterItem(ci); // 양방향 연결 포함
+        });
+
+        log.info("addCharacterItem 완료");
+
         characterRepository.save(character);
 
         log.info("Character 세팅 완료 - id: {}", character.getId());
