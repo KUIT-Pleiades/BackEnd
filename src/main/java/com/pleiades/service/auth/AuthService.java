@@ -259,16 +259,16 @@ public class AuthService {
         return token.getSubject();
     }
 
-    public void userInStation(String stationId, String email) {
-        if (stationId == null || stationId.isEmpty()) { throw new CustomException(ErrorCode.INVALID_STATION_ID); }
+    public void userInStation(String stationPublicId, String email) {
+        if (stationPublicId == null || stationPublicId.isEmpty()) { throw new CustomException(ErrorCode.INVALID_STATION_ID); }
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
 
-        Optional<Station> station = stationRepository.findById(stationId);
+        Optional<Station> station = stationRepository.findByPublicId(UUID.fromString(stationPublicId));
         if (station.isEmpty()) { throw new CustomException(ErrorCode.STATION_NOT_FOUND); }
 
-        UserStationId userStationId = new UserStationId(user.get().getId(), stationId);
+        UserStationId userStationId = new UserStationId(user.get().getId(), station.get().getId());
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
 
         if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }

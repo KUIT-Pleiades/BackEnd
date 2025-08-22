@@ -42,11 +42,11 @@ public class StationService {
     private final StationBackgroundRepository stationBackgroundRepository;
 
     @Transactional
-    public ResponseEntity<Map<String, String>> deleteStation(String email, String stationId){
+    public ResponseEntity<Map<String, String>> deleteStation(String email, String stationPublicId){
         Map<String, String> response = new HashMap<>();
 
         User user = userService.getUserByEmail(email);
-        Station station = stationRepository.findById(stationId)
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))        // findById -> findByPublicId
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // 방장인지 확인
@@ -62,7 +62,7 @@ public class StationService {
             // 방장 X: 정거장 나가기 (사용자_정거장 관계만 삭제)
             log.info("일반 사용자({}) -> 정거장 나가기: {}", user.getEmail(), station.getName());
 
-            UserStationId userStationId = new UserStationId(user.getId(), stationId);
+            UserStationId userStationId = new UserStationId(user.getId(), station.getId());
             UserStation userStation = userStationRepository.findById(userStationId)
                     .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
@@ -82,7 +82,8 @@ public class StationService {
     public Map<String, Object> createStation(String email, StationCreateDto requestDto) {
 
         User adminUser = userService.getUserByEmail(email);
-        String stationId = generateUniqueStationCode();
+//        String stationId = generateUniqueStationCode();
+        String stationCode = generateUniqueStationCode();
         StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getStationBackground()).orElse(null);
         if (stationBackground == null) {
             log.info("station background not found");
@@ -90,7 +91,7 @@ public class StationService {
         }
 
         Station station = Station.builder()
-                .id(stationId)
+//                .id(stationId)
                 .name(requestDto.getName())
                 .intro(requestDto.getIntro())
                 .numberOfUsers(1)
@@ -99,7 +100,8 @@ public class StationService {
                 .reportNoticeTime(requestDto.getReportNoticeTime())
                 .background(stationBackground)
                 .recentActivity(LocalDateTimeUtil.now())
-                .code(stationId)        // 초기 정거장 코드는 아이디와 동일
+//                .code(stationId)        // 초기 정거장 코드는 아이디와 동일
+                .code(stationCode)
                 .build();
 
         stationRepository.save(station);
@@ -109,7 +111,8 @@ public class StationService {
         Report report = todaysReportService.createTodaysReport(adminUser,station);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        return Map.of("stationId", stationId);
+//        return Map.of("stationId", stationId);
+        return Map.of("stationId", station.getPublicId());
     }
 
 
@@ -117,7 +120,7 @@ public class StationService {
         String code;
         do {
             code = generateStationCode();
-        } while (stationRepository.existsById(code)); // 중복 체크
+        } while (stationRepository.existsByCode(code)); // 중복 체크
 
         return code;
     }

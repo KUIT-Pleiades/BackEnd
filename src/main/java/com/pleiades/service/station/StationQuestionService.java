@@ -53,7 +53,7 @@ public class StationQuestionService {
         do {
             count++;
             question = randomQuestion();
-            existingStationQuesiton = stationQuestionRepository.findByStationIdAndQuestiontId(station.getId(), question.getId());
+            existingStationQuesiton = stationQuestionRepository.findByStationIdAndQuestionId(station.getId(), question.getId());
         } while (existingStationQuesiton.isPresent() && count <= questionRepository.count());
 
         // 더 이상 할당 가능한 질문이 없으면 어떡하지

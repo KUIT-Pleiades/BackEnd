@@ -13,5 +13,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserStationId implements Serializable {
     private String userId;
-    private String stationId;
+    private Long stationId;
 }
