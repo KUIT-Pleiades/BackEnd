@@ -108,7 +108,7 @@ public class StationService {
         log.info("새로운 정거장 생성 완료: {}", station.getName());
 
         userStationService.addUserStation(adminUser, station, true);
-        Report report = todaysReportService.createTodaysReport(adminUser,station);
+        Report report = todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
 //        return Map.of("stationId", stationId);

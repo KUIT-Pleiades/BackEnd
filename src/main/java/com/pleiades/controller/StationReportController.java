@@ -31,8 +31,6 @@ import java.util.UUID;
 public class StationReportController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
-    private final StationRepository stationRepository;
     private final ModelMapper modelMapper;
     private final TodaysReportService todaysReportService;
 
@@ -41,12 +39,8 @@ public class StationReportController {
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/{}/report", stationPublicId);
         String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationPublicId, email);
 
-        User user = userRepository.findByEmail(email).get();
-
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
-        Report report = todaysReportService.searchTodaysReport(user, station);
+        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
 
         // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
         if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
@@ -60,16 +54,11 @@ public class StationReportController {
     @PatchMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> updateReport(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("PATCH /stations/{}/report", stationPublicId);
-
         String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationPublicId, email);
-
-        User user = userRepository.findByEmail(email).get();
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
 
         String answer = body.get("answer").toString();
 
-        ValidationStatus updateReport = todaysReportService.updateTodaysReport(user, station, answer);
+        ValidationStatus updateReport = todaysReportService.updateTodaysReport(email, stationPublicId, answer);
 
         if (updateReport == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Today's report not created"));
@@ -83,12 +72,8 @@ public class StationReportController {
     public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization) {
         log.info("/stations/"+stationPublicId+"/report/create");
         String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationPublicId, email);
 
-        User user = userRepository.findByEmail(email).get();
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
-
-        Report report = todaysReportService.createTodaysReport(user, station);
+        Report report = todaysReportService.createTodaysReport(email, stationPublicId);
 
         if (report == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
 
@@ -101,13 +86,8 @@ public class StationReportController {
     @GetMapping("/{stationId}/users/{userId}/report")
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationPublicId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
-        authService.userInStation(stationPublicId, email);
 
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
-
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
-        Report report = todaysReportService.searchTodaysReport(user.get(), station);
+        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
 
         if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 

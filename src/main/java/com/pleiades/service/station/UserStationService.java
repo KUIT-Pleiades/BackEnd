@@ -82,9 +82,9 @@ public class UserStationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
-        Report todaysReport = todaysReportService.searchTodaysReport(user, station);
+        Report todaysReport = todaysReportService.searchTodaysReport(email, stationPublicId);
         if (todaysReport == null) {
-            todaysReportService.createTodaysReport(user, station);
+            todaysReportService.createTodaysReport(email, stationPublicId);
         }
 
         // response DTO 생성
@@ -114,7 +114,7 @@ public class UserStationService {
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
         stationRepository.save(station);
 
-        Report report = todaysReportService.createTodaysReport(user, station);
+        Report report = todaysReportService.createTodaysReport(email, stationPublicId);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
         return Map.of("message", "Enter Station Success");

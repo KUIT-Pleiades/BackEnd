@@ -36,7 +36,9 @@ public enum ErrorCode {
 
     SIGN_UP_REQUIRED(HttpStatus.ACCEPTED, "Need Sign-up"),
 
-    DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error");
+    DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error"),
+
+    NO_TODAYS_REPORT(HttpStatus.NOT_FOUND, "Today's report not created");
 
     private final HttpStatus status;
     private final String message;
