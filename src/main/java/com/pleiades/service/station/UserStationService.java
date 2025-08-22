@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,19 +42,20 @@ public class UserStationService {
     private final TodaysReportService todaysReportService;
 
     @Transactional
-    public Map<String,String> setUserPosition(String email, String stationId, String userId, UserPositionDto requestBody){
+    public Map<String, String> setUserPosition(String email, String stationPublicId, String userId, UserPositionDto requestBody) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
         // 정거장 존재 여부 확인 (404)
-        stationRepository.findById(stationId).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+//        stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // target 사용자가 정거장에 있는지 확인 (404)
-        UserStation targetUserStation = userStationRepository.findById(new UserStationId(userId, stationId))
+        UserStation targetUserStation = userStationRepository.findById(new UserStationId(userId, station.getId()))
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_IN_STATION));
 
         // 사용자가 정거장 멤버인지 확인 (403)
-        userStationRepository.findById(new UserStationId(user.getId(), stationId))
+        userStationRepository.findById(new UserStationId(user.getId(), station.getId()))
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         targetUserStation.setPositionX(requestBody.getPositionX());
@@ -67,21 +69,23 @@ public class UserStationService {
 
     // 정거장 홈 _ 입장
     @Transactional
-    public StationHomeDto enterStation(String email, String stationId) {
+    public StationHomeDto enterStation(String email, String stationPublicId) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
         // 정거장 존재 여부 확인 (404)
-        Station station = stationRepository.findById(stationId)
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // 사용자가 정거장 멤버인지 확인 (403)
-        UserStation userStation = userStationRepository.findById(new UserStationId(user.getId(), stationId))
+        UserStation userStation = userStationRepository.findById(new UserStationId(user.getId(), station.getId()))
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
-        Report todaysReport = todaysReportService.searchTodaysReport(user, station);
-        if (todaysReport == null) { todaysReportService.createTodaysReport(user, station); }
+        Report todaysReport = todaysReportService.searchTodaysReport(email, stationPublicId);
+        if (todaysReport == null) {
+            todaysReportService.createTodaysReport(email, stationPublicId);
+        }
 
         // response DTO 생성
         return buildStationHomeDto(station, userStation.isTodayReport(), user);
@@ -89,16 +93,16 @@ public class UserStationService {
 
     // 정거장 첫 입장 _ 멤버 추가
     @Transactional
-    public Map<String, String> addMemberToStation(String email, String stationId) {
+    public Map<String, String> addMemberToStation(String email, String stationPublicId) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
         // 정거장 존재 여부 확인 (404)
-        Station station = stationRepository.findById(stationId)
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // 이미 해당 station member 인지 확인 (409)
-        boolean isUserAlreadyInStation = userStationRepository.existsById(new UserStationId(user.getId(), stationId));
+        boolean isUserAlreadyInStation = userStationRepository.existsById(new UserStationId(user.getId(), station.getId()));
         if (isUserAlreadyInStation) {
             throw new CustomException(ErrorCode.USER_ALREADY_IN_STATION);
         }
@@ -110,10 +114,10 @@ public class UserStationService {
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
         stationRepository.save(station);
 
-        Report report = todaysReportService.createTodaysReport(user,station);
+        Report report = todaysReportService.createTodaysReport(email, stationPublicId);
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        return Map.of("message","Enter Station Success");
+        return Map.of("message", "Enter Station Success");
     }
 
     // response DTO 형성 method
@@ -138,7 +142,7 @@ public class UserStationService {
                 .collect(Collectors.toList());
 
         return new StationHomeDto(
-                station.getId(),
+                station.getPublicId().toString(),
                 station.getAdminUserId(),
                 station.getName(),
                 station.getIntro(),
@@ -191,7 +195,8 @@ public class UserStationService {
                 .map(userStation -> {
                     Station station = userStation.getStation();
                     return new StationDto(
-                            station.getId(),
+//                            station.getId(),
+                            station.getPublicId().toString(),
                             station.getName(),
                             station.getNumberOfUsers(),
                             station.getBackground().getName(),
@@ -205,8 +210,8 @@ public class UserStationService {
         return new StationListDto(stationDtos);
     }
 
-    public ValidationStatus setStationFavorite(String stationId, String userId, boolean isFavorite) {
-        Optional<UserStation> userStation = userStationRepository.findByStationIdAndUserId(stationId, userId);
+    public ValidationStatus setStationFavorite(String stationPublicId, String userId, boolean isFavorite) {
+        Optional<UserStation> userStation = userStationRepository.findByStationPublicIdAndUserId(UUID.fromString(stationPublicId), userId);
 
         if (userStation.isEmpty()) {
             return ValidationStatus.NOT_VALID;

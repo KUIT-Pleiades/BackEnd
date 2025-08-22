@@ -28,7 +28,7 @@ public class UserStationController {
 
     @Operation(summary = "사용자 위치 설정", description = "정거장 내 사용자 위치 설정하기")
     @PatchMapping("/{station_id}/users/{user_id}/position")
-    public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @Valid @RequestBody UserPositionDto requestBody, @PathVariable String station_id, @PathVariable String user_id){
+    public ResponseEntity<Map<String, String>> setUserPosition(HttpServletRequest request, @Valid @RequestBody UserPositionDto requestBody, @PathVariable("stationId") String stationPublicId, @PathVariable String user_id){
         log.info("setUserPosition controller 진입");
 
         String email = (String) request.getAttribute("email");
@@ -37,7 +37,7 @@ public class UserStationController {
         }
         log.info("사용자 email = {}", email);
 
-        Map<String, String> response = userStationService.setUserPosition(email, station_id, user_id, requestBody);
+        Map<String, String> response = userStationService.setUserPosition(email, stationPublicId, user_id, requestBody);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -59,7 +59,7 @@ public class UserStationController {
 
     @Operation(summary = "정거장 가입", description = "코드에 해당하는 정거장 가입하기")
     @PatchMapping("/{station_id}")
-    public ResponseEntity<Map<String, String>> addUserStation(@PathVariable("station_id") String stationId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> addUserStation(@PathVariable("station_id") String stationPublicId, HttpServletRequest request) {
         log.info("멤버 추가: add UserStation Controller 진입");
         String email = (String) request.getAttribute("email");
         if (email == null) {
@@ -67,14 +67,14 @@ public class UserStationController {
         } // 401
         log.info("사용자 email = {}", email);
 
-        Map<String, String> response = userStationService.addMemberToStation(email, stationId);
+        Map<String, String> response = userStationService.addMemberToStation(email, stationPublicId);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "정거장 입장", description = "코드에 해당하는 정거장 입장하기")
+    @Operation(summary = "정거장 입장", description = "id에 해당하는 정거장 입장하기")
     @GetMapping("/{station_id}")
-    public ResponseEntity<StationHomeDto> enterStation(@PathVariable("station_id") String stationId, HttpServletRequest request) {
+    public ResponseEntity<StationHomeDto> enterStation(@PathVariable("station_id") String stationPublicId, HttpServletRequest request) {
         log.info("정거장 입장 Controller 진입");
         String email = (String) request.getAttribute("email");
         if (email == null) {
@@ -82,7 +82,7 @@ public class UserStationController {
         } // 401
         log.info("사용자 email = {}", email);
 
-        StationHomeDto stationHomeDto = userStationService.enterStation(email, stationId);
+        StationHomeDto stationHomeDto = userStationService.enterStation(email, stationPublicId);
 
         if(!stationHomeDto.isReportWritten()){ // 202
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(stationHomeDto);

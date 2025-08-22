@@ -7,6 +7,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "stations")
@@ -18,7 +19,11 @@ import java.time.LocalTime;
 @Builder
 public class Station {
     @Id
-    private String id; // 정거장 code와 별개
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    private UUID publicId;
 
     @Column(nullable = false)
     private String name;
@@ -48,4 +53,11 @@ public class Station {
     @ManyToOne
     @JoinColumn(name = "background_id")
     StationBackground background;
+
+    @PrePersist
+    protected void generateUuid() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID();
+        }
+    }
 }

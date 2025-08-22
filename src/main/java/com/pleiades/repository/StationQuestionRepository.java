@@ -9,12 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface StationQuestionRepository extends JpaRepository<StationQuestion, Long> {
-    public List<StationQuestion> findByStationId(String stationId);
+    public List<StationQuestion> findByStationId(Long stationId);
+    List<StationQuestion> findByStationPublicId(UUID stationPublicId);
+    public List<StationQuestion> findByStationCode(String stationCode);
     public List<StationQuestion> findByQuestionId(Long questionId);
 
     @Query("SELECT sr FROM StationQuestion sr WHERE sr.station.id = :stationId AND sr.question.id = :questionId")
-    Optional<StationQuestion> findByStationIdAndQuestiontId(@Param("stationId") String stationId, @Param("questionId") Long questionId);
+    Optional<StationQuestion> findByStationIdAndQuestionId(@Param("stationId") Long stationId, @Param("questionId") Long questionId);
 }

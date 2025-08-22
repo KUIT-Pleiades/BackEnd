@@ -27,6 +27,8 @@ public class TheItem {
 
     private boolean isRequired = false;
 
+    private boolean isBasic = true;
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CharacterItem> usedByCharacters = new ArrayList<>();
 
