@@ -3,9 +3,9 @@
 
 
 🔍 API 명세서
-[🧾 Notion](https://hilarious-chanter-07d.notion.site/API-f47ae7bf409e4ca3842de317b69a32f7?pvs=4) 
+[🧾 Notion](https://mini-gambler-27b.notion.site/API-public-265ec367b0e981e5a47afa1e8a51f1b3?source=copy_link) 
 [📬 Postman](https://orange-escape-394597.postman.co/workspace/My-Workspace~8f78ac46-b881-4d5d-8fe1-01c90a9635a4/collection/39867897-48c7f8ba-183c-43ca-afcc-b2625b352b79?action=share&creator=38791322)
 
 
 🧠 ERD (Entity Relationship Diagram)
-[🌐 ERD Cloud](https://www.erdcloud.com/d/iX4XC9GgH2onGpY26)
+[🌐 ERD Cloud](https://www.erdcloud.com/d/F5J88PZ2LEjbcxQRW)
