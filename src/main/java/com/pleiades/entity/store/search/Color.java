@@ -1,4 +1,4 @@
-package com.pleiades.entity.store;
+package com.pleiades.entity.store.search;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

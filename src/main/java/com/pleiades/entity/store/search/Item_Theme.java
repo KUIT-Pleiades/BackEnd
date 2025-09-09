@@ -1,4 +1,4 @@
-package com.pleiades.entity.store;
+package com.pleiades.entity.store.search;
 
 import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
