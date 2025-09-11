@@ -14,8 +14,12 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     Optional<TheItem> findByNameAndType(String name, ItemType type);
 
-    List<TheItem> findByType(ItemType type);
+    @Query("SELECT i FROM TheItem i WHERE i.type=:type")
+    List<TheItem> findByType(@Param("type") ItemType type);
 
     @Query("SELECT i FROM TheItem i WHERE i.type IN :types")
     List<TheItem> findByTypes(@Param("types") List<ItemType> types);
+
+    @Query("SELECT i FROM TheItem i WHERE i.type=:type AND i.name=:name")
+    Optional<TheItem> findByTypeAndName(@Param("type") ItemType type, @Param("name") String name);
 }

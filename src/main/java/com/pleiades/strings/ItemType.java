@@ -19,7 +19,10 @@ public enum ItemType {
     LEFT_HAND("left_hand"),
     LEFT_WRIST("left_wrist"),
     RIGHT_HAND("right_hand"),
-    RIGHT_WRIST("right_wrist");
+    RIGHT_WRIST("right_wrist"),
+
+    // bg
+    STAR_BG("star_background"), STATION_BG("station_background");
 
     private final String type;
 

@@ -2,13 +2,9 @@ package com.pleiades.service.store;
 
 import com.pleiades.dto.store.OfficialItemDto;
 import com.pleiades.entity.Star;
-import com.pleiades.entity.StarBackground;
-import com.pleiades.entity.StationBackground;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
 import com.pleiades.entity.store.search.ItemTheme;
-import com.pleiades.repository.StarBackgroundRepository;
-import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OfficialWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
@@ -25,8 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OfficialStoreService {
     private final TheItemRepository itemRepository;
-    private final StarBackgroundRepository starBackgroundRepository;
-    private final StationBackgroundRepository stationBackgroundRepository;
     private final OfficialWishlistRepository officialWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
 

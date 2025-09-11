@@ -43,7 +43,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
     private final FriendRepository friendRepository;
-    private final StarBackgroundRepository starBackgroundRepository; private final StarRepository starRepository;
+    private final StarRepository starRepository;
 
     private final CharacterRepository characterRepository;
     private final TheItemRepository theItemRepository;
@@ -142,7 +142,7 @@ public class UserService {
             return ValidationStatus.NOT_VALID;
         }
 
-        Optional<StarBackground> background = starBackgroundRepository.findByName(backgroundName);
+        Optional<TheItem> background = theItemRepository.findByTypeAndName(ItemType.STAR_BG, backgroundName);
         if (background.isEmpty()) {
             log.info("background not found");
             return ValidationStatus.NOT_VALID;
@@ -209,7 +209,9 @@ public class UserService {
 
     public UserInfoDto buildUserInfoDto(User user) {
         Optional<Star> star = starRepository.findByUserId(user.getId());
-        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+        if (star.isEmpty()) throw new CustomException(ErrorCode.STAR_NOT_FOUND);
+
+        Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
         Characters character = characterRepository.findByUser(user).orElseThrow(() -> new CustomException(ErrorCode.CHARACTER_NOT_FOUND));
 
         UserInfoDto userInfoDto = modelMapper.map(user, UserInfoDto.class);

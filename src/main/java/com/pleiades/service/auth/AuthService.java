@@ -2,18 +2,19 @@ package com.pleiades.service.auth;
 
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.Star;
-import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
 import com.pleiades.entity.character.Characters;
+import com.pleiades.entity.character.TheItem;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterItemRepository;
 import com.pleiades.repository.character.CharacterRepository;
+import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.service.UserService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
@@ -44,7 +45,6 @@ public class AuthService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final StarRepository starRepository;
-    private final StarBackgroundRepository starBackgroundRepository;
     private final CharacterRepository characterRepository;
     private final CharacterItemRepository characterItemRepository;
     private final UserHistoryRepository userHistoryRepository;
@@ -53,6 +53,7 @@ public class AuthService {
     private final ReportHistoryRepository reportHistoryRepository;
     private final NaverTokenRepository naverTokenRepository;
     private final KakaoTokenRepository kakaoTokenRepository;
+    private final TheItemRepository theItemRepository;
 
     private final JwtUtil jwtUtil;
 
@@ -135,7 +136,7 @@ public class AuthService {
             return ValidationStatus.NOT_VALID;
         }
 
-        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+        Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
 
         if (starBackground.isEmpty()) {
             log.info("no star background");
@@ -186,7 +187,9 @@ public class AuthService {
         if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
         Optional<Star> star = starRepository.findByUserId(friend.getId());
-        Optional<StarBackground> starBackground = starBackgroundRepository.findById(star.get().getBackground().getId());
+        if (star.isEmpty()) throw new CustomException(ErrorCode.STAR_NOT_FOUND);
+
+        Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
 //        Optional<Characters> character = characterRepository.findByUser(friend);
 
         String profileUrl = friend.getProfileUrl();

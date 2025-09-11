@@ -1,5 +1,6 @@
 package com.pleiades.entity;
 
+import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -25,5 +26,5 @@ public class Star {
 
     @ManyToOne
     @JoinColumn(name = "background_id")
-    private StarBackground background;
+    private TheItem background;
 }
