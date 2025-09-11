@@ -2,11 +2,13 @@ package com.pleiades.entity.store;
 
 import com.pleiades.strings.SaleStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 public class ResaleListing {
     @Id

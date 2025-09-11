@@ -39,13 +39,9 @@ public class OfficialStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<TheItem> items = officialStoreService.getFaceItems();
-        List<OfficialItemDto> dtos = new ArrayList<>();
+        List<OfficialItemDto> dtos = officialStoreService.getFaceItems();
 
-        for (TheItem item : items) dtos.add(officialStoreService.itemToOfficialItemDto(item));
-
-        List<TheItem> wishlist = officialStoreService.getFaceWishlistItems(user.get().getId());
-        List<Long> wishIds = wishlist.stream().map(TheItem::getId).toList();
+        List<Long> wishIds = officialStoreService.getFaceWishlistItems(user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -58,13 +54,9 @@ public class OfficialStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<TheItem> items = officialStoreService.getFashionItems();
-        List<OfficialItemDto> dtos = new ArrayList<>();
+        List<OfficialItemDto> dtos = officialStoreService.getFashionItems();
 
-        for (TheItem item : items) dtos.add(officialStoreService.itemToOfficialItemDto(item));
-
-        List<TheItem> wishlist = officialStoreService.getFashionWishlistItems(user.get().getId());
-        List<Long> wishIds = wishlist.stream().map(TheItem::getId).toList();
+        List<Long> wishIds = officialStoreService.getFashionWishlistItems(user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -1,6 +1,7 @@
 package com.pleiades.service.store;
 
 import com.pleiades.dto.store.OfficialItemDto;
+import com.pleiades.entity.Star;
 import com.pleiades.entity.StarBackground;
 import com.pleiades.entity.StationBackground;
 import com.pleiades.entity.character.TheItem;
@@ -29,25 +30,44 @@ public class OfficialStoreService {
     private final OfficialWishlistRepository officialWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
 
-    public List<TheItem> getFaceItems() {
+    public List<OfficialItemDto> getFaceItems() {
         List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
 
-        return itemRepository.findByTypes(types);
+        List<TheItem> items = itemRepository.findByTypes(types);
+
+        List<OfficialItemDto> dtos = new ArrayList<>();
+
+        for (TheItem item : items) dtos.add(itemToOfficialItemDto(item));
+
+        return dtos;
     }
 
-    public List<TheItem> getFashionItems() {
+    public List<OfficialItemDto> getFashionItems() {
         List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
 
-        return itemRepository.findByTypes(types);
+        List<TheItem> items = itemRepository.findByTypes(types);
+
+        List<OfficialItemDto> dtos = new ArrayList<>();
+
+        for (TheItem item : items) dtos.add(itemToOfficialItemDto(item));
+
+        return dtos;
     }
 
-//    public List<> getBgItems() {
+//    public List<StarBackground> getStarBgItems() {
 //        List<StarBackground> backgrounds = starBackgroundRepository.findAll();
+//
+//
+//    }
+//
+//    public List<StationBackground> getStationBgItems() {
 //        List<StationBackground> stations = stationBackgroundRepository.findAll();
+//
+//
 //
 //    }
 
-    public List<TheItem> getFaceWishlistItems(String userid) {
+    public List<Long> getFaceWishlistItems(String userid) {
         List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
 
         List<OfficialWishlist> wishlist = officialWishlistRepository.findByTypesInWishlist(types, userid);
@@ -60,10 +80,10 @@ public class OfficialStoreService {
             items.add(item);
         }
 
-        return items;
+        return items.stream().map(TheItem::getId).toList();
     }
 
-    public List<TheItem> getFashionWishlistItems(String userid) {
+    public List<Long> getFashionWishlistItems(String userid) {
         List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
 
         List<OfficialWishlist> wishlist = officialWishlistRepository.findByTypesInWishlist(types, userid);
@@ -76,10 +96,10 @@ public class OfficialStoreService {
             items.add(item);
         }
 
-        return items;
+        return items.stream().map(TheItem::getId).toList();
     }
 
-    public OfficialItemDto itemToOfficialItemDto(TheItem item) {
+    private OfficialItemDto itemToOfficialItemDto(TheItem item) {
         List<ItemTheme> themes = itemThemeRepository.findByItemId(item.getId());
 
         return new OfficialItemDto(

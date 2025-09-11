@@ -4,11 +4,13 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemSource;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 public class Ownership {
     @Id
