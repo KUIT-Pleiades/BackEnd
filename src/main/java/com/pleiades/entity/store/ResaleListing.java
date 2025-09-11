@@ -14,7 +14,7 @@ public class ResaleListing {
     private Long id;
 
     @OneToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ownership ownership;
 

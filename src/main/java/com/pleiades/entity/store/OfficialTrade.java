@@ -15,11 +15,11 @@ public class OfficialTrade {
     private Long id;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private TheItem item;
 
     @OneToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User buyer;
 

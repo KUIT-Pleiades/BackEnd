@@ -16,12 +16,12 @@ public class Ownership {
     private Long id;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private TheItem item;
 
     private LocalDateTime purchasedAt = LocalDateTime.now();
