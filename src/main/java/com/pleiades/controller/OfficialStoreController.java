@@ -52,10 +52,25 @@ public class OfficialStoreController {
                 .body(new OfficialStoreDto(dtos, wishIds));
     }
 
-//    @GetMapping("/fashion")
-//    public String getFashionList(@RequestHeader("Authorization") String authorization) {
-//    }
-//
+    @GetMapping("/fashion")
+    public ResponseEntity<OfficialStoreDto> getFashionList(@RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+        List<TheItem> items = officialStoreService.getFashionItems();
+        List<OfficialItemDto> dtos = new ArrayList<>();
+
+        for (TheItem item : items) dtos.add(officialStoreService.itemToOfficialItemDto(item));
+
+        List<TheItem> wishlist = officialStoreService.getFashionWishlistItems(user.get().getId());
+        List<Long> wishIds = wishlist.stream().map(TheItem::getId).toList();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new OfficialStoreDto(dtos, wishIds));
+    }
+
 //    @GetMapping("/bg")
 //    public String getBgList() {
 //

@@ -63,6 +63,22 @@ public class OfficialStoreService {
         return items;
     }
 
+    public List<TheItem> getFashionWishlistItems(String userid) {
+        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
+
+        List<OfficialWishlist> wishlist = officialWishlistRepository.findByTypesInWishlist(types, userid);
+
+        List<TheItem> items = new ArrayList<>();
+
+        for (OfficialWishlist w : wishlist) {
+            TheItem item = w.getItem();
+            if (item == null) continue;
+            items.add(item);
+        }
+
+        return items;
+    }
+
     public OfficialItemDto itemToOfficialItemDto(TheItem item) {
         List<ItemTheme> themes = itemThemeRepository.findByItemId(item.getId());
 
