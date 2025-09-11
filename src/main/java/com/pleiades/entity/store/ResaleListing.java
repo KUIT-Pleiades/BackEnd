@@ -23,5 +23,6 @@ public class ResaleListing {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private SaleStatus status;
 }

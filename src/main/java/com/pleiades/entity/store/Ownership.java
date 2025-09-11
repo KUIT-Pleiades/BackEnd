@@ -29,5 +29,6 @@ public class Ownership {
     private String nft_id;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ItemSource source;
 }
