@@ -25,14 +25,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResaleStoreService {
     private final ResaleListingRepository resaleListingRepository;
-//    private final StarBackgroundRepository starBackgroundRepository;
-//    private final StationBackgroundRepository stationBackgroundRepository;
     private final ResaleWishlistRepository resaleWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
 
-    public List<ResaleItemDto> getFaceItems() {
-        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
-
+    public List<ResaleItemDto> getItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findByTypes(types);
 
         List<ResaleItemDto> dtos = new ArrayList<>();
@@ -42,50 +38,7 @@ public class ResaleStoreService {
         return dtos;
     }
 
-    public List<ResaleItemDto> getFashionItems() {
-        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
-
-        List<ResaleListing> items = resaleListingRepository.findByTypes(types);
-
-        List<ResaleItemDto> dtos = new ArrayList<>();
-
-        for (ResaleListing item : items) dtos.add(itemToResaleItemDto(item));
-
-        return dtos;
-    }
-
-//    public List<StarBackground> getStarBgItems() {
-//        List<StarBackground> backgrounds = starBackgroundRepository.findAll();
-//
-//
-//    }
-//
-//    public List<StationBackground> getStationBgItems() {
-//        List<StationBackground> stations = stationBackgroundRepository.findAll();
-//
-//
-//
-//    }
-
-    public List<Long> getFaceWishlistItems(String userid) {
-        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
-
-        List<ResaleWishlist> wishlist = resaleWishlistRepository.findByTypesInWishlist(types, userid);
-
-        List<Long> listingIds = new ArrayList<>();
-
-        for (ResaleWishlist w : wishlist) {
-            ResaleListing item = w.getResaleListing();
-            if (item == null) continue;
-            listingIds.add(item.getId());
-        }
-
-        return listingIds;
-    }
-
-    public List<Long> getFashionWishlistItems(String userid) {
-        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
-
+    public List<Long> getWishlistItems(List<ItemType> types, String userid) {
         List<ResaleWishlist> wishlist = resaleWishlistRepository.findByTypesInWishlist(types, userid);
 
         List<Long> listingIds = new ArrayList<>();

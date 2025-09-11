@@ -3,12 +3,12 @@ package com.pleiades.controller;
 import com.pleiades.dto.store.OfficialItemDto;
 import com.pleiades.dto.store.OfficialStoreDto;
 import com.pleiades.entity.User;
-import com.pleiades.entity.character.TheItem;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.OfficialStoreService;
+import com.pleiades.strings.ItemType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +39,10 @@ public class OfficialStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<OfficialItemDto> dtos = officialStoreService.getFaceItems();
+        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
+        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
-        List<Long> wishIds = officialStoreService.getFaceWishlistItems(user.get().getId());
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -54,17 +55,29 @@ public class OfficialStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<OfficialItemDto> dtos = officialStoreService.getFashionItems();
+        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
+        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
-        List<Long> wishIds = officialStoreService.getFashionWishlistItems(user.get().getId());
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new OfficialStoreDto(dtos, wishIds));
     }
 
-//    @GetMapping("/bg")
-//    public String getBgList() {
-//
-//    }
+    @GetMapping("/bg")
+    public ResponseEntity<OfficialStoreDto> getBgList(@RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+        List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
+        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
+
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new OfficialStoreDto(dtos, wishIds));
+    }
 }

@@ -8,6 +8,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.ResaleStoreService;
+import com.pleiades.strings.ItemType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +39,10 @@ public class ResaleStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<ResaleItemDto> dtos = resaleStoreService.getFaceItems();
+        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
+        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
 
-        List<Long> wishIds = resaleStoreService.getFaceWishlistItems(user.get().getId());
+        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -53,17 +55,29 @@ public class ResaleStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<ResaleItemDto> dtos = resaleStoreService.getFashionItems();
+        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
+        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
 
-        List<Long> wishIds = resaleStoreService.getFashionWishlistItems(user.get().getId());
+        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResaleStoreDto(dtos, wishIds));
     }
 
-//    @GetMapping("/bg")
-//    public String getBgList() {
-//
-//    }
+    @GetMapping("/bg")
+    public ResponseEntity<ResaleStoreDto> getBgList(@RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+        List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
+        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
+
+        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResaleStoreDto(dtos, wishIds));
+    }
 }
