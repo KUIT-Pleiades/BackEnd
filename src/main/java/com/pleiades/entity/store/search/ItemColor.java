@@ -4,7 +4,7 @@ import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 
 @Entity
-public class Item_Color {
+public class ItemColor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,15 +1,17 @@
 package com.pleiades.entity.store.search;
 
+import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 
 @Entity
-public class Color_Synonyms {
+public class ItemTheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String synonyms;
+    @ManyToOne
+    private TheItem item;
 
     @ManyToOne
-    private Color color;
+    private Theme theme;
 }
