@@ -22,9 +22,11 @@ public class Color {
     @Column(nullable = false)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "color", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ColorSynonyms> synonyms = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "color", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemColor> itemColors = new ArrayList<>();
 }
