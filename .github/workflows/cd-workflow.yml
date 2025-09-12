@@ -2,7 +2,7 @@ name: CD with Gradle and Docker
 
 on:
   push:
-    branches: [ 'main', 'dev', 'feat/spreadsheet' ] # 테스트용 브랜치 추가
+    branches: [ 'main', 'dev', 'feat/spreadsheet' ]
   # pull_request:
   #   branches: [ 'main', 'dev' ]
 
@@ -37,9 +37,6 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
-      - name: set deploy branch env
-        run: echo "DEPLOY_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
       - name: 🚀 deploy to server
         uses: appleboy/ssh-action@master
         with:
@@ -51,7 +48,7 @@ jobs:
           script: |
             set -e
 
-            if [ "$DEPLOY_BRANCH" = "dev" ]; then
+            if [ "${GITHUB_REF##*/}" = "dev" ]; then
               echo "🌱 DEV branch detected: deploying to port 8008"
               sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
               sudo docker stop pleiades-dev  || true
@@ -71,7 +68,7 @@ jobs:
                 -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
                 -e IPFS_URL=${{ secrets.IPFS_URL }} \
                 -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
-                -e GOOGLE_APPLICATION_CREDENTIALS_JSON=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON}} \
+                -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64}} \
                 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
               echo "✅ DEV deploy complete (http://<EC2 IP>:8008)"
@@ -111,7 +108,7 @@ jobs:
               -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
               -e IPFS_URL=${{ secrets.IPFS_URL }} \
               -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
-              -e GOOGLE_APPLICATION_CREDENTIALS_JSON=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON}} \
+              -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64}} \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
             echo "⏳ Waiting for health check…"
