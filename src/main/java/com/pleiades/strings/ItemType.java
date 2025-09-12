@@ -5,11 +5,13 @@ import lombok.Getter;
 @Getter
 public enum ItemType {
     // face
+    FACE("Face"),
     SKIN_COLOR("skinColor"), HAIR("hair"),
     EYES("eyes"), NOSE("nose"),
     MOUTH("mouth"), MOLE("mole"),
 
     // outfit
+    FASHION("fashion"),
     TOP("top"), BOTTOM("bottom"),
     SET("set"),SHOES("shoes"),
 
@@ -19,7 +21,9 @@ public enum ItemType {
     LEFT_HAND("left_hand"),
     LEFT_WRIST("left_wrist"),
     RIGHT_HAND("right_hand"),
-    RIGHT_WRIST("right_wrist");
+    RIGHT_WRIST("right_wrist"),
+
+    BG("BG");
 
     private final String type;
 
