@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ItemType {
     // face
-    SKIN_COLOR("skinColor"), HAIR("hair"),
+    SKIN_COLOR("skin"), HAIR("hair"),
     EYES("eyes"), NOSE("nose"),
     MOUTH("mouth"), MOLE("mole"),
 
@@ -22,7 +22,7 @@ public enum ItemType {
     RIGHT_WRIST("right_wrist"),
 
     // bg
-    STAR_BG("star_background"), STATION_BG("station_background");
+    STAR_BG("star"), STATION_BG("station");
 
     private final String type;
 

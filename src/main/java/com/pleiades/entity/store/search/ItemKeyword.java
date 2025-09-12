@@ -2,17 +2,16 @@ package com.pleiades.entity.store.search;
 
 import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Builder
+@Table(uniqueConstraints = @UniqueConstraint(name = "uk_item_keyword", columnNames = {"item_id", "keyword_id"}))
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemColor {
+@Builder
+public class ItemKeyword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,6 +21,6 @@ public class ItemColor {
     private TheItem item;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "color_id", nullable = false)
-    private Color color;
+    @JoinColumn(name = "keyword_id", nullable = false)
+    private Keyword keyword;
 }
