@@ -22,7 +22,9 @@ public enum ItemType {
     RIGHT_WRIST("right_wrist"),
 
     // bg
-    STAR_BG("star"), STATION_BG("station");
+    STAR_BG("star"), STATION_BG("station"),
+
+    DEFAULT("default");
 
     private final String type;
 

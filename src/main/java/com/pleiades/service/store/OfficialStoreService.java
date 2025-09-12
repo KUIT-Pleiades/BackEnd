@@ -24,7 +24,7 @@ public class OfficialStoreService {
     private final ItemThemeRepository itemThemeRepository;
 
     public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
-        List<TheItem> items = itemRepository.findByTypes(types);
+        List<TheItem> items = itemRepository.findByTypeIn(types);
 
         List<OfficialItemDto> dtos = new ArrayList<>();
 

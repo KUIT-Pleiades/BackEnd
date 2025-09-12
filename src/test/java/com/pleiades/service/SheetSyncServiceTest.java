@@ -27,17 +27,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@EntityScan(basePackageClasses = {
-        com.pleiades.entity.character.TheItem.class,
-        com.pleiades.entity.store.search.Color.class,
-        com.pleiades.entity.store.search.Theme.class,
-        com.pleiades.entity.store.search.Keyword.class,
-        com.pleiades.entity.store.search.ItemColor.class,
-        com.pleiades.entity.store.search.ItemTheme.class,
-        com.pleiades.entity.store.search.ItemKeyword.class
-})
 @ActiveProfiles("test") // 테스트용 설정이 있다면
-@Transactional // 테스트 종료 후 롤백
+@Transactional
 class SheetSyncServiceTest {
 
     @Autowired private SheetSyncService sheetSyncService;

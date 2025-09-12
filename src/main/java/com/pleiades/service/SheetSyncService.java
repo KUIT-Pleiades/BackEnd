@@ -19,16 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * 아이템 시트 컬럼
- * 0: 파일명
- * 1: 생성일
- * 2: 토글 카테고리(bg/face)
- * 3: 가격
- * 4: 색상CSV
- * 5: 테마CSV
- * 6: 키워드CSV
- * 7: 아이템명
- *
  * 색상 사전 시트 컬럼
  * 0: 색상(메인)
  * 1: 동의어CSV
@@ -43,8 +33,8 @@ public class SheetSyncService {
     private final ThemeRepository themeRepository;
     private final KeywordRepository keywordRepository;
 
-    private static final String SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
-    private static final String ITEM_RANGE = "avatar_item_list!A2:I";
+    private static final String SPREADSHEET_ID = "15n299QZR6vvQrca0bybf1ie5P-xbNkTa0DpmVHrGjko";
+    private static final String ITEM_RANGE = "avatar_item_list!A2:J";
     private static final String COLOR_DICT_RANGE = "color_synonyms!A2:B";  // ← 실제 색상 사전 시트명으로 변경
 
     /** SyncItemSpreadsheet에서 주기적으로 호출 */
@@ -159,32 +149,43 @@ public class SheetSyncService {
             Map<String, Color> colorCache,
             Map<String, Theme> themeCache
     ) {
-        String filename    = safe(row, 0);
-        String createdAt   = safe(row, 1); // 미사용
-        String toggle      = safe(row, 2);
-        String priceStr    = safe(row, 3);
-        String colorsCsv   = safe(row, 4); // CSV
-        String themesCsv    = safe(row, 5); // CSV
-        String keywordsCsv = safe(row, 6); // CSV
-        String itemName    = safe(row, 7);
+        String index = safe(row, 0);
+        String filename    = safe(row, 1);
+        String createdAt   = safe(row, 2); // 미사용
+        String toggle      = safe(row, 3);
+        String type        = safe(row, 4);
+        String priceStr    = safe(row, 5);
+        String colorsCsv   = safe(row, 6); // CSV
+        String themesCsv    = safe(row, 7); // CSV
+        String keywordsCsv = safe(row, 8); // CSV
+        String itemName    = safe(row, 9);
+
+        if (itemName.isBlank()) {
+            log.warn("[SheetSync] 아이템명 비어있어 스킵: {}", row);
+            return;
+        }
+
+        if (priceStr.isBlank()) {
+            log.warn("[SheetSync] 가격 비어있어 스킵: {}", row);
+            return;
+        }
 
         // 1) TheItem 업서트
-        String finalName = (itemName == null || itemName.isBlank()) ? filename : itemName;
-        var found = theItemRepository.findByName(finalName);
+        var found = theItemRepository.findByName(itemName);
 
         TheItem item = found.orElseGet(() ->
                 TheItem.builder()
-                        .name(finalName)
-                        .type(parseType(toggle))
+                        .name(itemName)
+                        .type(parseType(type))
                         .price(parseLong(priceStr))
                         .build()
         );
         if (found.isPresent()) {
-            item.setName(finalName);
-            item.setType(parseType(toggle));
+            item.setName(itemName);
+            item.setType(parseType(type));
             item.setPrice(parseLong(priceStr));
         }
-        theItemRepository.save(item); // ID 확보
+        theItemRepository.save(item);
 
         // 2) 색상 연결 (별도 시트에서 미리 업서트된 colorCache 사용)
         if (!colorsCsv.isBlank()) {
@@ -204,7 +205,7 @@ public class SheetSyncService {
         // 3) 테마 연결 (CSV)
         if (!themesCsv.isBlank()) {
             for (String raw : TextNormalizer.splitCsv(themesCsv)) {
-                Theme theme = upsertTheme(raw, themeCache /* , item.getType() 필요 시 */);
+                Theme theme = upsertTheme(raw, themeCache);
 
                 boolean hasTheme = item.getItemThemes().stream()
                         .anyMatch(it -> Objects.equals(it.getTheme().getId(), theme.getId()));
@@ -220,7 +221,7 @@ public class SheetSyncService {
             }
         }
 
-        // 4) 키워드 연결 (CSV → Keyword 마스터 업서트 → ItemKeyword 연결)
+        // 4) 키워드 연결 (CSV -> Keyword 마스터 업서트 -> ItemKeyword 연결)
         if (!keywordsCsv.isBlank()) {
             for (String raw : TextNormalizer.splitCsv(keywordsCsv)) {
                 String kwName = TextNormalizer.norm(raw);
@@ -259,16 +260,19 @@ public class SheetSyncService {
 
     private Theme upsertTheme(String raw, Map<String, Theme> cache) {
         String key = TextNormalizer.norm(raw);
+
         Theme cached = cache.get(key);
         if (cached != null) return cached;
 
         Theme t = themeRepository.findByName(key)
-                .orElseGet(() -> Theme.builder().name(key).build());
-        if (t.getId() == null) t = themeRepository.save(t);
+                .orElseGet(() -> themeRepository.save(
+                        Theme.builder().name(key).build()
+                ));
 
         cache.put(key, t);
         return t;
     }
+
 
     private String safe(List<Object> row, int i) {
         return (i < row.size() && row.get(i) != null) ? String.valueOf(row.get(i)).trim() : "";
@@ -281,10 +285,10 @@ public class SheetSyncService {
 
     private ItemType parseType(String s) {
         try {
-            return (s == null || s.isBlank()) ? ItemType.BG : ItemType.fromString(s.trim());
+            return ItemType.fromString(s.trim());
         } catch (IllegalArgumentException e) {
-            log.warn("[SheetSync] 알 수 없는 ItemType: '{}', 기본값(BG)로 대체", s);
-            return ItemType.BG;
+            log.warn("[SheetSync] 알 수 없는 ItemType: '{}', 기본값으로 대체", s);
+            return ItemType.DEFAULT;
         }
     }
 }

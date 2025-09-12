@@ -23,9 +23,6 @@ public class Theme {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private ItemType itemType;
-
     @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemTheme> itemThemes = new ArrayList<>();
 }

@@ -3,7 +3,6 @@ package com.pleiades.entity.character;
 import com.pleiades.entity.store.search.ItemColor;
 import com.pleiades.entity.store.search.ItemKeyword;
 import com.pleiades.entity.store.search.ItemTheme;
-import com.pleiades.entity.store.search.Keyword;
 import com.pleiades.strings.ItemType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +25,6 @@ public class TheItem {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private ItemType type;
 
     @Column(nullable = false)
@@ -40,15 +38,19 @@ public class TheItem {
     @Column(nullable = false)
     private boolean isBasic = true;
 
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CharacterItem> usedByCharacters = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemColor> itemColors = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemTheme> itemThemes = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemKeyword> itemKeywords = new ArrayList<>();
 
