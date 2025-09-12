@@ -2,7 +2,7 @@ name: CD with Gradle and Docker
 
 on:
   push:
-    branches: [ 'main', 'dev', 'feat/spreadsheet' ]
+    branches: [ 'main', 'dev']
   # pull_request:
   #   branches: [ 'main', 'dev' ]
 
