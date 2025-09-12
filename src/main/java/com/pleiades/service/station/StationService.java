@@ -5,14 +5,16 @@ import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
+import com.pleiades.entity.character.TheItem;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
-import com.pleiades.repository.StationBackgroundRepository;
 import com.pleiades.repository.StationRepository;
 
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.service.UserService;
 import com.pleiades.service.report.TodaysReportService;
+import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,7 @@ public class StationService {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // A-Z, 0-9
     private static final int CODE_LENGTH = 6;
-    private final StationBackgroundRepository stationBackgroundRepository;
+    private final TheItemRepository theItemRepository;
 
     @Transactional
     public ResponseEntity<Map<String, String>> deleteStation(String email, String stationPublicId){
@@ -84,10 +86,10 @@ public class StationService {
         User adminUser = userService.getUserByEmail(email);
 //        String stationId = generateUniqueStationCode();
         String stationCode = generateUniqueStationCode();
-        StationBackground stationBackground = stationBackgroundRepository.findByName(requestDto.getStationBackground()).orElse(null);
+        TheItem stationBackground = theItemRepository.findByTypeAndName(ItemType.STATION_BG, requestDto.getStationBackground()).orElse(null);
         if (stationBackground == null) {
             log.info("station background not found");
-            stationBackground = stationBackgroundRepository.findByName("station_dim_01").orElseThrow();
+            stationBackground = theItemRepository.findByTypeAndName(ItemType.STATION_BG, "station_dim_01.png").orElseThrow();
         }
 
         Station station = Station.builder()
@@ -140,7 +142,7 @@ public class StationService {
     public ValidationStatus setBackground(Station station, String backgroundName) {
         log.info("setBackground");
 
-        Optional<StationBackground> background = stationBackgroundRepository.findByName(backgroundName);
+        Optional<TheItem> background = theItemRepository.findByTypeAndName(ItemType.STATION_BG, backgroundName);
         if (background.isEmpty()) {
             log.info("background not found");
             return ValidationStatus.NOT_VALID;

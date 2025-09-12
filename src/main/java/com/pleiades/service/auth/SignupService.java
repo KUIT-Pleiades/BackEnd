@@ -28,7 +28,6 @@ import java.util.*;
 @Service
 public class SignupService {
 
-    private final StarBackgroundRepository starBackgroundRepository;
     private final UserRepository userRepository;
     private final StarRepository starRepository;
     private final CharacterRepository characterRepository;
@@ -88,7 +87,7 @@ public class SignupService {
         Star star = new Star();
         star.setUser(user);
 
-        Optional<StarBackground> background = starBackgroundRepository.findByName(userInfoDto.getBackgroundName());
+        Optional<TheItem> background = theItemRepository.findByTypeAndName(ItemType.STAR_BG, userInfoDto.getBackgroundName());
         background.ifPresent(star::setBackground);
 
         starRepository.save(star);

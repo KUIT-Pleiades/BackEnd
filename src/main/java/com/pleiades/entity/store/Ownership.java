@@ -4,11 +4,13 @@ import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemSource;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 public class Ownership {
     @Id
@@ -16,12 +18,12 @@ public class Ownership {
     private Long id;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private TheItem item;
 
     private LocalDateTime purchasedAt = LocalDateTime.now();

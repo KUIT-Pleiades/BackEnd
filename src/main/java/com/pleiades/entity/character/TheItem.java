@@ -25,6 +25,8 @@ public class TheItem {
 
     private Long price = 0L;
 
+    private String description;
+
     private boolean isRequired = false;
 
     private boolean isBasic = true;
