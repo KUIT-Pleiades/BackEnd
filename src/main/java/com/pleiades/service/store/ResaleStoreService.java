@@ -13,6 +13,7 @@ import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.ResaleWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.SaleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,7 @@ public class ResaleStoreService {
                 item.getType(),
                 item.getPrice(),
                 listing.getPrice(),
+                listing.getStatus(),
                 themes
         );
     }
