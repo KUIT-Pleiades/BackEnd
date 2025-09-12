@@ -5,10 +5,14 @@ import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.strings.ItemType;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)

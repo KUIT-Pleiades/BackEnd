@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ResaleWishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(nullable = false)
