@@ -14,7 +14,7 @@ public class ResaleTrade {
     private Long id;
 
     @OneToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private ResaleListing resaleListing;
 
     @OneToOne

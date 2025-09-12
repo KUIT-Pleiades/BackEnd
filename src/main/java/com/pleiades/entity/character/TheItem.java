@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "the_item")
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,13 +32,13 @@ public class TheItem {
     @Column(nullable = false)
     private Long price = 0L;
 
+    private String description;
+
     @Column(nullable = false)
     private boolean isRequired = false;
 
     @Column(nullable = false)
     private boolean isBasic = true;
-
-    private String description;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CharacterItem> usedByCharacters = new ArrayList<>();
