@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -80,6 +81,21 @@ public class OfficialStoreService {
             newWishlist.setItem(item);
             newWishlist.setUser(user);
             officialWishlistRepository.save(newWishlist);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+        return ValidationStatus.VALID;
+    }
+
+    public ValidationStatus removeWishlist(String userId, Long itemId) {
+        log.info("itemId: " + itemId + " userId: " + userId);
+
+        Optional<OfficialWishlist> officialWishlist = officialWishlistRepository.findByUserIdAndItemId(userId, itemId);
+        if (officialWishlist.isEmpty()) return ValidationStatus.DUPLICATE;
+
+        try {
+            officialWishlistRepository.delete(officialWishlist.get());
         } catch (CustomException e) {
             log.error(e.getMessage());
             return ValidationStatus.NOT_VALID;

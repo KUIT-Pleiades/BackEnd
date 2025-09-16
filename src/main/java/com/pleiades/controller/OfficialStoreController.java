@@ -36,13 +36,12 @@ public class OfficialStoreController {
     @GetMapping("/face")
     public ResponseEntity<OfficialStoreDto> getFaceList(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -52,13 +51,12 @@ public class OfficialStoreController {
     @GetMapping("/fashion")
     public ResponseEntity<OfficialStoreDto> getFashionList(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -68,13 +66,12 @@ public class OfficialStoreController {
     @GetMapping("/bg")
     public ResponseEntity<OfficialStoreDto> getBgList(@RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.get().getId());
+        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -84,14 +81,26 @@ public class OfficialStoreController {
     @PostMapping("/wishlist")
     public ResponseEntity<Map<String, String>> addWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
         String email = authService.getEmailByAuthorization(authorization);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        ValidationStatus validationStatus = officialStoreService.addWishlist(user.get().getId(), wishlist.getId());
+        ValidationStatus validationStatus = officialStoreService.addWishlist(user.getId(), wishlist.getId());
 
         if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Wishlist Already Existing"));
         if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
+    }
+
+    @DeleteMapping("/wishlist")
+    public ResponseEntity<Map<String, String>> removeWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        ValidationStatus validationStatus = officialStoreService.removeWishlist(user.getId(), wishlist.getId());
+
+        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Wishlist Not Found"));
+        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
     }
 }
