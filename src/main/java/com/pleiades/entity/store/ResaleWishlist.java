@@ -2,9 +2,11 @@ package com.pleiades.entity.store;
 import com.pleiades.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@Setter
 @Getter
 @Entity
 public class ResaleWishlist {

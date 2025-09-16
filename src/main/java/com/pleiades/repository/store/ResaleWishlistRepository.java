@@ -13,4 +13,6 @@ import java.util.List;
 public interface ResaleWishlistRepository extends JpaRepository<ResaleWishlist, Long> {
     @Query("SELECT i FROM ResaleWishlist i WHERE i.resaleListing.ownership.item.type IN :types AND i.user.id=:userid")
     List<ResaleWishlist> findByTypesInWishlist(@Param("types") List<ItemType> types, @Param("userid") String userid);
+
+    boolean existsByUserIdAndResaleListingId(String userId, Long resaleListingId);
 }
