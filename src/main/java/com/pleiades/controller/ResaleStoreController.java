@@ -93,4 +93,17 @@ public class ResaleStoreController {
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
+
+    @DeleteMapping("/wishlist")
+    public ResponseEntity<Map<String, String>> removeWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        ValidationStatus validationStatus = resaleStoreService.removeWishlist(user.getId(), wishlist.getId());
+
+        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Wishlist Not Found"));
+        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
+    }
 }

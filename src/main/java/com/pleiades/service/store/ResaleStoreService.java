@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -89,6 +90,21 @@ public class ResaleStoreService {
             newWishlist.setResaleListing(item);
             newWishlist.setUser(user);
             resaleWishlistRepository.save(newWishlist);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+        return ValidationStatus.VALID;
+    }
+
+    public ValidationStatus removeWishlist(String userId, Long itemId) {
+        log.info("itemId: " + itemId + " userId: " + userId);
+
+        Optional<ResaleWishlist> officialWishlist = resaleWishlistRepository.findByUserIdAndResaleListingId(userId, itemId);
+        if (officialWishlist.isEmpty()) return ValidationStatus.DUPLICATE;
+
+        try {
+            resaleWishlistRepository.delete(officialWishlist.get());
         } catch (CustomException e) {
             log.error(e.getMessage());
             return ValidationStatus.NOT_VALID;
