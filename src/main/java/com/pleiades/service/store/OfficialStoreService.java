@@ -1,13 +1,18 @@
 package com.pleiades.service.store;
 
 import com.pleiades.dto.store.OfficialItemDto;
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
 import com.pleiades.entity.store.search.ItemTheme;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OfficialWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ public class OfficialStoreService {
     private final TheItemRepository itemRepository;
     private final OfficialWishlistRepository officialWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
+    private final UserRepository userRepository;
 
     public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
         List<TheItem> items = itemRepository.findByTypeIn(types);
@@ -58,5 +64,26 @@ public class OfficialStoreService {
                 item.getPrice(),
                 themes
         );
+    }
+
+    public ValidationStatus addWishlist(String userId, Long itemId) {
+        log.info("itemId: " + itemId + " userId: " + userId);
+
+        if (officialWishlistRepository.existsByUserIdAndItemId(userId, itemId)) return ValidationStatus.DUPLICATE;
+
+        try {
+            OfficialWishlist newWishlist = new OfficialWishlist();
+
+            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+            newWishlist.setItem(item);
+            newWishlist.setUser(user);
+            officialWishlistRepository.save(newWishlist);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+        return ValidationStatus.VALID;
     }
 }

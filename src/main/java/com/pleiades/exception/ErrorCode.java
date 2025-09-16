@@ -41,7 +41,9 @@ public enum ErrorCode {
     NO_TODAYS_REPORT(HttpStatus.NOT_FOUND, "Today's report not created"),
 
     ENV_NOT_SET(HttpStatus.INTERNAL_SERVER_ERROR, "서버 환경변수가 설정되지 않았습니다."),
-    GOOGLE_SHEET_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "구글 시트 연결 오류");
+    GOOGLE_SHEET_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "구글 시트 연결 오류"),
+
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "Item not found");
 
     private final HttpStatus status;
     private final String message;
