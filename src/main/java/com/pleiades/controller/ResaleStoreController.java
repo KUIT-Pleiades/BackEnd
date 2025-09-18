@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.store.ListingPriceDto;
 import com.pleiades.dto.store.ResaleItemDto;
 import com.pleiades.dto.store.ResaleStoreDto;
 import com.pleiades.dto.store.WishListDto;
@@ -105,5 +106,10 @@ public class ResaleStoreController {
         if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
+    }
+
+    @GetMapping("/items/{item_id}/price")
+    public ResponseEntity<List<ListingPriceDto>> getListingsPrice(@PathVariable("item_id") Long itemId) {
+        return ResponseEntity.status(HttpStatus.OK).body(resaleStoreService.getListingsPrice(itemId));
     }
 }

@@ -1,5 +1,6 @@
 package com.pleiades.service.store;
 
+import com.pleiades.dto.store.ListingPriceDto;
 import com.pleiades.dto.store.OfficialItemDto;
 import com.pleiades.dto.store.ResaleItemDto;
 import com.pleiades.entity.User;
@@ -12,6 +13,7 @@ import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.ResaleWishlistRepository;
@@ -35,6 +37,7 @@ public class ResaleStoreService {
     private final ResaleWishlistRepository resaleWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
     private final UserRepository userRepository;
+    private final TheItemRepository itemRepository;
 
     public List<ResaleItemDto> getItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findByTypes(types);
@@ -110,5 +113,24 @@ public class ResaleStoreService {
             return ValidationStatus.NOT_VALID;
         }
         return ValidationStatus.VALID;
+    }
+
+    public List<ListingPriceDto> getListingsPrice(Long itemId) {
+        TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        ItemType type = item.getType();
+        List<ResaleListing> resaleListings = resaleListingRepository.findByTypes(List.of(type));
+
+        List<ListingPriceDto> dtos = new ArrayList<>();
+
+        for (ResaleListing listing : resaleListings) {
+            ListingPriceDto priceDto = new ListingPriceDto();
+            priceDto.setId(listing.getId());
+            priceDto.setPrice(item.getPrice());
+            priceDto.setDiscountedPrice(listing.getPrice());
+
+            dtos.add(priceDto);
+        }
+
+        return dtos;
     }
 }
