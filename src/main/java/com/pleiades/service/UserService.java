@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -84,7 +85,7 @@ public class UserService {
 
         List<CharacterItem> characterItems = selectedItems.stream()
                 .map(item -> new CharacterItem(character, item))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         character.setCharacterItems(characterItems);
         characterRepository.save(character);
