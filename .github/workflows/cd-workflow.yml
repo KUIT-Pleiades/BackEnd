@@ -2,7 +2,7 @@ name: CD with Gradle and Docker
 
 on:
   push:
-    branches: [ 'main', 'dev' ]
+    branches: [ 'main', 'dev']
   # pull_request:
   #   branches: [ 'main', 'dev' ]
 
@@ -68,6 +68,7 @@ jobs:
                 -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
                 -e IPFS_URL=${{ secrets.IPFS_URL }} \
                 -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
+                -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64}} \
                 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
               echo "✅ DEV deploy complete (http://<EC2 IP>:8008)"
@@ -107,6 +108,7 @@ jobs:
               -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
               -e IPFS_URL=${{ secrets.IPFS_URL }} \
               -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
+              -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64}} \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
             echo "⏳ Waiting for health check…"

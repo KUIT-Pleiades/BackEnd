@@ -1,30 +1,27 @@
-package com.pleiades.entity;
+package com.pleiades.entity.store;
 
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Table(name="stars")
-@Builder
-public class Star {
-
+@Entity
+public class OfficialWishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "background_id")
-    private TheItem background;
+    @JoinColumn(nullable = false)
+    private TheItem item;
 }

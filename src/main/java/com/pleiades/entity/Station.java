@@ -1,5 +1,6 @@
 package com.pleiades.entity;
 
+import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,10 +50,9 @@ public class Station {
     @Column(nullable = false)
     private LocalDateTime recentActivity;
 
-    // name으로 바꿔야할 듯 - 왜 이렇게 생각했을까
     @ManyToOne
     @JoinColumn(name = "background_id")
-    StationBackground background;
+    TheItem background;
 
     @PrePersist
     protected void generateUuid() {
