@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -35,5 +36,10 @@ public class Characters {
     public void addCharacterItem(CharacterItem characterItem) {
         this.characterItems.add(characterItem);
         characterItem.setCharacter(this); // 양방향 연관관계 동기화
+    }
+
+    public void changeCharacterItems(List<CharacterItem> items) {
+        this.characterItems.clear();
+        if (items != null) this.characterItems.addAll(items);
     }
 }

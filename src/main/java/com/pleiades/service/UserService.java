@@ -87,7 +87,7 @@ public class UserService {
                 .map(item -> new CharacterItem(character, item))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        character.setCharacterItems(characterItems);
+        character.changeCharacterItems(characterItems);
         characterRepository.save(character);
 
         user.setProfileUrl(characterDto.getProfile());
