@@ -178,4 +178,17 @@ public class ResaleStoreService {
 
         return listing.getId();
     }
+
+    @Transactional
+    public void deleteListing(String userId, Long listingId) {
+        // listing이 onsale일 때만 삭제
+        // 내 listing인지 확인
+        ResaleListing listing = resaleListingRepository.findById(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!listing.getStatus().equals(SaleStatus.ONSALE)) throw new CustomException(ErrorCode.NOT_ONSALE);
+        if (!listing.getSourceOwnership().getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+
+        resaleListingRepository.delete(listing);
+    }
 }

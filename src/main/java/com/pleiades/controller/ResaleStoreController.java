@@ -132,4 +132,14 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(listingIdDto);
     }
 
+    @DeleteMapping("/listings/{listing_id}")
+    public ResponseEntity<Map<String,String>> deleteListing(@RequestHeader("Authorization") String authorization, @RequestParam Long listingId) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        resaleStoreService.deleteListing(user.getId(), listingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Listing Deleted Successfully"));
+    }
+
 }
