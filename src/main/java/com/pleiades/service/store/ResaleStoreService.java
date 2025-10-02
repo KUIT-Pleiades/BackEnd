@@ -81,6 +81,7 @@ public class ResaleStoreService {
         );
     }
 
+    @Transactional
     public ValidationStatus addWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
@@ -102,6 +103,7 @@ public class ResaleStoreService {
         return ValidationStatus.VALID;
     }
 
+    @Transactional
     public ValidationStatus removeWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
@@ -160,5 +162,20 @@ public class ResaleStoreService {
         ownershipRepository.save(ownership);
 
         return ownership.getId();
+    }
+
+    @Transactional
+    public Long addListing(String userId, Long ownershipId, Long price) {
+        Ownership ownership = ownershipRepository.findById(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!ownership.getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+
+        resaleListingRepository.findBySourceOwnershipId(ownershipId).ifPresent((l) -> { throw new CustomException(ErrorCode.ALREADY_EXISTS); });
+
+        ResaleListing listing = new ResaleListing(ownership, price);
+        resaleListingRepository.save(listing);
+
+        return listing.getId();
     }
 }

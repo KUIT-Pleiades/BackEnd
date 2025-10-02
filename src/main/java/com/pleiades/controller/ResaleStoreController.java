@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
+import com.pleiades.entity.store.Ownership;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
@@ -118,4 +119,17 @@ public class ResaleStoreController {
         Long ownershipId = resaleStoreService.buyItem(user.getId(), listingIdDto.getListingId());
         return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
     }
+
+    @PostMapping("/listings")
+    public ResponseEntity<ListingIdDto> listings(@RequestHeader("Authorization") String authorization, @RequestBody AddListingRequestDto addListingRequestDto) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long listingId = resaleStoreService.addListing(user.getId(), addListingRequestDto.getOwnershipId(), addListingRequestDto.getPrice());
+
+        ListingIdDto listingIdDto = new ListingIdDto(listingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(listingIdDto);
+    }
+
 }

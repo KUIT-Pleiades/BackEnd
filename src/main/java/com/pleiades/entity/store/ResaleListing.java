@@ -29,7 +29,8 @@ public class ResaleListing {
 
     private Long price;
 
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -38,5 +39,17 @@ public class ResaleListing {
     public void sale(Ownership resultOwnership) {
         this.status = SaleStatus.SOLDOUT;
         this.resultOwnership = resultOwnership;
+    }
+
+    public ResaleListing(Ownership sourceOwnership) {
+        this.sourceOwnership = sourceOwnership;
+        this.price = sourceOwnership.getItem().getPrice();
+        this.status = SaleStatus.ONSALE;
+    }
+
+    public ResaleListing(Ownership sourceOwnership, Long price) {
+        this.sourceOwnership = sourceOwnership;
+        this.price = price;
+        this.status = SaleStatus.ONSALE;
     }
 }
