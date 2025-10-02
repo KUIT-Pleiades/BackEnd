@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -44,5 +45,13 @@ public class User implements Serializable {
 
     @Column
     private String refreshToken;
+
+    @Column
+    @ColumnDefault("0")
+    private Long coin;
+
+    @Column
+    @ColumnDefault("0")
+    private Long stone;
 
 }
