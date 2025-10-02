@@ -14,4 +14,6 @@ import java.util.List;
 public interface OwnershipRepository extends JpaRepository<Ownership, Long> {
     @Query("SELECT i FROM Ownership i WHERE i.item.type IN :types")
     List<Ownership> findByTypes(@Param("types") List<ItemType> types);
+
+    boolean existsByUserIdAndItemId(Long userId, ItemType itemId);
 }

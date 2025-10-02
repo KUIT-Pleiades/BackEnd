@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.store.ItemIdDto;
 import com.pleiades.dto.store.OfficialItemDto;
 import com.pleiades.dto.store.OfficialStoreDto;
 import com.pleiades.dto.store.WishListDto;
@@ -102,5 +103,13 @@ public class OfficialStoreController {
         if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
+    }
+
+    @PostMapping("/trades")
+    public ResponseEntity<Map<String, String>> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+
     }
 }

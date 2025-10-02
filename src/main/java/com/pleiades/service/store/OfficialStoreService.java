@@ -4,13 +4,16 @@ import com.pleiades.dto.store.OfficialItemDto;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
+import com.pleiades.entity.store.Ownership;
 import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OfficialWishlistRepository;
+import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.strings.ItemSource;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class OfficialStoreService {
     private final OfficialWishlistRepository officialWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
     private final UserRepository userRepository;
+    private final OwnershipRepository ownershipRepository;
 
     public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
         List<TheItem> items = itemRepository.findByTypeIn(types);
@@ -100,6 +104,27 @@ public class OfficialStoreService {
             log.error(e.getMessage());
             return ValidationStatus.NOT_VALID;
         }
+        return ValidationStatus.VALID;
+    }
+
+    public ValidationStatus buyItem(String userId, Long itemId) {
+        try {
+            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+            ownershipRepository.f
+
+            Ownership newOwnership = new Ownership();
+            newOwnership.setUser(user);
+            newOwnership.setItem(item);
+            newOwnership.setSource(ItemSource.OFFICIAL);
+
+            ownershipRepository.save(newOwnership);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+
         return ValidationStatus.VALID;
     }
 }
