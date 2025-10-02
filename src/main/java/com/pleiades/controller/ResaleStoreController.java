@@ -1,9 +1,6 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.store.ListingPriceDto;
-import com.pleiades.dto.store.ResaleItemDto;
-import com.pleiades.dto.store.ResaleStoreDto;
-import com.pleiades.dto.store.WishListDto;
+import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -111,5 +108,14 @@ public class ResaleStoreController {
     @GetMapping("/items/{item_id}/price")
     public ResponseEntity<List<ListingPriceDto>> getListingsPrice(@PathVariable("item_id") Long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(resaleStoreService.getListingsPrice(itemId));
+    }
+
+    @PostMapping("/trades")
+    public ResponseEntity<PurchaseResponseDto> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ListingIdDto listingIdDto) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long ownershipId = resaleStoreService.buyItem(user.getId(), listingIdDto.getListingId());
+        return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
     }
 }

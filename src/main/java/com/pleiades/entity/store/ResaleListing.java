@@ -34,4 +34,9 @@ public class ResaleListing {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SaleStatus status;
+
+    public void sale(Ownership resultOwnership) {
+        this.status = SaleStatus.SOLDOUT;
+        this.resultOwnership = resultOwnership;
+    }
 }

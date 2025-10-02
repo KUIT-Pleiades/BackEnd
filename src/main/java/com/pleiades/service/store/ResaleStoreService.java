@@ -24,6 +24,7 @@ import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class ResaleStoreService {
     private final ItemThemeRepository itemThemeRepository;
     private final UserRepository userRepository;
     private final TheItemRepository itemRepository;
+    private final OwnershipRepository ownershipRepository;
 
     public List<ResaleItemDto> getItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findByTypes(types);
@@ -132,5 +134,31 @@ public class ResaleStoreService {
         }
 
         return dtos;
+    }
+
+    @Transactional
+    public Long buyItem(String userId, Long listingId) {
+        // listing이 존재하는지
+        // listing 상태가 onsale인지
+        // 해당 Listing의 source 소유권의 주인이 현재 user가 아닌지
+        // 돈 있는지 ㅋ
+        ResaleListing listing = resaleListingRepository.findById(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        if (listing.getStatus() != SaleStatus.ONSALE) throw new CustomException(ErrorCode.NOT_ONSALE);
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (user.getStone() < listing.getPrice()) throw new CustomException(ErrorCode.INSUFFICIENT_FUNDS);
+
+        if (user.equals(listing.getSourceOwnership().getUser())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
+
+        // 구매 후
+        // source 소유권 active = false
+        // listing 상태 sold
+        listing.getSourceOwnership().sold();
+        Ownership ownership = Ownership.resaleOf(user, listing);
+        listing.sale(ownership);
+
+        ownershipRepository.save(ownership);
+
+        return ownership.getId();
     }
 }

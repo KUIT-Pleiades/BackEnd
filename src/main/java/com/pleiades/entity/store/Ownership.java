@@ -60,7 +60,15 @@ public class Ownership {
         return new Ownership(user, item, ItemSource.OFFICIAL, price);
     }
 
+    public static Ownership resaleOf(User user, ResaleListing listing) {
+        return new Ownership(user, listing.getSourceOwnership().getItem(), ItemSource.RESALE, listing.getPrice());
+    }
+
     public static Ownership resaleOf(User user, TheItem item, Long price) {
         return new Ownership(user, item, ItemSource.RESALE, price);
+    }
+
+    public void sold() {
+        this.active = false;
     }
 }
