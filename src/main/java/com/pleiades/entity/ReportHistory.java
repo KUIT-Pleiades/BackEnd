@@ -27,7 +27,7 @@ public class ReportHistory {
     @Column(nullable = false)
     String query;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="user")
     User user;
