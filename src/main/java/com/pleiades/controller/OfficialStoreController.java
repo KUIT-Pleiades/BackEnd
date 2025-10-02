@@ -106,10 +106,13 @@ public class OfficialStoreController {
     }
 
     @PostMapping("/trades")
-    public ResponseEntity<Map<String, String>> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto) {
+    public ResponseEntity<Map<String, String>> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto itemIdDto) {
         String email = authService.getEmailByAuthorization(authorization);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        if (officialStoreService.buyItem(user.getId(), itemIdDto.getItemId()) == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Item already exists"));
+        if (officialStoreService.buyItem(user.getId(), itemIdDto.getItemId()) == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Item purchase failed"));
 
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Item purchased"));
     }
 }

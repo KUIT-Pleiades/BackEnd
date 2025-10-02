@@ -112,12 +112,9 @@ public class OfficialStoreService {
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            ownershipRepository.f
+            if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) return ValidationStatus.DUPLICATE;
 
-            Ownership newOwnership = new Ownership();
-            newOwnership.setUser(user);
-            newOwnership.setItem(item);
-            newOwnership.setSource(ItemSource.OFFICIAL);
+            Ownership newOwnership = Ownership.officialOf(user, item);
 
             ownershipRepository.save(newOwnership);
         } catch (Exception e) {

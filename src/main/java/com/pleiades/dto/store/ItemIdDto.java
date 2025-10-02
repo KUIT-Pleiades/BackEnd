@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemIdDto {
-    private String itemId;
+    private Long itemId;
 }
