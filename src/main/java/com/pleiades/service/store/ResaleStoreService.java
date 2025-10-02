@@ -161,6 +161,9 @@ public class ResaleStoreService {
 
         ownershipRepository.save(ownership);
 
+        // 상대 자금 추가
+        listing.getSourceOwnership().getUser().addStone(listing.getPrice());
+
         return ownership.getId();
     }
 

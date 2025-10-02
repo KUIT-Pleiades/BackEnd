@@ -52,4 +52,11 @@ public class User implements Serializable {
     @ColumnDefault("0")
     private Long stone;
 
+    public void addCoin(Long coin) {
+        this.coin += coin;
+    }
+
+    public void addStone(Long stone) {
+        this.stone += stone;
+    }
 }

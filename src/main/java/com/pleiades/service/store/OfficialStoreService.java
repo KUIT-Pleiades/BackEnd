@@ -19,6 +19,7 @@ import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,7 @@ public class OfficialStoreService {
         );
     }
 
+    @Transactional
     public ValidationStatus addWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
@@ -92,6 +94,7 @@ public class OfficialStoreService {
         return ValidationStatus.VALID;
     }
 
+    @Transactional
     public ValidationStatus removeWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
@@ -107,21 +110,16 @@ public class OfficialStoreService {
         return ValidationStatus.VALID;
     }
 
+    @Transactional
     public Long buyItem(String userId, Long itemId) {
-        Ownership newOwnership;
-        try {
-            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-            TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
+        if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
 
-            newOwnership = Ownership.officialOf(user, item);
+        Ownership newOwnership = Ownership.officialOf(user, item);
 
-            ownershipRepository.save(newOwnership);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new CustomException(ErrorCode.DB_ERROR);
-        }
+        ownershipRepository.save(newOwnership);
 
         return newOwnership.getId();
     }
