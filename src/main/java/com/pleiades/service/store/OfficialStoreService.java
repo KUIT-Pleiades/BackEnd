@@ -107,21 +107,22 @@ public class OfficialStoreService {
         return ValidationStatus.VALID;
     }
 
-    public ValidationStatus buyItem(String userId, Long itemId) {
+    public Long buyItem(String userId, Long itemId) {
+        Ownership newOwnership;
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) return ValidationStatus.DUPLICATE;
+            if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
 
-            Ownership newOwnership = Ownership.officialOf(user, item);
+            newOwnership = Ownership.officialOf(user, item);
 
             ownershipRepository.save(newOwnership);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ValidationStatus.NOT_VALID;
+            throw new CustomException(ErrorCode.DB_ERROR);
         }
 
-        return ValidationStatus.VALID;
+        return newOwnership.getId();
     }
 }

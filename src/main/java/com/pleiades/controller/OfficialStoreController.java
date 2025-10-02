@@ -1,9 +1,6 @@
 package com.pleiades.controller;
 
-import com.pleiades.dto.store.ItemIdDto;
-import com.pleiades.dto.store.OfficialItemDto;
-import com.pleiades.dto.store.OfficialStoreDto;
-import com.pleiades.dto.store.WishListDto;
+import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -106,13 +103,11 @@ public class OfficialStoreController {
     }
 
     @PostMapping("/trades")
-    public ResponseEntity<Map<String, String>> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto itemIdDto) {
+    public ResponseEntity<PurchaseResponseDto> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto itemIdDto) {
         String email = authService.getEmailByAuthorization(authorization);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (officialStoreService.buyItem(user.getId(), itemIdDto.getItemId()) == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Item already exists"));
-        if (officialStoreService.buyItem(user.getId(), itemIdDto.getItemId()) == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Item purchase failed"));
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Item purchased"));
+        Long ownershipId = officialStoreService.buyItem(user.getId(), itemIdDto.getItemId());
+        return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
     }
 }
