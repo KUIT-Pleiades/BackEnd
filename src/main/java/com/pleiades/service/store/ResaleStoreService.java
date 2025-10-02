@@ -64,7 +64,7 @@ public class ResaleStoreService {
     }
 
     public ResaleItemDto itemToResaleItemDto(ResaleListing listing) {
-        TheItem item = listing.getOwnership().getItem();
+        TheItem item = listing.getSourceOwnership().getItem();
         List<ItemTheme> themes = itemThemeRepository.findByItemId(item.getId());
 
         return new ResaleItemDto(
