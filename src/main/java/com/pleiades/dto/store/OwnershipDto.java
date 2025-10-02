@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OwnershipIdDto {
-    private Long ownershipId;
+public class OwnershipDto {
+    private Long id;
+    private Long itemId;
 }

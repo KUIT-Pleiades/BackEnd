@@ -142,4 +142,16 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Listing Deleted Successfully"));
     }
 
+    @GetMapping("/listings")
+    public ResponseEntity<ListingsDto> myListings(@RequestHeader("Authorization") String authorization) {
+        String email = authService.getEmailByAuthorization(authorization);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        List<Long> ids = resaleStoreService.getListings(user.getId());
+
+        ListingsDto listingsDto = new ListingsDto(ids);
+
+        return ResponseEntity.status(HttpStatus.OK).body(listingsDto);
+    }
+
 }

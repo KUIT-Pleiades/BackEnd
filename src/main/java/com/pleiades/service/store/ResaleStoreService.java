@@ -167,6 +167,13 @@ public class ResaleStoreService {
         return ownership.getId();
     }
 
+    public List<Long> getListings(String userId) {
+        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<ResaleListing> listings = resaleListingRepository.findByUserId(userId);
+
+        return listings.stream().filter((l)->l.getStatus().equals(SaleStatus.ONSALE)).map(ResaleListing::getId).toList();
+    }
+
     @Transactional
     public Long addListing(String userId, Long ownershipId, Long price) {
         Ownership ownership = ownershipRepository.findById(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
