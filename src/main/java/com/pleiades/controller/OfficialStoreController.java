@@ -41,9 +41,11 @@ public class OfficialStoreController {
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
+        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new OfficialStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @GetMapping("/fashion")
@@ -56,9 +58,11 @@ public class OfficialStoreController {
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
+        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new OfficialStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @GetMapping("/bg")
@@ -71,9 +75,11 @@ public class OfficialStoreController {
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
 
+        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new OfficialStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @PostMapping("/wishlist")

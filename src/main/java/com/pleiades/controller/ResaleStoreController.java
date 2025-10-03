@@ -42,9 +42,11 @@ public class ResaleStoreController {
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
 
+        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResaleStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @GetMapping("/fashion")
@@ -58,9 +60,11 @@ public class ResaleStoreController {
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
 
+        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResaleStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @GetMapping("/bg")
@@ -74,9 +78,11 @@ public class ResaleStoreController {
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
 
+        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResaleStoreDto(dtos, wishIds));
+                .body(dto);
     }
 
     @PostMapping("/wishlist")
