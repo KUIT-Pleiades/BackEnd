@@ -1,19 +1,29 @@
 package com.pleiades.service.store;
 
 import com.pleiades.dto.store.OfficialItemDto;
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
+import com.pleiades.entity.store.Ownership;
 import com.pleiades.entity.store.search.ItemTheme;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OfficialWishlistRepository;
+import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.strings.ItemSource;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -22,6 +32,8 @@ public class OfficialStoreService {
     private final TheItemRepository itemRepository;
     private final OfficialWishlistRepository officialWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
+    private final UserRepository userRepository;
+    private final OwnershipRepository ownershipRepository;
 
     public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
         List<TheItem> items = itemRepository.findByTypes(types);
@@ -58,5 +70,57 @@ public class OfficialStoreService {
                 item.getPrice(),
                 themes
         );
+    }
+
+    @Transactional
+    public ValidationStatus addWishlist(String userId, Long itemId) {
+        log.info("itemId: " + itemId + " userId: " + userId);
+
+        if (officialWishlistRepository.existsByUserIdAndItemId(userId, itemId)) return ValidationStatus.DUPLICATE;
+
+        try {
+            OfficialWishlist newWishlist = new OfficialWishlist();
+
+            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+            newWishlist.setItem(item);
+            newWishlist.setUser(user);
+            officialWishlistRepository.save(newWishlist);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+        return ValidationStatus.VALID;
+    }
+
+    @Transactional
+    public ValidationStatus removeWishlist(String userId, Long itemId) {
+        log.info("itemId: " + itemId + " userId: " + userId);
+
+        Optional<OfficialWishlist> officialWishlist = officialWishlistRepository.findByUserIdAndItemId(userId, itemId);
+        if (officialWishlist.isEmpty()) return ValidationStatus.DUPLICATE;
+
+        try {
+            officialWishlistRepository.delete(officialWishlist.get());
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+            return ValidationStatus.NOT_VALID;
+        }
+        return ValidationStatus.VALID;
+    }
+
+    @Transactional
+    public Long buyItem(String userId, Long itemId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+
+        if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
+
+        Ownership newOwnership = Ownership.officialOf(user, item);
+
+        ownershipRepository.save(newOwnership);
+
+        return newOwnership.getId();
     }
 }

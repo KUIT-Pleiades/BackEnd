@@ -9,10 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ResaleListingRepository extends JpaRepository<ResaleListing, Long> {
 
-    @Query("SELECT i FROM ResaleListing i WHERE i.ownership.item.type IN :types")
+    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.item.type IN :types")
     List<ResaleListing> findByTypes(@Param("types") List<ItemType> types);
+
+    Optional<ResaleListing> findBySourceOwnershipId(Long id);
+
+    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId")
+    List<ResaleListing> findByUserId(@Param("userId") String userId);
 }
