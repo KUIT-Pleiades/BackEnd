@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.store.ListingPriceDto;
 import com.pleiades.dto.store.MyItemsResponseDto;
+import com.pleiades.dto.store.ThemesDto;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -27,6 +28,11 @@ public class StoreController {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final StoreService storeService;
+
+    @GetMapping("/theme")
+    public ResponseEntity<ThemesDto> getThemes() {
+        return new ResponseEntity<>(storeService.getThemes(), HttpStatus.OK);
+    }
 
     @GetMapping("/purchases")
     public ResponseEntity<MyItemsResponseDto> getPurchases(@RequestHeader("Authorization") String authorization) {
