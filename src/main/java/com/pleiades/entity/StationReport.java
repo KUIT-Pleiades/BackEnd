@@ -18,12 +18,12 @@ public class StationReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Station station;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Report report;

@@ -23,13 +23,13 @@ public class UserStation {
     @EmbeddedId
     private UserStationId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("stationId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "station_id", nullable = false)

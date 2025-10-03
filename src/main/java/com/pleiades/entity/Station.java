@@ -50,7 +50,7 @@ public class Station {
     @Column(nullable = false)
     private LocalDateTime recentActivity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_id")
     TheItem background;
 

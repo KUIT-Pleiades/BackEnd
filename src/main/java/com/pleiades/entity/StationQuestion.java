@@ -21,12 +21,12 @@ public class StationQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Station station;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Question question;

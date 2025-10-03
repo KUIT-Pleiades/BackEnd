@@ -24,7 +24,7 @@ public class Star {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_id")
     private TheItem background;
 }

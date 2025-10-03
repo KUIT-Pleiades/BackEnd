@@ -9,10 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OfficialWishlistRepository extends JpaRepository<OfficialWishlist, Long> {
 
     @Query("SELECT i FROM OfficialWishlist i WHERE i.item.type IN :types AND i.user.id=:userid")
     List<OfficialWishlist> findByTypesInWishlist(@Param("types") List<ItemType> types, @Param("userid") String userid);
+
+    Optional<OfficialWishlist> findByUserIdAndItemId(String userId, Long itemId);
+
+    boolean existsByUserIdAndItemId(String userId, Long itemId);
 }

@@ -1,10 +1,8 @@
 package com.pleiades.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(of="id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -45,4 +44,19 @@ public class User implements Serializable {
     @Column
     private String refreshToken;
 
+    @Column
+    @ColumnDefault("0")
+    private Long coin;
+
+    @Column
+    @ColumnDefault("0")
+    private Long stone;
+
+    public void addCoin(Long coin) {
+        this.coin += coin;
+    }
+
+    public void addStone(Long stone) {
+        this.stone += stone;
+    }
 }
