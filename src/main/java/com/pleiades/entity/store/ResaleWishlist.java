@@ -1,5 +1,6 @@
 package com.pleiades.entity.store;
 import com.pleiades.entity.User;
+import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,4 +27,12 @@ public class ResaleWishlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private ResaleListing resaleListing;
+
+    public static ResaleWishlist of(User user, ResaleListing resaleListing) {
+        ResaleWishlist resaleWishlist = new ResaleWishlist();
+        resaleWishlist.setUser(user);
+        resaleWishlist.setResaleListing(resaleListing);
+
+        return resaleWishlist;
+    }
 }

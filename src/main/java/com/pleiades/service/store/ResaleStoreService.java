@@ -88,13 +88,11 @@ public class ResaleStoreService {
         if (resaleWishlistRepository.existsByUserIdAndResaleListingId(userId, itemId)) return ValidationStatus.DUPLICATE;
 
         try {
-            ResaleWishlist newWishlist = new ResaleWishlist();
-
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             ResaleListing item = resaleListingRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            newWishlist.setResaleListing(item);
-            newWishlist.setUser(user);
+            ResaleWishlist newWishlist = ResaleWishlist.of(user, item);
+
             resaleWishlistRepository.save(newWishlist);
         } catch (CustomException e) {
             log.error(e.getMessage());

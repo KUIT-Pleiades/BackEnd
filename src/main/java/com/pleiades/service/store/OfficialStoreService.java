@@ -79,13 +79,11 @@ public class OfficialStoreService {
         if (officialWishlistRepository.existsByUserIdAndItemId(userId, itemId)) return ValidationStatus.DUPLICATE;
 
         try {
-            OfficialWishlist newWishlist = new OfficialWishlist();
-
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            newWishlist.setItem(item);
-            newWishlist.setUser(user);
+            OfficialWishlist newWishlist = OfficialWishlist.of(user, item);
+
             officialWishlistRepository.save(newWishlist);
         } catch (CustomException e) {
             log.error(e.getMessage());

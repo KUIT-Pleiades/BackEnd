@@ -28,4 +28,12 @@ public class OfficialWishlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private TheItem item;
+
+    public static OfficialWishlist of(User user, TheItem item) {
+        OfficialWishlist officialWishlist = new OfficialWishlist();
+        officialWishlist.setUser(user);
+        officialWishlist.setItem(item);
+
+        return officialWishlist;
+    }
 }
