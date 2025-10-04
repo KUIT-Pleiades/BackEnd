@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Table(name = "item_themes")
 public class ItemTheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

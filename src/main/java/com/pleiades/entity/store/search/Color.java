@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "colors")
 public class Color {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

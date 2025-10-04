@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "station_question", uniqueConstraints = @UniqueConstraint(columnNames = {"station", "question"}))
+@Table(name = "station_questions", uniqueConstraints = @UniqueConstraint(columnNames = {"station_id", "question_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

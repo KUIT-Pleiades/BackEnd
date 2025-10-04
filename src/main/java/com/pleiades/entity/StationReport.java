@@ -6,7 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "station_report")
+@Table(name = "station_reports")
 @Data
 @Setter
 @Getter

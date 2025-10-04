@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "item_colors")
 public class ItemColor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
