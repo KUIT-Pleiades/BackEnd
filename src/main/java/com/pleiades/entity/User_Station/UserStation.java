@@ -13,7 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_station")
+@Table(name = "user_stations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

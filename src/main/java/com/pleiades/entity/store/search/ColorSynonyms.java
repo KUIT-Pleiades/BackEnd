@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "color_synonyms")
 public class ColorSynonyms {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

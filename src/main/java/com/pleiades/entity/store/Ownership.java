@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Table(name = "ownerships")
 public class Ownership {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
