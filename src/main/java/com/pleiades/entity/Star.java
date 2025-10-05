@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name="stars")
+@Table(name = "stars")
 @Builder
 public class Star {
 

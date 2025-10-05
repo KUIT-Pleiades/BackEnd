@@ -171,19 +171,31 @@ public class SheetSyncService {
         }
 
         // 1) TheItem 업서트
-        var found = theItemRepository.findByName(itemName);
+        var found = theItemRepository.findByName(filename);
+
+        List<String> required = List.of(
+                ItemType.EYES.getType(), ItemType.NOSE.getType(), ItemType.MOUTH.getType(),
+                ItemType.HAIR.getType(), ItemType.SKIN_COLOR.getType()
+                );
+        boolean isRequired = required.contains(type);
+
+        boolean isBasic = priceStr.equals("0");
 
         TheItem item = found.orElseGet(() ->
                 TheItem.builder()
-                        .name(itemName)
+                        .name(filename)
                         .type(parseType(type))
                         .price(parseLong(priceStr))
+                        .description(itemName)
+                        .isRequired(isRequired)
+                        .isBasic(isBasic)
                         .build()
         );
         if (found.isPresent()) {
-            item.setName(itemName);
+            item.setName(filename);
             item.setType(parseType(type));
             item.setPrice(parseLong(priceStr));
+            item.setDescription(itemName);
         }
         theItemRepository.save(item);
 

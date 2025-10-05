@@ -3,14 +3,18 @@ package com.pleiades.entity.store;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @Entity
+@Table(name = "official_wishlists")
 public class OfficialWishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +28,12 @@ public class OfficialWishlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private TheItem item;
+
+    public static OfficialWishlist of(User user, TheItem item) {
+        OfficialWishlist officialWishlist = new OfficialWishlist();
+        officialWishlist.setUser(user);
+        officialWishlist.setItem(item);
+
+        return officialWishlist;
+    }
 }

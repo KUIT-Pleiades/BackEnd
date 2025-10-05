@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Table(name = "resale_listings")
 public class ResaleListing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
