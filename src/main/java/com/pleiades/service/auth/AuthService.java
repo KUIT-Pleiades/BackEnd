@@ -130,6 +130,7 @@ public class AuthService {
             return ValidationStatus.NOT_VALID;
         }
 
+        /* 과한 검증인 것 같아 제거
         Optional<Star> star = starRepository.findByUserId(user.get().getId());
         if (star.isEmpty()) {
             log.info("no star");
@@ -149,6 +150,7 @@ public class AuthService {
             log.info("no character");
             return ValidationStatus.NOT_VALID;
         }
+         */
 
         return ValidationStatus.VALID;
     }
