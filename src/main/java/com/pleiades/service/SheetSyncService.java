@@ -160,7 +160,7 @@ public class SheetSyncService {
         String keywordsCsv = safe(row, 8); // CSV
         String itemName    = safe(row, 9);
 
-        log.info("======= item info =======\nindex: {}, filename: {}, createAt: {}, toggle: {}, type: {}, price: {}, itemName: {}", index, filename, createdAt, toggle, type, priceStr, itemName);
+        log.info("\n======= item info =======\nindex: {}, filename: {}, createAt: {}, toggle: {}, type: {}, price: {}, itemName: {}", index, filename, createdAt, toggle, type, priceStr, itemName);
 
         if (itemName.isBlank()) {
             log.warn("[SheetSync] 아이템명 비어있어 스킵: {}", row);
