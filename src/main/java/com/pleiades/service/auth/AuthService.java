@@ -136,11 +136,18 @@ public class AuthService {
             return ValidationStatus.NOT_VALID;
         }
 
+        TheItem bg = star.get().getBackground();
+
+        if (bg == null) {
+            log.info("no connected star background");
+            throw new CustomException(ErrorCode.ITEM_NOT_FOUND);
+        }
+
         Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
 
         if (starBackground.isEmpty()) {
-            log.info("no star background");
-            return ValidationStatus.NOT_VALID;
+            log.info("star background not existing");
+            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
         }
 
         Optional<Characters> character = characterRepository.findByUser(user.get());
