@@ -185,6 +185,7 @@ public class SheetSyncService {
 
         TheItem item = found.orElseGet(() ->
                 TheItem.builder()
+                        .id(parseLong(index))
                         .name(filename)
                         .type(parseType(type))
                         .price(parseLong(priceStr))
