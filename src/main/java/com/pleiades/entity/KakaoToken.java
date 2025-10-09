@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "kakao_tokens")
 @Data
@@ -29,5 +31,8 @@ public class KakaoToken {
 
     @Column(nullable = false)
     private String refreshToken;
+
+    @Column(nullable = true)
+    private Timestamp lastUpdated;
 }
 
