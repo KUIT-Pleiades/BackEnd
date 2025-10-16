@@ -62,9 +62,9 @@ public class OfficialStoreService {
 
     private OfficialItemDto itemToOfficialItemDto(TheItem item) {
         List<ItemTheme> itemThemes = itemThemeRepository.findByItemId(item.getId());
-        List<Theme> themes = new ArrayList<>();
+        List<String> themes = new ArrayList<>();
 
-        for (ItemTheme iT : itemThemes) themes.add(iT.getTheme());
+        for (ItemTheme iT : itemThemes) themes.add(iT.getTheme().getName());
 
         return new OfficialItemDto(
                 item.getId(),

@@ -23,5 +23,5 @@ public class OfficialItemDto {
     private String description;
     private ItemType type;
     private Long price;
-    private List<Theme> theme;
+    private List<String> theme;
 }
