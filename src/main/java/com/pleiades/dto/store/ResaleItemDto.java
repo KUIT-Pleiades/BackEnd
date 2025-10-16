@@ -22,5 +22,5 @@ public class ResaleItemDto {
     private Long price;
     private Long discounted_price;
     private SaleStatus status;
-    private List<Theme> theme;
+    private List<String> theme;
 }
