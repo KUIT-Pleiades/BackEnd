@@ -3,6 +3,7 @@ package com.pleiades.dto.store;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.search.ItemTheme;
+import com.pleiades.entity.store.search.Theme;
 import com.pleiades.strings.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +23,5 @@ public class OfficialItemDto {
     private String description;
     private ItemType type;
     private Long price;
-    private List<ItemTheme> theme;
+    private List<Theme> theme;
 }

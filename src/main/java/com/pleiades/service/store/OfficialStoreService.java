@@ -6,6 +6,7 @@ import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
 import com.pleiades.entity.store.Ownership;
 import com.pleiades.entity.store.search.ItemTheme;
+import com.pleiades.entity.store.search.Theme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
@@ -60,7 +61,10 @@ public class OfficialStoreService {
     }
 
     private OfficialItemDto itemToOfficialItemDto(TheItem item) {
-        List<ItemTheme> themes = itemThemeRepository.findByItemId(item.getId());
+        List<ItemTheme> itemThemes = itemThemeRepository.findByItemId(item.getId());
+        List<Theme> themes = new ArrayList<>();
+
+        for (ItemTheme iT : itemThemes) themes.add(iT.getTheme());
 
         return new OfficialItemDto(
                 item.getId(),
