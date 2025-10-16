@@ -98,14 +98,14 @@ public class AuthKakaoController {
             Optional<KakaoToken> oldToken = kakaoTokenRepository.findByEmail(email);
             if (oldToken.isPresent()) {
                 oldToken.get().setRefreshToken(responseToken.getRefreshToken());
-                oldToken.get().setLastUpdated(Timestamp.from(Instant.from(LocalDateTimeUtil.now())));
+                oldToken.get().setLastUpdated(Timestamp.valueOf(LocalDateTimeUtil.now()));
                 kakaoTokenRepository.save(oldToken.get());
             } else {
                 // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
                 KakaoToken token = new KakaoToken();
                 token.setEmail(email);
                 token.setRefreshToken(responseToken.getRefreshToken());
-                token.setLastUpdated(Timestamp.from(Instant.from(LocalDateTimeUtil.now())));
+                token.setLastUpdated(Timestamp.valueOf(LocalDateTimeUtil.now()));
 
                 User user = userRepository.findByEmail(email).orElse(null);
                 token.setUser(user);
