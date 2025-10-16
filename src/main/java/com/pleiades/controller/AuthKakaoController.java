@@ -15,6 +15,7 @@ import com.pleiades.service.auth.KakaoRequest;
 import com.pleiades.service.auth.KakaoTokenService;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.KakaoUrl;
+import com.pleiades.util.LocalDateTimeUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
@@ -29,9 +30,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Timer;
 
 @Tag(name = "Auth: Kakao", description = "카카오 인증 관련 API")
 @RequiredArgsConstructor
@@ -91,19 +95,23 @@ public class AuthKakaoController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
             }
 
-            // 기존 카카오 토큰 삭제
             Optional<KakaoToken> oldToken = kakaoTokenRepository.findByEmail(email);
-            oldToken.ifPresent(kakaoTokenRepository::delete);
+            if (oldToken.isPresent()) {
+                oldToken.get().setRefreshToken(responseToken.getRefreshToken());
+                oldToken.get().setLastUpdated(Timestamp.from(Instant.from(LocalDateTimeUtil.now())));
+                kakaoTokenRepository.save(oldToken.get());
+            } else {
+                // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
+                KakaoToken token = new KakaoToken();
+                token.setEmail(email);
+                token.setRefreshToken(responseToken.getRefreshToken());
+                token.setLastUpdated(Timestamp.from(Instant.from(LocalDateTimeUtil.now())));
 
-            // 카카오 토큰 저장 - 회원가입 완료 후 유저 아이디 추가 저장
-            KakaoToken token = new KakaoToken();
-            token.setEmail(email);
-            token.setRefreshToken(responseToken.getRefreshToken());
+                User user = userRepository.findByEmail(email).orElse(null);
+                token.setUser(user);
 
-            User user = userRepository.findByEmail(email).orElse(null);
-            token.setUser(user);
-
-            kakaoTokenRepository.save(token);
+                kakaoTokenRepository.save(token);
+            }
             kakaoTokenRepository.flush();
 
             if (kakaoTokenRepository.findByEmail(email).isEmpty()) {
