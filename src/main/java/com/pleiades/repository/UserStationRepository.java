@@ -44,7 +44,7 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
     Optional<UserStation> findByStationIdAndUserId(@Param("stationId") Long stationId, @Param("userId") String userId);
 
     @Query("SELECT sr FROM UserStation sr WHERE sr.station.publicId = :stationPublicId AND sr.user.id = :userId")
-    Optional<UserStation> findByStationPublicIdAndUserId(@Param("stationId") UUID stationId, @Param("userId") String userId);
+    Optional<UserStation> findByStationPublicIdAndUserId(@Param("stationPublicId") UUID stationPublicId, @Param("userId") String userId);
 
     @Query("SELECT us.station FROM UserStation us WHERE us.user = :user AND us.isAdmin = true")
     List<Station> findStationsWhereUserIsAdmin(@Param("user") User user);
