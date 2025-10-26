@@ -53,8 +53,8 @@ public class StationController {
     }
 
     @Operation(summary = "정거장 삭제", description = "정거장 삭제하기")
-    @DeleteMapping("/{station_id}")
-    public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("station_id") String stationPublicId) {
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("stationId") String stationPublicId) {
         log.info("deleteStation controller 진입");
 
         String email = (String) request.getAttribute("email");
@@ -67,8 +67,8 @@ public class StationController {
     }
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
-    @PatchMapping("/{station_id}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationPublicId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+    @PatchMapping("/{stationId}/background")
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
         log.info("/stations/"+stationPublicId+"/background");
         String email = authService.getEmailByAuthorization(authorization);
         authService.userInStation(stationPublicId, email);
