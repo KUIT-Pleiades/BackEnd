@@ -197,6 +197,7 @@ public class UserStationService {
                     return new StationDto(
 //                            station.getId(),
                             station.getPublicId().toString(),
+                            station.getCode(),
                             station.getName(),
                             station.getNumberOfUsers(),
                             station.getBackground().getName(),
