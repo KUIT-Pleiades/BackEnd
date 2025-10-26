@@ -58,8 +58,8 @@ public class UserStationController {
     }
 
     @Operation(summary = "정거장 가입", description = "코드에 해당하는 정거장 가입하기")
-    @PatchMapping("/{station_id}")
-    public ResponseEntity<Map<String, String>> addUserStation(@PathVariable("station_id") String stationPublicId, HttpServletRequest request) {
+    @PatchMapping("/{station_code}")
+    public ResponseEntity<Map<String, String>> addUserStation(@PathVariable("station_code") String stationCode, HttpServletRequest request) {
         log.info("멤버 추가: add UserStation Controller 진입");
         String email = (String) request.getAttribute("email");
         if (email == null) {
@@ -67,7 +67,7 @@ public class UserStationController {
         } // 401
         log.info("사용자 email = {}", email);
 
-        Map<String, String> response = userStationService.addMemberToStation(email, stationPublicId);
+        Map<String, String> response = userStationService.addMemberToStation(email, stationCode);
 
         return ResponseEntity.ok(response);
     }
