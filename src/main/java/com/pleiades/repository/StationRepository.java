@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface StationRepository extends JpaRepository<Station, Long> {
     public Optional<Station> findById(Long id);
     public Optional<Station> findByPublicId(UUID id);
+    public Optional<Station> findByCode(String code);
 
     boolean existsById(Long id);
     boolean existsByPublicId(UUID publicId);
