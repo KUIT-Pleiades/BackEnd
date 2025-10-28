@@ -73,8 +73,8 @@ public class UserStationController {
     }
 
     @Operation(summary = "정거장 입장", description = "id에 해당하는 정거장 입장하기")
-    @GetMapping("/{stationId}")
-    public ResponseEntity<StationHomeDto> enterStation(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
+    @GetMapping("/{stationCode}")
+    public ResponseEntity<StationHomeDto> enterStation(@PathVariable("stationCode") String stationCode, HttpServletRequest request) {
         log.info("정거장 입장 Controller 진입");
         String email = (String) request.getAttribute("email");
         if (email == null) {
@@ -82,7 +82,7 @@ public class UserStationController {
         } // 401
         log.info("사용자 email = {}", email);
 
-        StationHomeDto stationHomeDto = userStationService.enterStation(email, stationPublicId);
+        StationHomeDto stationHomeDto = userStationService.enterStation(email, stationCode);
 
         if(!stationHomeDto.isReportWritten()){ // 202
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(stationHomeDto);
