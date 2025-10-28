@@ -13,7 +13,6 @@ import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.service.UserService;
-import com.pleiades.service.report.ReportService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
@@ -82,7 +81,7 @@ public class UserStationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
-        Report todaysReport = todaysReportService.searchTodaysReport(email, station.getPublicId().toString());
+        Report todaysReport = todaysReportService.searchTodaysReportByCode(email, stationCode);
         if (todaysReport == null) {
             todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         }
