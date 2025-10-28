@@ -129,7 +129,7 @@ public class TodaysReportService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Station station = stationRepository.findByCode(stationCode).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
-        authService.userInStation(stationCode, email);
+        authService.userInStation(station.getPublicId().toString(), email);
 
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
         if (stationQuestions.isEmpty()) { return null; }
