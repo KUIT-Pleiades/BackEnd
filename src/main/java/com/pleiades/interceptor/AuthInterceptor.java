@@ -79,6 +79,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 사용자 email 추출 후 request attribute 에 넣기
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();
+
+        // TODO
+        if (email == null) {
+            log.info("AuthInterceptor preHandle 401 - no email");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
         request.setAttribute("email", email);
 
         log.info("AuthInterceptor preHandle 200");

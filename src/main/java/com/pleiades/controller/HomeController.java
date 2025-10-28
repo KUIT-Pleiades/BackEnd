@@ -10,6 +10,7 @@ import com.pleiades.service.UserService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,9 +42,20 @@ public class HomeController {
 
     @Operation(summary = "내 별", description = "내 별")
     @GetMapping("")
-    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization) {
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        return authService.responseUserInfo(accessToken);
+    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+        String email = request.getAttribute("email").toString();
+
+        ValidationStatus userValidation = authService.userValidation(email);
+        if (userValidation.equals(ValidationStatus.NOT_VALID)) throw new CustomException(ErrorCode.SIGN_UP_REQUIRED);     // 202
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+        UserInfoDto userInfoDto = userService.buildUserInfoDto(user.get());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userInfoDto);
     }
 
     @Operation(summary = "친구 별", description = "친구 별")

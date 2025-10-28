@@ -56,21 +56,16 @@ public class StationController {
     @DeleteMapping("/{station_id}")
     public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("station_id") String stationPublicId) {
         log.info("deleteStation controller 진입");
-
         String email = (String) request.getAttribute("email");
-        if (email == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
-        }
-        log.info("사용자 email = {}", email);
 
         return stationService.deleteStation(email, stationPublicId);
     }
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{station_id}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationPublicId, @RequestHeader("Authorization") String authorization, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationPublicId, HttpServletRequest request, @RequestBody Map<String, Object> body) {
         log.info("/stations/"+stationPublicId+"/background");
-        String email = authService.getEmailByAuthorization(authorization);
+        String email = (String) request.getAttribute("email");
         authService.userInStation(stationPublicId, email);
 
         Object stationBackground = body.get("stationBackground");
@@ -89,9 +84,9 @@ public class StationController {
 
     @Operation(summary = "정거장 설정", description = "정거장 설정 변경하기")
     @PatchMapping("/{stationId}/settings")
-    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization, @Valid @RequestBody StationSettingDto settingDto) {
+    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationPublicId+"/settings");
-        String email = authService.getEmailByAuthorization(authorization);
+        String email = (String) request.getAttribute("email");
         authService.userInStation(stationPublicId, email);
 
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
@@ -102,8 +97,8 @@ public class StationController {
 
     @Operation(summary = "정거장 코드 재발급", description = "정거장 코드 재발급하기")
     @PatchMapping("/{stationId}/code")
-    public ResponseEntity<Map<String, String>> reissueCode(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, String>> reissueCode(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         authService.userInStation(stationPublicId, email);
 
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
@@ -120,8 +115,8 @@ public class StationController {
 
     @Operation(summary = "정거장 즐겨찾기", description = "정거장 즐겨찾기 설정")
     @PostMapping("/{stationId}/favorite")
-    public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).get();
@@ -138,8 +133,8 @@ public class StationController {
     }
 
     @DeleteMapping("/{stationId}/favorite")
-    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationPublicId, @RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).get();
