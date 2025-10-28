@@ -4,7 +4,6 @@ import com.pleiades.dto.ReportDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
-import com.pleiades.repository.*;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.ValidationStatus;
@@ -16,12 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 @Tag(name = "StationReport", description = "오늘의 리포트 관련 API")
 @Slf4j
@@ -40,7 +36,7 @@ public class StationReportController {
         log.info("/stations/{}/report", stationPublicId);
         String email = authService.getEmailByAuthorization(authorization);
 
-        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
+        Report report = todaysReportService.searchTodaysReportById(email, stationPublicId);
 
         // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
         if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
@@ -87,7 +83,7 @@ public class StationReportController {
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationPublicId, @PathVariable("userId") String userId, @RequestHeader("Authorization") String authorization) {
         String email = authService.getEmailByAuthorization(authorization);
 
-        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
+        Report report = todaysReportService.searchTodaysReportById(email, stationPublicId);
 
         if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 
