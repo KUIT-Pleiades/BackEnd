@@ -77,7 +77,7 @@ public class TodaysReportService {
         authService.userInStation(stationPublicId, email);
 
         // 사용자가 오늘의 리포트를 생성한 적 없음
-        Report report = searchTodaysReport(email, stationPublicId);
+        Report report = searchTodaysReportById(email, stationPublicId);
         if (report == null) { return ValidationStatus.NONE; }
 
         User user = userRepository.findByEmail(email).get();
@@ -98,13 +98,39 @@ public class TodaysReportService {
     }
 
     // 이 정거장에서 해당 사용자가 작성한 투데이 리포트 반환
-    public Report searchTodaysReport(String email, String stationPublicId) {
-        log.info("searchTodaysReport");
+    public Report searchTodaysReportById(String email, String stationPublicId) {
+        log.info("searchTodaysReportById");
 
         authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
+        if (stationQuestions.isEmpty()) { return null; }
+
+        Report report = null;
+
+        for (StationQuestion stationQuestion : stationQuestions) {
+            if (stationQuestion.getCreatedAt().equals(LocalDateTimeUtil.today())) {
+                Question question = questionRepository.findById(stationQuestion.getQuestion().getId()).orElseThrow(()->new CustomException(ErrorCode.NO_TODAYS_REPORT));
+                report = searchUserQuestion(user, question);
+                if (report == null) { return report; }
+                Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
+                if (stationReport.isEmpty()) { return null; }
+            }
+        }
+
+        return report;
+    }
+
+    public Report searchTodaysReportByCode(String email, String stationCode) {
+        log.info("searchTodaysReportByCode");
+
+        authService.userInStation(stationCode, email);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Station station = stationRepository.findByCode(stationCode).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
         if (stationQuestions.isEmpty()) { return null; }
