@@ -101,10 +101,10 @@ public class TodaysReportService {
     public Report searchTodaysReportById(String email, String stationPublicId) {
         log.info("searchTodaysReportById");
 
-        authService.userInStation(stationPublicId, email);
-
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        authService.userInStation(stationPublicId, email);
 
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
         if (stationQuestions.isEmpty()) { return null; }
@@ -126,11 +126,10 @@ public class TodaysReportService {
 
     public Report searchTodaysReportByCode(String email, String stationCode) {
         log.info("searchTodaysReportByCode");
-
-        authService.userInStation(stationCode, email);
-
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Station station = stationRepository.findByCode(stationCode).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        authService.userInStation(stationCode, email);
 
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
         if (stationQuestions.isEmpty()) { return null; }
