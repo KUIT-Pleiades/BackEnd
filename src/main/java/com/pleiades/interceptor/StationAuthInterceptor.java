@@ -40,26 +40,42 @@ public class StationAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HandlerMethod controller = null;
-        if (handler instanceof HandlerMethod) controller = (HandlerMethod) handler;
-
+        if(request.getMethod().equals("OPTIONS")) { return true; }
+        
         String email = (String) request.getAttribute("email");
+
         Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         String stationPublicId = pathVariables.get("stationId");
         String stationCode = pathVariables.get("stationCode");
 
         if (stationCode != null) return true;
-        if (stationPublicId == null || stationPublicId.isEmpty()) { throw new CustomException(ErrorCode.INVALID_STATION_ID); }
+        if (stationPublicId == null || stationPublicId.isEmpty()) {
+            log.error("stationId is null or empty");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid station id");
+            return false;
+        }
 
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
+        if (user.isEmpty()) {
+            log.error("User is empty or not found");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
+            return false;
+        }
 
         Optional<Station> station = stationRepository.findByPublicId(UUID.fromString(stationPublicId));
-        if (station.isEmpty()) { throw new CustomException(ErrorCode.STATION_NOT_FOUND); }
+        if (station.isEmpty()) {
+            log.error("Station is null or empty");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Station not found");
+            return false;
+        }
 
         UserStationId userStationId = new UserStationId(user.get().getId(), station.get().getId());
         Optional<UserStation> userStation = userStationRepository.findById(userStationId);
-        if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }
+        if (userStation.isEmpty()) {
+            log.error("UserStation is null or not found");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "UserStation not found");
+            return false;
+        }
 
         return true;
     }

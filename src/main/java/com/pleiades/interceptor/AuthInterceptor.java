@@ -80,10 +80,10 @@ public class AuthInterceptor implements HandlerInterceptor {
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();
 
-        // TODO
         if (email == null) {
             log.info("AuthInterceptor preHandle 401 - no email");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
         }
         request.setAttribute("email", email);
 
