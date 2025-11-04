@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,14 +20,13 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@Order(1)
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
-    private final AuthService authService;
 
     @Autowired
-    public AuthInterceptor(JwtUtil jwtUtil, AuthService authService) {
+    public AuthInterceptor(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        this.authService = authService;
     }
 
     @Override
@@ -79,6 +79,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 사용자 email 추출 후 request attribute 에 넣기
         Claims token = jwtUtil.validateToken(accessToken);
         String email = token.getSubject();
+
+        // TODO
+        if (email == null) {
+            log.info("AuthInterceptor preHandle 401 - no email");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
         request.setAttribute("email", email);
 
         log.info("AuthInterceptor preHandle 200");

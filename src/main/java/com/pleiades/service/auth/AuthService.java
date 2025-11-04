@@ -116,72 +116,6 @@ public class AuthService {
                 .body(body);
     }
 
-    // 회원가입 여부
-    public ValidationStatus userValidation(String accessToken) {
-        log.info("AuthService userValidation");
-
-        Claims claims = jwtUtil.validateToken(accessToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) {
-            log.info("no user");
-            return ValidationStatus.NOT_VALID;
-        }
-
-        Optional<Star> star = starRepository.findByUserId(user.get().getId());
-        if (star.isEmpty()) {
-            log.info("no star");
-            return ValidationStatus.NOT_VALID;
-        }
-
-        TheItem bg = star.get().getBackground();
-
-        if (bg == null) {
-            log.info("no connected star background");
-            throw new CustomException(ErrorCode.ITEM_NOT_FOUND);
-        }
-
-        Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
-
-        if (starBackground.isEmpty()) {
-            log.info("star background not existing");
-            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
-        }
-
-        Optional<Characters> character = characterRepository.findByUser(user.get());
-
-        if (character.isEmpty()) {
-            log.info("no character");
-            return ValidationStatus.NOT_VALID;
-        }
-
-        return ValidationStatus.VALID;
-    }
-
-    // 회원가입 안 한 경우 -> 202 or 204
-    public ResponseEntity<UserInfoDto> responseUserInfo(String accessToken) {
-        log.info("AuthService responseUserInfo");
-
-        ValidationStatus userValidation = userValidation(accessToken);
-
-        if (userValidation.equals(ValidationStatus.NOT_VALID)) {
-            throw new CustomException(ErrorCode.SIGN_UP_REQUIRED);     // 202
-        }
-
-        Claims claims = jwtUtil.validateToken(accessToken);
-        String email = claims.getSubject();
-
-        Optional<User> user = userRepository.findByEmail(email);
-
-        UserInfoDto userInfoDto = userService.buildUserInfoDto(user.get());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userInfoDto);
-    }
-
     public ResponseEntity<Map<String, Object>> responseFriendInfo(User user, User friend) {
         log.info("AuthService responseFriendInfo");
 
@@ -260,30 +194,6 @@ public class AuthService {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    public String getEmailByAuthorization(String authorization) {
-        if (authorization.startsWith("admin")) { return HeaderUtil.authorizationAdmin(authorization); }
-
-        String accessToken = HeaderUtil.authorizationBearer(authorization);
-        Claims token = jwtUtil.validateToken(accessToken);
-
-        return token.getSubject();
-    }
-
-    public void userInStation(String stationPublicId, String email) {
-        if (stationPublicId == null || stationPublicId.isEmpty()) { throw new CustomException(ErrorCode.INVALID_STATION_ID); }
-
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
-
-        Optional<Station> station = stationRepository.findByPublicId(UUID.fromString(stationPublicId));
-        if (station.isEmpty()) { throw new CustomException(ErrorCode.STATION_NOT_FOUND); }
-
-        UserStationId userStationId = new UserStationId(user.get().getId(), station.get().getId());
-        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
-
-        if (userStation.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_IN_STATION); }
-    }
-
     @Transactional
     public void logout(String email) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -326,4 +236,48 @@ public class AuthService {
 
         userRepository.delete(user);
     }
+
+
+
+    // 회원가입 여부
+    public ValidationStatus userValidation(String email) {
+        log.info("AuthService userValidation");
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            log.info("no user");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        Optional<Star> star = starRepository.findByUserId(user.get().getId());
+        if (star.isEmpty()) {
+            log.info("no star");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        TheItem bg = star.get().getBackground();
+
+        if (bg == null) {
+            log.info("no connected star background");
+            throw new CustomException(ErrorCode.ITEM_NOT_FOUND);
+        }
+
+        Optional<TheItem> starBackground = theItemRepository.findById(star.get().getBackground().getId());
+
+        if (starBackground.isEmpty()) {
+            log.info("star background not existing");
+            throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+        }
+
+        Optional<Characters> character = characterRepository.findByUser(user.get());
+
+        if (character.isEmpty()) {
+            log.info("no character");
+            return ValidationStatus.NOT_VALID;
+        }
+
+        return ValidationStatus.VALID;
+    }
+
 }

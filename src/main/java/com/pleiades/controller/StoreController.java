@@ -11,6 +11,7 @@ import com.pleiades.service.UserService;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.StoreService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,8 @@ public class StoreController {
     }
 
     @GetMapping("/purchases")
-    public ResponseEntity<MyItemsResponseDto> getPurchases(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<MyItemsResponseDto> getPurchases(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         MyItemsResponseDto myItemsResponseDto = new MyItemsResponseDto(storeService.getMyItems(user.getId()));

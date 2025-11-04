@@ -78,11 +78,11 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestHeader("Authorization") String authorization, @Valid @RequestBody UserInfoDto userInfoDto) {
+    public ResponseEntity<Map<String, String>> signup(HttpServletRequest request, @Valid @RequestBody UserInfoDto userInfoDto) {
         log.info("/auth/signup");
+        String email = request.getAttribute("email").toString();
 
         try {
-            String email = authService.getEmailByAuthorization(authorization);
             ValidationStatus signupStatus = signupService.signup(email, userInfoDto);
 
             if (signupStatus == ValidationStatus.NOT_VALID) {
@@ -103,7 +103,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
         log.info("/auth/logout");
-        String email = TokenValidateResult.of(refreshToken).getEmail();
+        String email = request.getAttribute("email").toString();
 
         if (email == null || email.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","unvalid refresh token"));
@@ -116,7 +116,7 @@ public class AuthController {
     @DeleteMapping("/withdraw")
     public ResponseEntity<Map<String, Object>> withdraw(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
         log.info("/auth/withdraw");
-        String email = (String) request.getAttribute("email");
+        String email = request.getAttribute("email").toString();
         if(email == null) { throw new CustomException(ErrorCode.INVALID_TOKEN);}
         authService.withdraw(email);
 

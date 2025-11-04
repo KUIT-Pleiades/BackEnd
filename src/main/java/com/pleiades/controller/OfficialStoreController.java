@@ -10,6 +10,7 @@ import com.pleiades.service.store.OfficialStoreService;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,8 +33,8 @@ public class OfficialStoreController {
     private final UserRepository userRepository;
 
     @GetMapping("/face")
-    public ResponseEntity<OfficialStoreDto> getFaceList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<OfficialStoreDto> getFaceList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
@@ -49,8 +50,8 @@ public class OfficialStoreController {
     }
 
     @GetMapping("/fashion")
-    public ResponseEntity<OfficialStoreDto> getFashionList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<OfficialStoreDto> getFashionList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
@@ -66,8 +67,8 @@ public class OfficialStoreController {
     }
 
     @GetMapping("/bg")
-    public ResponseEntity<OfficialStoreDto> getBgList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<OfficialStoreDto> getBgList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
@@ -83,8 +84,8 @@ public class OfficialStoreController {
     }
 
     @PostMapping("/wishlist")
-    public ResponseEntity<Map<String, String>> addWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         ValidationStatus validationStatus = officialStoreService.addWishlist(user.getId(), wishlist.getId());
@@ -96,8 +97,8 @@ public class OfficialStoreController {
     }
 
     @DeleteMapping("/wishlist")
-    public ResponseEntity<Map<String, String>> removeWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, String>> removeWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         ValidationStatus validationStatus = officialStoreService.removeWishlist(user.getId(), wishlist.getId());
@@ -109,8 +110,8 @@ public class OfficialStoreController {
     }
 
     @PostMapping("/trades")
-    public ResponseEntity<PurchaseResponseDto> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ItemIdDto itemIdDto) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<PurchaseResponseDto> buyItem(HttpServletRequest request, @RequestBody ItemIdDto itemIdDto) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Long ownershipId = officialStoreService.buyItem(user.getId(), itemIdDto.getItemId());

@@ -1,6 +1,7 @@
 package com.pleiades.config;
 
 import com.pleiades.interceptor.AuthInterceptor;
+import com.pleiades.interceptor.StationAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
     private String FRONT_ORIGIN;
 
     private final AuthInterceptor authInterceptor;
+    private final StationAuthInterceptor stationAuthInterceptor;
 
     @Autowired
-    public WebConfig(AuthInterceptor authInterceptor) {
+    public WebConfig(AuthInterceptor authInterceptor, StationAuthInterceptor stationAuthInterceptor) {
         this.authInterceptor = authInterceptor;
+        this.stationAuthInterceptor = stationAuthInterceptor;
     }
 
     @Override
@@ -49,7 +52,9 @@ public class WebConfig implements WebMvcConfigurer {
 //                        "/auth/login/naver"
                         );  // 제외할 경로
 
-
+        registry.addInterceptor(stationAuthInterceptor)
+                .addPathPatterns("/stations/**")
+                .excludePathPatterns("/stations");
     }
 }
 

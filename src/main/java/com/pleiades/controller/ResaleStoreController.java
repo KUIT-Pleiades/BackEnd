@@ -11,6 +11,7 @@ import com.pleiades.service.store.ResaleStoreService;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,8 +33,8 @@ public class ResaleStoreController {
     private final UserRepository userRepository;
 
     @GetMapping("/face")
-    public ResponseEntity<ResaleStoreDto> getFaceList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<ResaleStoreDto> getFaceList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
@@ -50,8 +51,8 @@ public class ResaleStoreController {
     }
 
     @GetMapping("/fashion")
-    public ResponseEntity<ResaleStoreDto> getFashionList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<ResaleStoreDto> getFashionList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
@@ -68,8 +69,8 @@ public class ResaleStoreController {
     }
 
     @GetMapping("/bg")
-    public ResponseEntity<ResaleStoreDto> getBgList(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<ResaleStoreDto> getBgList(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
@@ -86,8 +87,8 @@ public class ResaleStoreController {
     }
 
     @PostMapping("/wishlist")
-    public ResponseEntity<Map<String, String>> addWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
+        String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
@@ -100,8 +101,8 @@ public class ResaleStoreController {
     }
 
     @DeleteMapping("/wishlist")
-    public ResponseEntity<Map<String, String>> removeWishlist(@RequestHeader("Authorization") String authorization, @RequestBody WishListDto wishlist) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String, String>> removeWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         ValidationStatus validationStatus = resaleStoreService.removeWishlist(user.getId(), wishlist.getId());
@@ -118,8 +119,8 @@ public class ResaleStoreController {
     }
 
     @PostMapping("/trades")
-    public ResponseEntity<PurchaseResponseDto> buyItem(@RequestHeader("Authorization") String authorization, @RequestBody ListingIdDto listingIdDto) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<PurchaseResponseDto> buyItem(HttpServletRequest request, @RequestBody ListingIdDto listingIdDto) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Long ownershipId = resaleStoreService.buyItem(user.getId(), listingIdDto.getListingId());
@@ -127,8 +128,8 @@ public class ResaleStoreController {
     }
 
     @PostMapping("/listings")
-    public ResponseEntity<ListingIdDto> listings(@RequestHeader("Authorization") String authorization, @RequestBody AddListingRequestDto addListingRequestDto) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<ListingIdDto> listings(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Long listingId = resaleStoreService.addListing(user.getId(), addListingRequestDto.getOwnershipId(), addListingRequestDto.getPrice());
@@ -139,8 +140,8 @@ public class ResaleStoreController {
     }
 
     @DeleteMapping("/listings/{listing_id}")
-    public ResponseEntity<Map<String,String>> deleteListing(@RequestHeader("Authorization") String authorization, @RequestParam Long listingId) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<Map<String,String>> deleteListing(HttpServletRequest request, @RequestParam Long listingId) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         resaleStoreService.deleteListing(user.getId(), listingId);
@@ -149,8 +150,8 @@ public class ResaleStoreController {
     }
 
     @GetMapping("/listings")
-    public ResponseEntity<ListingsDto> myListings(@RequestHeader("Authorization") String authorization) {
-        String email = authService.getEmailByAuthorization(authorization);
+    public ResponseEntity<ListingsDto> myListings(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Long> ids = resaleStoreService.getListings(user.getId());

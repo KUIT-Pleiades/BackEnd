@@ -116,7 +116,7 @@ public class UserStationService {
         Report report = todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        return Map.of("message", "Enter Station Success");
+        return Map.of("stationId", station.getPublicId().toString());
     }
 
     // response DTO 형성 method
@@ -194,7 +194,6 @@ public class UserStationService {
                 .map(userStation -> {
                     Station station = userStation.getStation();
                     return new StationDto(
-//                            station.getId(),
                             station.getPublicId().toString(),
                             station.getCode(),
                             station.getName(),
