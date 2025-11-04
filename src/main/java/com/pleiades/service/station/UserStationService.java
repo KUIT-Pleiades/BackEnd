@@ -68,12 +68,12 @@ public class UserStationService {
 
     // 정거장 홈 _ 입장
     @Transactional
-    public StationHomeDto enterStation(String email, String stationCode) {
+    public StationHomeDto enterStation(String email, String stationPublicId) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
         // 정거장 존재 여부 확인 (404)
-        Station station = stationRepository.findByCode(stationCode)
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // 사용자가 정거장 멤버인지 확인 (403)
@@ -81,7 +81,7 @@ public class UserStationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN_MEMBER));
 
         // 투데이 리포트 '생성' 여부 검증 - 안 됐으면 생성
-        Report todaysReport = todaysReportService.searchTodaysReportByCode(email, stationCode);
+        Report todaysReport = todaysReportService.searchTodaysReport(email, station.getPublicId().toString());
         if (todaysReport == null) {
             todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         }

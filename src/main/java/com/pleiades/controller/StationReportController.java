@@ -35,7 +35,7 @@ public class StationReportController {
         log.info("/stations/{}/report", stationPublicId);
         String email = (String) request.getAttribute("email");
 
-        Report report = todaysReportService.searchTodaysReportById(email, stationPublicId);
+        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
 
         // 입장할 때 투데이 리포트를 생성했기 때문에 말이 안 되지만 일단 예외 처리를 함
         if (report == null) { throw new CustomException(ErrorCode.USER_NEVER_ENTERED_STATION); }
@@ -82,7 +82,7 @@ public class StationReportController {
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationPublicId, @PathVariable("userId") String userId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
-        Report report = todaysReportService.searchTodaysReportById(email, stationPublicId);
+        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
 
         if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 
