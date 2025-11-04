@@ -84,7 +84,6 @@ public class StationService {
     public Map<String, Object> createStation(String email, StationCreateDto requestDto) {
 
         User adminUser = userService.getUserByEmail(email);
-//        String stationId = generateUniqueStationCode();
         String stationCode = generateUniqueStationCode();
         TheItem stationBackground = theItemRepository.findByTypeAndName(ItemType.STATION_BG, requestDto.getStationBackground()).orElse(null);
         if (stationBackground == null) {
@@ -93,7 +92,6 @@ public class StationService {
         }
 
         Station station = Station.builder()
-//                .id(stationId)
                 .name(requestDto.getName())
                 .intro(requestDto.getIntro())
                 .numberOfUsers(1)
@@ -102,7 +100,6 @@ public class StationService {
                 .reportNoticeTime(requestDto.getReportNoticeTime())
                 .background(stationBackground)
                 .recentActivity(LocalDateTimeUtil.now())
-//                .code(stationId)        // 초기 정거장 코드는 아이디와 동일
                 .code(stationCode)
                 .build();
 
@@ -113,7 +110,6 @@ public class StationService {
         Report report = todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-//        return Map.of("stationId", stationId);
         return Map.of("stationId", station.getPublicId());
     }
 

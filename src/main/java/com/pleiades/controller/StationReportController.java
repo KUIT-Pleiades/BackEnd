@@ -30,8 +30,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/stations")
 public class StationReportController {
-
-    private final AuthService authService;
     private final ModelMapper modelMapper;
     private final TodaysReportService todaysReportService;
 

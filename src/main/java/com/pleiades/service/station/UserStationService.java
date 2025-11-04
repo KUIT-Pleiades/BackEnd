@@ -93,12 +93,12 @@ public class UserStationService {
 
     // 정거장 첫 입장 _ 멤버 추가
     @Transactional
-    public Map<String, String> addMemberToStation(String email, String stationPublicId) {
+    public Map<String, String> addMemberToStation(String email, String stationCode) {
         // 사용자 조회
         User user = userService.getUserByEmail(email);
 
         // 정거장 존재 여부 확인 (404)
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
+        Station station = stationRepository.findByCode(stationCode)
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         // 이미 해당 station member 인지 확인 (409)
@@ -114,10 +114,10 @@ public class UserStationService {
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
         stationRepository.save(station);
 
-        Report report = todaysReportService.createTodaysReport(email, stationPublicId);
+        Report report = todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
 
-        return Map.of("message", "Enter Station Success");
+        return Map.of("stationId", station.getPublicId().toString());
     }
 
     // response DTO 형성 method

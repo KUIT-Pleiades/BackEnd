@@ -33,12 +33,10 @@ public class TodaysReportService {
     private final QuestionRepository questionRepository;
 
     private final StationQuestionService stationQuestionService;
-    private final AuthService authService;
 
     // 투데이 리포트 생성 (생성만, 작성은 안 됨)
     public Report createTodaysReport(String email, String stationPublicId) {
         log.info("createReport");
-        authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).get();
         Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
@@ -74,8 +72,6 @@ public class TodaysReportService {
     public ValidationStatus updateTodaysReport(String email, String stationPublicId, String answer) {
         log.info("updateTodaysReport");
 
-        authService.userInStation(stationPublicId, email);
-
         // 사용자가 오늘의 리포트를 생성한 적 없음
         Report report = searchTodaysReport(email, stationPublicId);
         if (report == null) { return ValidationStatus.NONE; }
@@ -100,8 +96,6 @@ public class TodaysReportService {
     // 이 정거장에서 해당 사용자가 작성한 투데이 리포트 반환
     public Report searchTodaysReport(String email, String stationPublicId) {
         log.info("searchTodaysReport");
-
-        authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));

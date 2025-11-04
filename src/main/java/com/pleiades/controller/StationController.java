@@ -53,8 +53,8 @@ public class StationController {
     }
 
     @Operation(summary = "정거장 삭제", description = "정거장 삭제하기")
-    @DeleteMapping("/{station_id}")
-    public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("station_id") String stationPublicId) {
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<Map<String, String>> deleteStation(HttpServletRequest request, @PathVariable("stationId") String stationPublicId) {
         log.info("deleteStation controller 진입");
         String email = (String) request.getAttribute("email");
 
@@ -62,11 +62,10 @@ public class StationController {
     }
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
-    @PatchMapping("/{station_id}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("station_id") String stationPublicId, HttpServletRequest request, @RequestBody Map<String, Object> body) {
+    @PatchMapping("/{stationId}/background")
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @RequestBody Map<String, Object> body) {
         log.info("/stations/"+stationPublicId+"/background");
         String email = (String) request.getAttribute("email");
-        authService.userInStation(stationPublicId, email);
 
         Object stationBackground = body.get("stationBackground");
         if (stationBackground == null) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message","Station Background required.")); }
@@ -87,7 +86,6 @@ public class StationController {
     public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationPublicId+"/settings");
         String email = (String) request.getAttribute("email");
-        authService.userInStation(stationPublicId, email);
 
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
         stationService.stationSettings(station, settingDto);
@@ -99,7 +97,6 @@ public class StationController {
     @PatchMapping("/{stationId}/code")
     public ResponseEntity<Map<String, String>> reissueCode(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        authService.userInStation(stationPublicId, email);
 
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
         ValidationStatus status = stationService.reissueStationCode(station);
@@ -117,7 +114,6 @@ public class StationController {
     @PostMapping("/{stationId}/favorite")
     public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).get();
 
@@ -135,7 +131,6 @@ public class StationController {
     @DeleteMapping("/{stationId}/favorite")
     public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        authService.userInStation(stationPublicId, email);
 
         User user = userRepository.findByEmail(email).get();
 
