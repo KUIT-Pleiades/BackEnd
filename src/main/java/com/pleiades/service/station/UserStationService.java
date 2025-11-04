@@ -195,7 +195,6 @@ public class UserStationService {
                 .map(userStation -> {
                     Station station = userStation.getStation();
                     return new StationDto(
-//                            station.getId(),
                             station.getPublicId().toString(),
                             station.getName(),
                             station.getNumberOfUsers(),
