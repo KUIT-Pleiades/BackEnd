@@ -101,7 +101,6 @@ public class ReportController {
     @DeleteMapping("/history/{historyId}")
     public ResponseEntity<Map<String, Object>> deleteHistory(HttpServletRequest request, @PathVariable("historyId") Long historyId) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
@@ -113,7 +112,6 @@ public class ReportController {
     @PatchMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> updateReport(HttpServletRequest request, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
@@ -131,7 +129,6 @@ public class ReportController {
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> deleteReport(HttpServletRequest request, @PathVariable("reportId") Long reportId) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
@@ -154,7 +151,6 @@ public class ReportController {
 
         // 친구 관계에 있는지 검증
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
@@ -177,7 +173,6 @@ public class ReportController {
 
         // 친구 관계에 있는지 검증
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }

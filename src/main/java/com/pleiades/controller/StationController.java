@@ -40,12 +40,7 @@ public class StationController {
     @PostMapping("")
     public ResponseEntity<Map<String, Object>> createStation(HttpServletRequest request, @Valid @RequestBody StationCreateDto requestDto) {
         log.info("createStation controller 진입");
-
         String email = (String) request.getAttribute("email");
-        if (email == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
-        }
-        log.info("사용자 email = {}", email);
 
         Map<String, Object> response = stationService.createStation(email, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

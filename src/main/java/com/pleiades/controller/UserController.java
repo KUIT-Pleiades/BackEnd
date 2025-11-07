@@ -27,9 +27,8 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<Map<String, Object>>  searchUser(HttpServletRequest request, @RequestParam("user_id") String userId) {
         log.info("search user controller 진입: user_id = {}", userId);
-
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
+
         List<SearchUserDto> searchResult = userService.searchUser(userId, email);
 
         return ResponseEntity.ok(Map.of("users",searchResult));
@@ -39,9 +38,7 @@ public class UserController {
     @GetMapping("/histories")
     public ResponseEntity<Map<String, Object>> searchUserHistory(HttpServletRequest request) {
         log.info("search user history controller 진입");
-
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         List<SearchUserDto> searchResult = userService.searchUserHistory(email);
 
@@ -52,9 +49,7 @@ public class UserController {
     @PostMapping("/histories")
     public ResponseEntity<Map<String, Object>> addUserHistory(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) {
         log.info("add user history controller 진입");
-
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         String searchedId = requestBody.get("searchedId").toString();
 
@@ -65,9 +60,7 @@ public class UserController {
     @DeleteMapping("/histories/{searched_id}")
     public ResponseEntity<Map<String, Object>> deleteUserHistory(HttpServletRequest request, @PathVariable("searched_id") String searchedId) {
         log.info("delete user history controller 진입");
-
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         return userService.deleteOldUserHistory(email, searchedId);
     }
@@ -76,9 +69,7 @@ public class UserController {
     @DeleteMapping("/histories")
     public ResponseEntity<Map<String, Object>> deleteAllUserHistory(HttpServletRequest request) {
         log.info("delete all user history controller 진입");
-
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         return userService.deleteAllUserHistory(email);
     }
