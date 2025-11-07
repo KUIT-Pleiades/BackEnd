@@ -42,7 +42,7 @@ public class HomeController {
 
     @Operation(summary = "내 별", description = "내 별")
     @GetMapping("")
-    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+    public ResponseEntity<UserInfoDto> home(HttpServletRequest request) {
         String email = request.getAttribute("email").toString();
 
         ValidationStatus userValidation = authService.userValidation(email);
