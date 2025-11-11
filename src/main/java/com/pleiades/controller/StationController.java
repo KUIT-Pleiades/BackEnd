@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.station.StationBgDto;
 import com.pleiades.dto.station.StationSettingDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
@@ -57,17 +58,16 @@ public class StationController {
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{stationId}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, StationBgDto stationBgDto) {
         log.info("/stations/"+stationPublicId+"/background");
-        Object stationBackground = body.get("stationBackground");
+        String stationBackground = stationBgDto.getStationBackground();
         if (stationBackground == null) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message","Station Background required.")); }
-        String background = stationBackground.toString();
-        log.info("stationBackground: " + background);
+        log.info("stationBackground: " + stationBackground);
 
         Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
                 .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
-        ValidationStatus setBackground = stationService.setBackground(station, background);
+        ValidationStatus setBackground = stationService.setBackground(station, stationBackground);
 
         // background 없음
         if (setBackground == ValidationStatus.NOT_VALID) { throw new CustomException(ErrorCode.IMAGE_NOT_FOUND); }
