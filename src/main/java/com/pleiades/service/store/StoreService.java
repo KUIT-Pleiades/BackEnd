@@ -32,7 +32,7 @@ public class StoreService {
         List<ItemTheme> themes = itemThemeRepository.findAll();
         ThemesDto themesDto = new ThemesDto();
 
-        themesDto.setCategories(themes.stream().map(ItemTheme::getTheme).toList());
+        themesDto.setThemes(themes.stream().map((theme) -> theme.getTheme().getName()).toList());
 
         return themesDto;
     }
