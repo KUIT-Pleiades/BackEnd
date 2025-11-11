@@ -15,5 +15,5 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ThemesDto {
-    private List<Theme> categories;
+    private List<String> themes;
 }

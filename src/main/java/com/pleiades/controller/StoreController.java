@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/store")
 public class StoreController {
-    private final AuthService authService;
     private final UserRepository userRepository;
     private final StoreService storeService;
 

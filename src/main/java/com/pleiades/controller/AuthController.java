@@ -31,13 +31,8 @@ import java.util.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final StarRepository starRepository;
-
-    private final KakaoTokenRepository kakaoTokenRepository;
-    private final NaverTokenRepository naverTokenRepository;
 
     private final SignupService signupService;
     private final AuthService authService;
@@ -105,9 +100,6 @@ public class AuthController {
         log.info("/auth/logout");
         String email = request.getAttribute("email").toString();
 
-        if (email == null || email.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","unvalid refresh token"));
-        }
         authService.logout(email);
 
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -117,7 +109,6 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> withdraw(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
         log.info("/auth/withdraw");
         String email = request.getAttribute("email").toString();
-        if(email == null) { throw new CustomException(ErrorCode.INVALID_TOKEN);}
         authService.withdraw(email);
 
         return ResponseEntity.status(HttpStatus.OK).build();

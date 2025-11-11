@@ -42,7 +42,7 @@ public class HomeController {
 
     @Operation(summary = "내 별", description = "내 별")
     @GetMapping("")
-    public ResponseEntity<UserInfoDto> home(@RequestHeader("Authorization") String authorization, HttpServletRequest request) {
+    public ResponseEntity<UserInfoDto> home(HttpServletRequest request) {
         String email = request.getAttribute("email").toString();
 
         ValidationStatus userValidation = authService.userValidation(email);
@@ -70,7 +70,7 @@ public class HomeController {
 
         // 사용자 존재 여부
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
+
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
@@ -81,7 +81,6 @@ public class HomeController {
     @PostMapping("/settings/character")
     public ResponseEntity<Map<String, Object>> characterSetting(HttpServletRequest request, @Valid @RequestBody UserInfoDto userInfoDto) {
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         CharacterDto characterDto = modelMapper.map(userInfoDto, CharacterDto.class);
 
@@ -104,7 +103,6 @@ public class HomeController {
     @GetMapping("/settings/profile")
     public ResponseEntity<ProfileDto> getProfile(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { throw new CustomException(ErrorCode.USER_NOT_FOUND); }
@@ -118,7 +116,6 @@ public class HomeController {
     @PostMapping("/settings/profile")
     public ResponseEntity<Map<String, String>> profileSetting(HttpServletRequest request, @Valid @RequestBody ProfileSettingDto profileSettingDto) {
         String email = (String) request.getAttribute("email");
-        log.info("사용자 email = {}", email);
 
         Map<String, String> response = userService.setProfile(email, profileSettingDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);

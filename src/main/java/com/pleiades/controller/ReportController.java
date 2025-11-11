@@ -4,6 +4,8 @@ import com.pleiades.dto.ReportDto;
 import com.pleiades.dto.ReportHistoryDto;
 import com.pleiades.entity.ReportHistory;
 import com.pleiades.entity.User;
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.ReportHistoryRepository;
 import com.pleiades.repository.UserRepository;
@@ -33,7 +35,6 @@ import java.util.*;
 @RequestMapping("/reports")
 public class ReportController {
     private final ReportHistoryService reportHistoryService;
-    private final AuthService authService;
     private final ReportService reportService;
     private final SearchReportService searchReportService;
 
@@ -100,7 +101,6 @@ public class ReportController {
     @DeleteMapping("/history/{historyId}")
     public ResponseEntity<Map<String, Object>> deleteHistory(HttpServletRequest request, @PathVariable("historyId") Long historyId) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
@@ -112,7 +112,6 @@ public class ReportController {
     @PatchMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> updateReport(HttpServletRequest request, @PathVariable("reportId") Long reportId, @RequestBody Map<String, Object> body) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "no user")); }
@@ -130,7 +129,6 @@ public class ReportController {
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Map<String, Object>> deleteReport(HttpServletRequest request, @PathVariable("reportId") Long reportId) {
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
@@ -148,21 +146,20 @@ public class ReportController {
     @GetMapping("/friends")
     public ResponseEntity<Map<String, Object>> friendsReports(HttpServletRequest request, @RequestParam("userId") String userId) {
         // 친구 아이디 존재 여부
-        Optional<User> friend = userRepository.findById(userId);
-        if (friend.isEmpty()) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "user not found")); }
+        User friend = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 친구 관계에 있는지 검증
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }
 
-        boolean relationship = friendRepository.isFriend(user.get(), friend.get(), FriendStatus.ACCEPTED);
+        boolean relationship = friendRepository.isFriend(user.get(), friend, FriendStatus.ACCEPTED);
 
         if (!relationship) { return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","not friend with user")); }
 
-        List<ReportDto> reports = reportService.getAllReports(friend.get());
+        List<ReportDto> reports = reportService.getAllReports(friend);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("reports", reports));
     }
@@ -176,7 +173,6 @@ public class ReportController {
 
         // 친구 관계에 있는지 검증
         String email = request.getAttribute("email").toString();
-        log.info("사용자 email = {}", email);
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "need sign-up")); }

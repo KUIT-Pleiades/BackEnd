@@ -29,7 +29,6 @@ import java.util.Optional;
 @RequestMapping("/store/resale")
 public class ResaleStoreController {
     private final ResaleStoreService resaleStoreService;
-    private final AuthService authService;
     private final UserRepository userRepository;
 
     @GetMapping("/face")

@@ -86,6 +86,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
         request.setAttribute("email", email);
+        log.info("사용자 email = {}", email);
 
         log.info("AuthInterceptor preHandle 200");
         response.setStatus(HttpServletResponse.SC_OK);
