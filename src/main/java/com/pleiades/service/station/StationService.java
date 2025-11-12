@@ -12,6 +12,7 @@ import com.pleiades.repository.StationRepository;
 
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.repository.character.TheItemRepository;
+import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.service.UserService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.ItemType;
@@ -34,6 +35,7 @@ public class StationService {
 
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
+    private final OwnershipRepository ownershipRepository;
 
     private final UserStationService userStationService;
     private final UserService userService;
@@ -135,24 +137,35 @@ public class StationService {
         return code.toString();
     }
 
-    public ValidationStatus setBackground(Station station, String backgroundName) {
+    public void setBackground(String stationPublicId, String backgroundName, String email) {
         log.info("setBackground");
+        Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
+                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
-        Optional<TheItem> background = theItemRepository.findByTypeAndName(ItemType.STATION_BG, backgroundName);
-        if (background.isEmpty()) {
-            log.info("background not found");
-            return ValidationStatus.NOT_VALID;
-        }
+        User user = userService.getUserByEmail(email);
 
-        background.ifPresent(station::setBackground);
+        Optional<TheItem> stationBackground = theItemRepository.findByTypeAndName(ItemType.STATION_BG, backgroundName);
+        if (stationBackground.isEmpty()) throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);  // 이미지 없음
+
+        // 기본 배경 아님 -> 소유권 확인 -> 없으면 디폴트 배경
+        station.setBackground(
+                stationBackground
+                        .filter(bg -> bg.isBasic() || ownershipRepository.existsByUserIdAndItemId(user.getId(), bg.getId()))
+                        .map(bg -> {    // 기본이면 null, 사용자 배경이면 user
+                            station.setBackgroundOwner(bg.isBasic() ? null : user);
+                            return bg;
+                        })
+                        // 기본 아님 + 미소유면 기본 배경으로 대체
+                        .orElseThrow(() -> new CustomException(ErrorCode.NO_OWNERSHIP))
+        );
 
         stationRepository.save(station);
-
-        return ValidationStatus.VALID;
     }
 
-    public void stationSettings(Station station, StationSettingDto settingDto) {
+    public void stationSettings(String stationPublicId, StationSettingDto settingDto) {
         log.info("stationSettings");
+        Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
+                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         station.setName(settingDto.getName());
         station.setIntro(settingDto.getIntro());
@@ -162,8 +175,10 @@ public class StationService {
     }
 
     // 정거장 코드 재발급
-    public ValidationStatus reissueStationCode(Station station) {
+    public ValidationStatus reissueStationCode(String stationPublicId) {
         log.info("reissueStationCode");
+        Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
+                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         String code = null;
         long count = 0;

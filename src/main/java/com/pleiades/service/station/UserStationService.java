@@ -11,6 +11,7 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
+import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.service.UserService;
 import com.pleiades.service.report.TodaysReportService;
@@ -39,6 +40,7 @@ public class UserStationService {
 
     private final UserService userService;
     private final TodaysReportService todaysReportService;
+    private final UserRepository userRepository;
 
     @Transactional
     public Map<String, String> setUserPosition(String email, String stationPublicId, String userId, UserPositionDto requestBody) {
@@ -209,8 +211,10 @@ public class UserStationService {
         return new StationListDto(stationDtos);
     }
 
-    public ValidationStatus setStationFavorite(String stationPublicId, String userId, boolean isFavorite) {
-        Optional<UserStation> userStation = userStationRepository.findByStationPublicIdAndUserId(UUID.fromString(stationPublicId), userId);
+    public ValidationStatus setStationFavorite(String stationPublicId, String email, boolean isFavorite) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Optional<UserStation> userStation = userStationRepository.findByStationPublicIdAndUserId(UUID.fromString(stationPublicId), user.getId());
 
         if (userStation.isEmpty()) {
             return ValidationStatus.NOT_VALID;
