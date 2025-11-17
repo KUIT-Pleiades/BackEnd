@@ -58,7 +58,7 @@ public class StationController {
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{stationId}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, StationBgDto stationBgDto) {
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestBody StationBgDto stationBgDto) {
         log.info("/stations/"+stationPublicId+"/background");
         String stationBackground = stationBgDto.getStationBackground();
         if (stationBackground == null) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message","Station Background required.")); }
