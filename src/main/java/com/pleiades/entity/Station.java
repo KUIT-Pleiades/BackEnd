@@ -4,8 +4,6 @@ import com.pleiades.entity.character.TheItem;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Time;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -53,6 +51,10 @@ public class Station {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_id")
     TheItem background;
+
+    @ManyToOne
+    @JoinColumn(name = "bgOwner_id", nullable = true)
+    User backgroundOwner;
 
     @PrePersist
     protected void generateUuid() {

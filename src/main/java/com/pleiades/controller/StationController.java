@@ -32,9 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/stations")
 public class StationController {
-    private final StationRepository stationRepository;
     private final StationService stationService;
-    private final UserRepository userRepository;
     private final UserStationService userStationService;
 
     @Operation(summary = "정거장 생성", description = "정거장 생성하기")
@@ -60,17 +58,13 @@ public class StationController {
     @PatchMapping("/{stationId}/background")
     public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestBody StationBgDto stationBgDto) {
         log.info("/stations/"+stationPublicId+"/background");
+        String email = (String) request.getAttribute("email");
+
         String stationBackground = stationBgDto.getStationBackground();
         if (stationBackground == null) { return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(Map.of("message","Station Background required.")); }
         log.info("stationBackground: " + stationBackground);
 
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
-                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
-
-        ValidationStatus setBackground = stationService.setBackground(station, stationBackground);
-
-        // background 없음
-        if (setBackground == ValidationStatus.NOT_VALID) { throw new CustomException(ErrorCode.IMAGE_NOT_FOUND); }
+        stationService.setBackground(stationPublicId, stationBackground, email);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Background edited"));
     }
@@ -79,9 +73,8 @@ public class StationController {
     @PatchMapping("/{stationId}/settings")
     public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationPublicId+"/settings");
-        Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
-                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
-        stationService.stationSettings(station, settingDto);
+
+        stationService.stationSettings(stationPublicId, settingDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Station Info editted"));
     }
@@ -89,9 +82,7 @@ public class StationController {
     @Operation(summary = "정거장 코드 재발급", description = "정거장 코드 재발급하기")
     @PatchMapping("/{stationId}/code")
     public ResponseEntity<Map<String, String>> reissueCode(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
-        Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
-                .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
-        ValidationStatus status = stationService.reissueStationCode(station);
+        ValidationStatus status = stationService.reissueStationCode(stationPublicId);
 
         if (status == ValidationStatus.NOT_VALID) {
             return ResponseEntity
@@ -107,10 +98,7 @@ public class StationController {
     public ResponseEntity<Map<String, Object>> setFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        ValidationStatus status = userStationService.setStationFavorite(stationPublicId, user.getId(), true);
+        ValidationStatus status = userStationService.setStationFavorite(stationPublicId, email, true);
 
         if (status == ValidationStatus.NOT_VALID) {
             return ResponseEntity
@@ -125,10 +113,7 @@ public class StationController {
     public ResponseEntity<Map<String, Object>> deleteFavorite(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        ValidationStatus status = userStationService.setStationFavorite(stationPublicId, user.getId(), false);
+        ValidationStatus status = userStationService.setStationFavorite(stationPublicId, email, false);
 
         if (status == ValidationStatus.NOT_VALID) {
             return ResponseEntity
