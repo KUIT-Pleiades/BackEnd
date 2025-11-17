@@ -10,6 +10,7 @@ import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.ResaleStoreService;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ResaleStoreController {
     private final ResaleStoreService resaleStoreService;
     private final UserRepository userRepository;
 
+    @Operation(summary = "얼굴 목록", description = "피부색/머리/눈/코/입/점 목록 불러오기")
     @GetMapping("/face")
     public ResponseEntity<ResaleStoreDto> getFaceList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -49,6 +51,7 @@ public class ResaleStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "패션 목록", description = "상의/하의/세트/신발 목록 불러오기")
     @GetMapping("/fashion")
     public ResponseEntity<ResaleStoreDto> getFashionList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -67,6 +70,7 @@ public class ResaleStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "배경 목록", description = "별/정거장 배경 목록 불러오기")
     @GetMapping("/bg")
     public ResponseEntity<ResaleStoreDto> getBgList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -85,6 +89,7 @@ public class ResaleStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "찜 추가", description = "찜 추가하기")
     @PostMapping("/wishlist")
     public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
@@ -99,6 +104,7 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
 
+    @Operation(summary = "찜 해제", description = "찜 해제하기")
     @DeleteMapping("/wishlist")
     public ResponseEntity<Map<String, String>> removeWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
@@ -112,11 +118,13 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
     }
 
+    @Operation(summary = "판매 시세 확인", description = "파려고 하는 아이템의 시세 확인하기")
     @GetMapping("/items/{item_id}/price")
     public ResponseEntity<List<ListingPriceDto>> getListingsPrice(@PathVariable("item_id") Long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(resaleStoreService.getListingsPrice(itemId));
     }
 
+    @Operation(summary = "아이템 구매", description = "아이템 구매하기")
     @PostMapping("/trades")
     public ResponseEntity<PurchaseResponseDto> buyItem(HttpServletRequest request, @RequestBody ListingIdDto listingIdDto) {
         String email = (String) request.getAttribute("email");
@@ -126,6 +134,7 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
     }
 
+    @Operation(summary = "매물 등록", description = "매물 등록하기")
     @PostMapping("/listings")
     public ResponseEntity<ListingIdDto> listings(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
         String email = (String) request.getAttribute("email");
@@ -138,6 +147,7 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(listingIdDto);
     }
 
+    @Operation(summary = "매물 내리기", description = "매물 내리기")
     @DeleteMapping("/listings/{listing_id}")
     public ResponseEntity<Map<String,String>> deleteListing(HttpServletRequest request, @RequestParam Long listingId) {
         String email = (String) request.getAttribute("email");
@@ -148,6 +158,7 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Listing Deleted Successfully"));
     }
 
+    @Operation(summary = "내 매물", description = "판매중인 내 매물 보기")
     @GetMapping("/listings")
     public ResponseEntity<ListingsDto> myListings(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");

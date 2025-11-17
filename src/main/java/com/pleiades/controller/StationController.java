@@ -56,7 +56,7 @@ public class StationController {
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{stationId}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, StationBgDto stationBgDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestBody StationBgDto stationBgDto) {
         log.info("/stations/"+stationPublicId+"/background");
         String email = (String) request.getAttribute("email");
 

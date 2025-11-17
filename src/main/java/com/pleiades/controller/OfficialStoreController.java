@@ -9,6 +9,7 @@ import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.OfficialStoreService;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class OfficialStoreController {
     private final OfficialStoreService officialStoreService;
     private final UserRepository userRepository;
 
+    @Operation(summary = "얼굴 목록", description = "피부색/머리/눈/코/입/점 목록 불러오기")
     @GetMapping("/face")
     public ResponseEntity<OfficialStoreDto> getFaceList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -48,6 +50,7 @@ public class OfficialStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "패션 목록", description = "상의/하의/세트/신발 목록 불러오기")
     @GetMapping("/fashion")
     public ResponseEntity<OfficialStoreDto> getFashionList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -65,6 +68,7 @@ public class OfficialStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "배경 목록", description = "별/정거장 배경 목록 불러오기")
     @GetMapping("/bg")
     public ResponseEntity<OfficialStoreDto> getBgList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
@@ -82,6 +86,7 @@ public class OfficialStoreController {
                 .body(dto);
     }
 
+    @Operation(summary = "찜 추가", description = "찜 추가하기")
     @PostMapping("/wishlist")
     public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
@@ -95,6 +100,7 @@ public class OfficialStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
 
+    @Operation(summary = "찜 해제", description = "찜 해제하기")
     @DeleteMapping("/wishlist")
     public ResponseEntity<Map<String, String>> removeWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
@@ -108,6 +114,7 @@ public class OfficialStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
     }
 
+    @Operation(summary = "아이템 구매", description = "아이템 구매하기")
     @PostMapping("/trades")
     public ResponseEntity<PurchaseResponseDto> buyItem(HttpServletRequest request, @RequestBody ItemIdDto itemIdDto) {
         String email = (String) request.getAttribute("email");
