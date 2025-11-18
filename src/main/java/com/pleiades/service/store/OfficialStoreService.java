@@ -64,7 +64,13 @@ public class OfficialStoreService {
         List<ItemTheme> itemThemes = itemThemeRepository.findByItemId(item.getId());
         List<String> themes = new ArrayList<>();
 
-        for (ItemTheme iT : itemThemes) themes.add(iT.getTheme().getName());
+        for (ItemTheme iT : itemThemes) {
+            String theme = iT.getTheme().getName();
+            int idx = theme.indexOf(" ");
+
+            if (idx == -1) themes.add(theme);
+            else themes.add(theme.substring(idx + 1));
+        }
 
         return new OfficialItemDto(
                 item.getId(),

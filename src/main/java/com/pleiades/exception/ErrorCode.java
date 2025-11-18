@@ -47,7 +47,9 @@ public enum ErrorCode {
     NOT_ONSALE(HttpStatus.CONFLICT, "Not on sale."),
     INSUFFICIENT_FUNDS(HttpStatus.BAD_REQUEST, "Insufficient Funds"),
 
-    ALREADY_EXISTS(HttpStatus.CONFLICT, "Already exists");
+    ALREADY_EXISTS(HttpStatus.CONFLICT, "Already exists"),
+
+    NO_OWNERSHIP(HttpStatus.FORBIDDEN, "You don't own this item");
 
     private final HttpStatus status;
     private final String message;

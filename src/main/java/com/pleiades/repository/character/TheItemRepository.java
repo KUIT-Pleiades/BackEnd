@@ -4,6 +4,7 @@ import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
     List<TheItem> findByType(ItemType type);
 
     @Query("SELECT i FROM TheItem i WHERE i.type IN :types")
-    List<TheItem> findByTypes(List<ItemType> types);
+    List<TheItem> findByTypes(@Param("types") List<ItemType> types);
 
     Optional<TheItem> findByTypeAndName(ItemType type, String name);
 
