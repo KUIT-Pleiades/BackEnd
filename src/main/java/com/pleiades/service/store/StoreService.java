@@ -17,22 +17,36 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class StoreService {
-    private final TheItemRepository itemRepository;
     private final UserRepository userRepository;
     private final OwnershipRepository ownershipRepository;
-    private final ItemThemeRepository itemThemeRepository;
+    private final ThemeRepository themeRepository;
 
     public ThemesDto getThemes() {
-        List<ItemTheme> themes = itemThemeRepository.findAll();
+        List<Theme> themes = themeRepository.findAll();
         ThemesDto themesDto = new ThemesDto();
 
-        themesDto.setThemes(themes.stream().map((theme) -> theme.getTheme().getName()).toList());
+        List<String> face = themes.stream()
+                .filter((theme) -> theme.getName().startsWith("face"))
+                .map((theme) -> theme.getName().replace("face ", "") ).toList();
+
+        List<String> fashion = themes.stream()
+                .filter((theme) -> theme.getName().startsWith("fashion"))
+                .map((theme) -> theme.getName().replace("fashion ", "") ).toList();
+
+        List<String> background = themes.stream()
+                .filter((theme) -> theme.getName().startsWith("bg"))
+                .map((theme) -> theme.getName().replace("bg ", "") ).toList();
+
+        themesDto.setFace(face);
+        themesDto.setFashion(fashion);
+        themesDto.setBackground(background);
 
         return themesDto;
     }
