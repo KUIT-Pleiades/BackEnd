@@ -19,6 +19,8 @@ public interface ResaleListingRepository extends JpaRepository<ResaleListing, Lo
 
     Optional<ResaleListing> findBySourceOwnershipId(Long id);
 
+    Boolean existsBySourceOwnershipId(Long id);
+
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId")
     List<ResaleListing> findByUserId(@Param("userId") String userId);
 }

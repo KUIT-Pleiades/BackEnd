@@ -1,5 +1,6 @@
 package com.pleiades.service.store;
 
+import com.pleiades.dto.store.ItemDto;
 import com.pleiades.dto.store.OwnershipDto;
 import com.pleiades.dto.store.ThemesDto;
 import com.pleiades.entity.User;
@@ -12,13 +13,18 @@ import com.pleiades.repository.ThemeRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
+import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.strings.ItemCategory;
+import com.pleiades.strings.ItemType;
+import com.pleiades.strings.ItemTypeCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class StoreService {
     private final UserRepository userRepository;
     private final OwnershipRepository ownershipRepository;
     private final ThemeRepository themeRepository;
+    private final ResaleListingRepository resaleListingRepository;
 
     public ThemesDto getThemes() {
         List<Theme> themes = themeRepository.findAll();
@@ -55,6 +62,28 @@ public class StoreService {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<Ownership> items = ownershipRepository.findByUserId(userId);
 
-        return items.stream().map( (o) -> new OwnershipDto(o.getId(), o.getItem().getId()) ).toList();
+        return ownershipsToOwnershipDtos(items.stream());
     }
+
+    public List<OwnershipDto> getAvailableToSaleItems(String userId) {
+        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<Ownership> items = ownershipRepository.findByUserId(userId);
+
+        return ownershipsToOwnershipDtos(items.stream()
+                .filter((o) -> !resaleListingRepository.existsBySourceOwnershipId(o.getId())));
+    }
+
+    private List<OwnershipDto> ownershipsToOwnershipDtos(Stream<Ownership> ownerships) {
+        return ownerships
+                .map( (o) -> {
+                    ItemType type = o.getItem().getType();
+                    ItemCategory category = ItemTypeCategory.fromType(type);
+
+                    return new OwnershipDto(
+                            o.getId(),
+                            new ItemDto(o.getItem(), category, type)
+                    );
+                }).toList();
+    }
+
 }
