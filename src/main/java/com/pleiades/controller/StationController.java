@@ -56,7 +56,7 @@ public class StationController {
 
     @Operation(summary = "정거장 배경 설정", description = "정거장 배경 변경하기")
     @PatchMapping("/{stationId}/background")
-    public ResponseEntity<Map<String, Object>> updateBackground(@PathVariable("stationId") String stationPublicId, @RequestBody StationBgDto stationBgDto) {
+    public ResponseEntity<Map<String, Object>> updateBackground(HttpServletRequest request, @PathVariable("stationId") String stationPublicId, @RequestBody StationBgDto stationBgDto) {
         log.info("/stations/"+stationPublicId+"/background");
         String email = (String) request.getAttribute("email");
 
@@ -71,7 +71,7 @@ public class StationController {
 
     @Operation(summary = "정거장 설정", description = "정거장 설정 변경하기")
     @PatchMapping("/{stationId}/settings")
-    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @Valid @RequestBody StationSettingDto settingDto) {
+    public ResponseEntity<Map<String, Object>> stationSetting(@PathVariable("stationId") String stationPublicId, @Valid @RequestBody StationSettingDto settingDto) {
         log.info("/stations/"+stationPublicId+"/settings");
 
         stationService.stationSettings(stationPublicId, settingDto);
