@@ -1,14 +1,17 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.SearchUserDto;
+import com.pleiades.dto.StoneDto;
+import com.pleiades.dto.store.ListingPriceDto;
+import com.pleiades.exception.CustomException;
 import com.pleiades.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,5 +76,25 @@ public class UserController {
 
         return userService.deleteAllUserHistory(email);
     }
-}
 
+    @Operation(summary = "", description = "")
+    @GetMapping("/stone")
+    public ResponseEntity<Map<String, Long>> getPrices(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        Long stone = userService.getStone(email);
+
+        return ResponseEntity.ok(Map.of("stone", stone));
+    }
+
+    @Operation(summary = "", description = "")
+    @PostMapping("/stone")
+    public ResponseEntity<Map<String, String>> addStone(HttpServletRequest request, @Valid @RequestBody StoneDto stoneDto) {
+        String email = (String) request.getAttribute("email");
+
+        Long stone = stoneDto.getAddAmount();
+
+        userService.addStone(email, stone);
+
+        return ResponseEntity.ok(Map.of("message", "Added amount = " + stone));
+    }
+}
