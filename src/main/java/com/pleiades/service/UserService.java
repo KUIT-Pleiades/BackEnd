@@ -24,9 +24,7 @@ import com.pleiades.entity.character.Characters;
 import com.pleiades.repository.*;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.strings.ValidationStatus;
-import jakarta.persistence.EntityManager;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -325,6 +323,20 @@ public class UserService {
         }
     }
 
+    public Long getStone(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getStone();
+    }
+
+    @Transactional
+    public void addStone(String email, Long stone) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long currentStone = user.getStone();
+        user.setStone(currentStone + stone);
+        userRepository.save(user);
+    }
+
     private CharacterFaceDto makeCharacterFaceDto(List<TheItem> items) {
         CharacterFaceDto dto = new CharacterFaceDto();
         items.forEach(item -> {
@@ -374,19 +386,4 @@ public class UserService {
 
         return dto;
     }
-
-    // 캐릭터 생성 예전 버전
-//    private Face makeFace() {
-//        Face face = new Face();
-//        Optional<Skin> skin = skinRepository.findByName(characterDto.getFace().getSkinImg());
-//        Optional<Expression> expression = expressionRepository.findByName(characterDto.getFace().getExpressionImg());
-//        Optional<Hair> hair = hairRepository.findByName(characterDto.getFace().getHairImg());
-//
-//        skin.ifPresent(face::setSkin);
-//        expression.ifPresent(face::setExpression);
-//        hair.ifPresent(face::setHair);
-//
-//        return face;
-//    } // makeOutfit, makeItem
-
 }

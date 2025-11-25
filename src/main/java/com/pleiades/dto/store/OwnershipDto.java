@@ -13,5 +13,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OwnershipDto {
     private Long id;
-    private Long itemId;
+    private ItemDto item;
 }

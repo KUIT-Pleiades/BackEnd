@@ -42,7 +42,7 @@ public class StoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        MyItemsResponseDto myItemsResponseDto = new MyItemsResponseDto(storeService.getMyItems(user.getId()));
+        MyItemsResponseDto myItemsResponseDto = new MyItemsResponseDto(storeService.getAvailableToSaleItems(user.getId()));
 
         return new ResponseEntity<>(myItemsResponseDto, HttpStatus.OK);
     }
