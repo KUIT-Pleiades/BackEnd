@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ItemThemeRepository extends JpaRepository<ItemTheme, Long> {
     @Query("SELECT i FROM ItemTheme i WHERE i.item.id=:itemId")
-    public List<ItemTheme> findByItemId(@Param("itemId")Long itemId);
+    List<ItemTheme> findByItemId(@Param("itemId")Long itemId);
 
+    boolean existsByThemeId(Long themeId);
 }
