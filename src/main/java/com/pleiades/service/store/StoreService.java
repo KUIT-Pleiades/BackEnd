@@ -4,26 +4,21 @@ import com.pleiades.dto.store.ItemDto;
 import com.pleiades.dto.store.OfficialAndRestoreThemesDto;
 import com.pleiades.dto.store.OwnershipDto;
 import com.pleiades.dto.store.ThemesDto;
-import com.pleiades.entity.User;
 import com.pleiades.entity.store.Ownership;
-import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.entity.store.search.Theme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.ThemeRepository;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
-import com.pleiades.strings.ItemTypeCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -40,7 +35,7 @@ public class StoreService {
     public OfficialAndRestoreThemesDto getThemes() {
         OfficialAndRestoreThemesDto themesDto = new OfficialAndRestoreThemesDto();
         themesDto.setOfficialThemes(getOfficialThemes());
-//        themesDto.setResaleThemes(getResaleThemes());
+//        themesDto.setResaleThemes(getResaleThemes());2
 
         return themesDto;
     }
@@ -119,7 +114,7 @@ public class StoreService {
         return ownerships
                 .map( (o) -> {
                     ItemType type = o.getItem().getType();
-                    ItemCategory category = ItemTypeCategory.fromType(type);
+                    ItemCategory category = type.getCategory();
 
                     return new OwnershipDto(
                             o.getId(),

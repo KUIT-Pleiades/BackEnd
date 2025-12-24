@@ -1,16 +1,12 @@
 package com.pleiades.service.store;
 
-import com.pleiades.dto.store.ListingPriceDto;
-import com.pleiades.dto.store.OfficialItemDto;
-import com.pleiades.dto.store.ResaleItemDto;
+import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
-import com.pleiades.entity.store.OfficialWishlist;
 import com.pleiades.entity.store.Ownership;
 import com.pleiades.entity.store.ResaleListing;
 import com.pleiades.entity.store.ResaleWishlist;
 import com.pleiades.entity.store.search.ItemTheme;
-import com.pleiades.entity.store.search.Theme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
@@ -41,6 +37,7 @@ public class ResaleStoreService {
     private final UserRepository userRepository;
     private final TheItemRepository itemRepository;
     private final OwnershipRepository ownershipRepository;
+    private final TheItemRepository theItemRepository;
 
     public List<ResaleItemDto> getItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findByTypes(types);
@@ -169,11 +166,31 @@ public class ResaleStoreService {
         return ownership.getId();
     }
 
-    public List<Long> getListings(String userId) {
+    public List<ListingDto> getListings(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<ResaleListing> listings = resaleListingRepository.findByUserId(userId);
 
-        return listings.stream().filter((l)->l.getStatus().equals(SaleStatus.ONSALE)).map(ResaleListing::getId).toList();
+        List<ListingDto> listingDtos = new ArrayList<>();
+
+        List<ResaleListing> lsts = listings.stream()
+                .filter((l) ->
+                        l.getStatus()
+                        .equals(SaleStatus.ONSALE))
+                .toList();
+
+        for (ResaleListing lst : lsts) {
+            TheItem item = theItemRepository.findById(
+                    lst.getSourceOwnership().getId()).orElseThrow(
+                    () -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+            ItemType type = item.getType();
+            listingDtos.add(
+                    new ListingDto(
+                            lst.getId(),
+                            lst.getPrice(),
+                            new ItemDto(item, type.getCategory(), type)));
+        }
+
+        return listingDtos;
     }
 
     @Transactional

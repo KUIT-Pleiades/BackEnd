@@ -164,7 +164,7 @@ public class ResaleStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Long> ids = resaleStoreService.getListings(user.getId());
+        List<ListingDto> ids = resaleStoreService.getListings(user.getId());
 
         ListingsDto listingsDto = new ListingsDto(ids);
 

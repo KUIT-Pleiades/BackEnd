@@ -40,3 +40,5 @@ out/
 
 # 로컬 설정 제외
 application-local.properties
+
+.DS_Store

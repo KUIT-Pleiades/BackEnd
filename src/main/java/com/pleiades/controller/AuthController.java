@@ -43,6 +43,7 @@ public class AuthController {
         log.info("/auth");
         return ResponseEntity.status(HttpStatus.OK).build();  // user 존재 여부는 /home 에서
     }
+
     @Operation(summary = "자동 로그인", description = "리프레시 토큰 확인")
     @GetMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
