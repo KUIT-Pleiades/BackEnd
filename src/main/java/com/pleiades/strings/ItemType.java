@@ -5,31 +5,45 @@ import lombok.Getter;
 @Getter
 public enum ItemType {
     // face
-    SKIN_COLOR("skin"), HAIR("hair"),
-    EYES("eyes"), NOSE("nose"),
-    MOUTH("mouth"), MOLE("mole"),
+    SKIN_COLOR("skin", ItemCategory.FACE), 
+    HAIR("hair", ItemCategory.FACE),
+    EYES("eyes", ItemCategory.FACE), 
+    NOSE("nose", ItemCategory.FACE),
+    MOUTH("mouth", ItemCategory.FACE), 
+    MOLE("mole", ItemCategory.FACE),
 
     // outfit
-    TOP("top"), BOTTOM("bottom"),
-    SET("set"),SHOES("shoes"),
+    TOP("top", ItemCategory.FASHION), 
+    BOTTOM("bottom", ItemCategory.FASHION),
+    SET("set", ItemCategory.FASHION),
+    SHOES("shoes", ItemCategory.FASHION),
 
     // item (accessory)
-    HEAD("head"), EYES_ITEM("eyesItem"),
-    NECK("neck"), EARS("ears"),
-    LEFT_HAND("left_hand"),
-    LEFT_WRIST("left_wrist"),
-    RIGHT_HAND("right_hand"),
-    RIGHT_WRIST("right_wrist"),
+    HEAD("head", ItemCategory.FASHION), 
+    EYES_ITEM("eyesItem", ItemCategory.FASHION),
+    NECK("neck", ItemCategory.FASHION), 
+    EARS("ears", ItemCategory.FASHION),
+    LEFT_HAND("left_hand", ItemCategory.FASHION),
+    LEFT_WRIST("left_wrist", ItemCategory.FASHION),
+    RIGHT_HAND("right_hand", ItemCategory.FASHION),
+    RIGHT_WRIST("right_wrist", ItemCategory.FASHION),
 
     // bg
-    STAR_BG("star"), STATION_BG("station"),
+    STAR_BG("star", ItemCategory.BG), 
+    STATION_BG("station", ItemCategory.BG),
 
-    DEFAULT("default");
+    DEFAULT("default", ItemCategory.DEFAULT);
 
     private final String type;
+    private final ItemCategory category;
 
-    ItemType(String type) {
+    ItemType(String type, ItemCategory category) {
         this.type = type;
+        this.category = category;
+    }
+
+    public ItemCategory getCategory() {
+        return category;
     }
 
     @Override

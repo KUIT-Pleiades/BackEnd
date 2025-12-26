@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ListingsDto {
-    private List<ListingDto> listings;
+public class ListingDto {
+    private Long listingId;
+    private Long listingPrice;
+    private ItemDto listingItem;
 }

@@ -6,13 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
 @Setter
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ListingsDto {
-    private List<ListingDto> listings;
+public class OfficialAndRestoreThemesDto {
+    private ThemesDto officialThemes;
+    private ThemesDto resaleThemes;
 }

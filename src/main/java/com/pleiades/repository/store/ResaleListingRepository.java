@@ -23,4 +23,13 @@ public interface ResaleListingRepository extends JpaRepository<ResaleListing, Lo
 
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId")
     List<ResaleListing> findByUserId(@Param("userId") String userId);
+
+//    @Query("""
+//        SELECT CASE WHEN COUNT(rl) > 0 THEN true ELSE false END
+//        FROM ResaleListing rl
+//        WHERE EXISTS {
+//            rl.sourceOwnership.item.itemTheme.theme.name = :theme
+//        }
+//    """)
+//    Boolean existsByItemTheme(@Param("theme") String theme);
 }

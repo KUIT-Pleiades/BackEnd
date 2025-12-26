@@ -2,6 +2,7 @@ package com.pleiades.controller;
 
 import com.pleiades.dto.store.ListingPriceDto;
 import com.pleiades.dto.store.MyItemsResponseDto;
+import com.pleiades.dto.store.OfficialAndRestoreThemesDto;
 import com.pleiades.dto.store.ThemesDto;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
@@ -31,8 +32,8 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(summary = "테마 목록", description = "테마 목록 불러오기")
-    @GetMapping("/theme")
-    public ResponseEntity<ThemesDto> getThemes() {
+    @GetMapping("/theme/")
+    public ResponseEntity<OfficialAndRestoreThemesDto> getThemes() {
         return new ResponseEntity<>(storeService.getThemes(), HttpStatus.OK);
     }
 
