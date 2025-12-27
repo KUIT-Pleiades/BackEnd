@@ -32,7 +32,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(summary = "테마 목록", description = "테마 목록 불러오기")
-    @GetMapping("/theme/")
+    @GetMapping("/theme")
     public ResponseEntity<OfficialAndRestoreThemesDto> getThemes() {
         return new ResponseEntity<>(storeService.getThemes(), HttpStatus.OK);
     }
