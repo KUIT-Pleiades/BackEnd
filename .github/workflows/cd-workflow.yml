@@ -65,9 +65,9 @@ jobs:
                 -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL_DEV }} \
                 -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
                 -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
-                -e FRONT_ORIGIN=${{ secrets.FRONT_ORIGIN }} \
+                -e FRONT_ORIGIN=${{ secrets.TEST_FRONT_ORIGIN }} \
                 -e IPFS_URL=${{ secrets.IPFS_URL }} \
-                -e SERVER_DOMAIN=${{ secrets.SERVER_DOMAIN }} \
+                -e SERVER_DOMAIN=${{ secrets.TEST_SERVER_DOMAIN }} \
                 -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64}} \
                 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
