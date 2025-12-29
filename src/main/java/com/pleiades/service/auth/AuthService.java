@@ -177,11 +177,11 @@ public class AuthService {
     public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
         TokenValidateResult tokenStatus = TokenValidateResult.of(accessToken);
 
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
+        if (tokenStatus.getValidationStatus().equals(ValidationStatus.NONE)) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
         }
 
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+        if (tokenStatus.getValidationStatus().equals(ValidationStatus.NOT_VALID)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
         }
 
