@@ -12,6 +12,7 @@ import com.pleiades.service.DuplicationService;
 import com.pleiades.service.auth.SignupService;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

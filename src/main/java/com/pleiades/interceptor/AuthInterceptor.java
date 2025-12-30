@@ -60,7 +60,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String accessToken = HeaderUtil.authorizationBearer(authorization);
 
-        TokenValidateResult tokenValidateResult = TokenValidateResult.of(accessToken);
+        TokenValidateResult tokenValidateResult = TokenValidateResult.of(accessToken, jwtUtil);
 
         ValidationStatus tokenStatus = tokenValidateResult.getValidationStatus();
 

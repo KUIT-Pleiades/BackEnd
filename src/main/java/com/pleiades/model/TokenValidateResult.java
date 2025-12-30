@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
 public class TokenValidateResult {
     private final String token;
@@ -19,13 +18,12 @@ public class TokenValidateResult {
         this.claims = claims;
     }
 
-    public static TokenValidateResult of(String token) {
+    public static TokenValidateResult of(String token, JwtUtil jwtUtil) {
         Claims claims = null;
         if (token == null || token.isEmpty()) {
             return new TokenValidateResult(token, ValidationStatus.NONE, claims);
         }
 
-        JwtUtil jwtUtil = new JwtUtil();
         claims = jwtUtil.validateToken(token);
 
         if (claims == null) {
