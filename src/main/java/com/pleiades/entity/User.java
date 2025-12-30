@@ -1,5 +1,7 @@
 package com.pleiades.entity;
 
+import com.pleiades.exception.CustomException;
+import com.pleiades.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -58,5 +60,10 @@ public class User implements Serializable {
 
     public void addStone(Long stone) {
         this.stone += stone;
+    }
+
+    public void purchaseByStone(Long price) {
+        if (this.stone < price) throw new CustomException(ErrorCode.INSUFFICIENT_FUNDS);
+        this.stone -= price;
     }
 }

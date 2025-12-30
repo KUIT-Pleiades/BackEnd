@@ -147,9 +147,10 @@ public class ResaleStoreService {
         if (listing.getStatus() != SaleStatus.ONSALE) throw new CustomException(ErrorCode.NOT_ONSALE);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        if (user.getStone() < listing.getPrice()) throw new CustomException(ErrorCode.INSUFFICIENT_FUNDS);
-
         if (user.equals(listing.getSourceOwnership().getUser())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
+
+        // 구매
+        user.purchaseByStone(listing.getPrice());
 
         // 구매 후
         // source 소유권 active = false

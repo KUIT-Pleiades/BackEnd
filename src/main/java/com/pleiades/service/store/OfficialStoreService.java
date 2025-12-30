@@ -125,6 +125,8 @@ public class OfficialStoreService {
 
         if (ownershipRepository.existsByUserIdAndItemId(user.getId(), item.getId())) throw new CustomException(ErrorCode.ALREADY_EXISTS);
 
+        user.purchaseByStone(item.getPrice());
+
         Ownership newOwnership = Ownership.officialOf(user, item);
 
         ownershipRepository.save(newOwnership);
