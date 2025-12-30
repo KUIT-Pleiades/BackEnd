@@ -42,7 +42,6 @@ public class AuthService {
     private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
     private final FriendRepository friendRepository;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final StarRepository starRepository;
     private final CharacterRepository characterRepository;
@@ -63,7 +62,7 @@ public class AuthService {
 
         Map<String, String> body = new HashMap<>();
 
-        TokenValidateResult tokenStatus = TokenValidateResult.of(refreshToken);
+        TokenValidateResult tokenStatus = TokenValidateResult.of(refreshToken, jwtUtil);
 
         if (tokenStatus.getValidationStatus() == ValidationStatus.NONE) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
@@ -175,13 +174,13 @@ public class AuthService {
     }
 
     public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
-        TokenValidateResult tokenStatus = TokenValidateResult.of(accessToken);
+        TokenValidateResult tokenStatus = TokenValidateResult.of(accessToken,  jwtUtil);
 
-        if (tokenStatus.equals(ValidationStatus.NONE)) {
+        if (tokenStatus.getValidationStatus().equals(ValidationStatus.NONE)) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();      // 428
         }
 
-        if (tokenStatus.equals(ValidationStatus.NOT_VALID)) {
+        if (tokenStatus.getValidationStatus().equals(ValidationStatus.NOT_VALID)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();      // 401
         }
 
