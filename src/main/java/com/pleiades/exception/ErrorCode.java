@@ -44,7 +44,7 @@ public enum ErrorCode {
     GOOGLE_SHEET_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "구글 시트 연결 오류"),
 
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "Item not found"),
-    NOT_ONSALE(HttpStatus.CONFLICT, "Not on sale."),
+    NOT_ONSALE(HttpStatus.CONFLICT, "Not on sale"),
     INSUFFICIENT_FUNDS(HttpStatus.UNPROCESSABLE_ENTITY, "Insufficient Funds"),
 
     ALREADY_EXISTS(HttpStatus.CONFLICT, "Already exists"),

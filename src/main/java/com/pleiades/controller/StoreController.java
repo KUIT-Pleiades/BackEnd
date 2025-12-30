@@ -12,6 +12,11 @@ import com.pleiades.service.UserService;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +37,40 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(summary = "테마 목록", description = "테마 목록 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200 OK",
+                    description = "성공",
+                    content = @Content(schema = @Schema(implementation = OfficialAndRestoreThemesDto.class))
+            )
+    })
     @GetMapping("/theme")
     public ResponseEntity<OfficialAndRestoreThemesDto> getThemes() {
         return new ResponseEntity<>(storeService.getThemes(), HttpStatus.OK);
     }
 
     @Operation(summary = "내 아이템", description = "내 아이템 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200 OK",
+                    description = "성공",
+                    content = @Content(schema = @Schema(implementation = MyItemsResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404 NOT_FOUND",
+                    description = "실패: 사용자를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                            {
+                                "message": "User not found"
+                            }
+                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/purchases")
     public ResponseEntity<MyItemsResponseDto> getPurchases(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
