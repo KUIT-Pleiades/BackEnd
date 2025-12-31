@@ -4,7 +4,10 @@ import com.pleiades.dto.store.ItemDto;
 import com.pleiades.dto.store.OfficialAndRestoreThemesDto;
 import com.pleiades.dto.store.OwnershipDto;
 import com.pleiades.dto.store.ThemesDto;
+import com.pleiades.entity.User;
+import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.Ownership;
+import com.pleiades.entity.store.ResaleListing;
 import com.pleiades.entity.store.search.Theme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -15,12 +18,13 @@ import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.SaleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,92 +39,88 @@ public class StoreService {
     public OfficialAndRestoreThemesDto getThemes() {
         OfficialAndRestoreThemesDto themesDto = new OfficialAndRestoreThemesDto();
         themesDto.setOfficialThemes(getOfficialThemes());
-//        themesDto.setResaleThemes(getResaleThemes());2
+        themesDto.setResaleThemes(getResaleThemes());
 
         return themesDto;
     }
 
     public ThemesDto getOfficialThemes() {
         List<Theme> themes = themeRepository.findAll();
-        ThemesDto themesDto = new ThemesDto();
 
-        List<String> face = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("face"))
-                .map((theme) -> theme.getName().replace("face ", "") ).toList();
+        List<String> face = new ArrayList<>();
+        List<String> fashion = new ArrayList<>();
+        List<String> background = new ArrayList<>();
 
-        List<String> fashion = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("fashion"))
-                .map((theme) -> theme.getName().replace("fashion ", "") ).toList();
+        for (Theme theme : themes) {
+            String name = theme.getName();
+            if (!itemThemeRepository.existsByThemeId(theme.getId())) continue;
 
-        List<String> background = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("bg"))
-                .map((theme) -> theme.getName().replace("bg ", "") ).toList();
+            if (name.startsWith("face ")) face.add(name.replace("face ", ""));
+            else if (name.startsWith("fashion ")) fashion.add(name.replace("fashion ", ""));
+            else if (name.startsWith("bg ")) background.add(name.replace("bg ", ""));
+        }
 
-        themesDto.setFace(face);
-        themesDto.setFashion(fashion);
-        themesDto.setBackground(background);
-
-        return themesDto;
+        return new ThemesDto(face, fashion, background);
     }
 
-//    public ThemesDto getResaleThemes() {
-//        List<Theme> themes = themeRepository.findAll();
-//        ThemesDto themesDto = new ThemesDto();
-//        List<Theme> existingThemes = themes.stream()
-//                .filter((t) -> resaleListingRepository.existsByItemTheme(t.getName()))
-//                .toList();
-//
-//        List<String> face = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("face"))
-//                .map((theme) -> theme.getName().replace("face ", "") ).toList();
-//
-//        List<String> fashion = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("fashion"))
-//                .map((theme) -> theme.getName().replace("fashion ", "") ).toList();
-//
-//        List<String> background = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("bg"))
-//                .map((theme) -> theme.getName().replace("bg ", "") ).toList();
-//
-//        themesDto.setFace(face);
-//        themesDto.setFashion(fashion);
-//        themesDto.setBackground(background);
-//
-//        return themesDto;
-//    }
+    public ThemesDto getResaleThemes() {
+        List<Theme> themes = themeRepository.findThemesWithResaleListings();
+
+        List<String> face = new ArrayList<>();
+        List<String> fashion = new ArrayList<>();
+        List<String> background = new ArrayList<>();
+
+        for (Theme theme : themes) {
+            String name = theme.getName();
+
+            if (name.startsWith("face ")) face.add(name.replace("face ", ""));
+            else if (name.startsWith("fashion ")) fashion.add(name.replace("fashion ", ""));
+            else if (name.startsWith("bg ")) background.add(name.replace("bg ", ""));
+        }
+
+        return new ThemesDto(face, fashion, background);
+    }
 
     public List<OwnershipDto> getMyItems(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<Ownership> items = ownershipRepository.findByUserId(userId);
 
-        return ownershipsToOwnershipDtos(items.stream());
+        return items
+                .stream()
+                .map(StoreService::ownershipToOwnershipDto)
+                .toList();
     }
 
-    public List<OwnershipDto> getAvailableToSaleItems(String userId) {
-        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<Ownership> items = ownershipRepository.findByUserId(userId);
+    public List<OwnershipDto> getAvailableToSaleItems(User user) {
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        List<Ownership> items = ownershipRepository.findByUserId(user.getId());
 
-        return ownershipsToOwnershipDtos(items.stream()
-                .filter((o) -> !resaleListingRepository.existsBySourceOwnershipId(o.getId())));
+        return items.stream()
+                .filter((o) -> !resaleListingRepository.existsBySourceOwnershipId(o.getId()))
+                .map(StoreService::ownershipToOwnershipDto)
+                .toList();
     }
 
-    private List<OwnershipDto> ownershipsToOwnershipDtos(Stream<Ownership> ownerships) {
-        return ownerships
-                .map( (o) -> {
-                    ItemType type = o.getItem().getType();
-                    ItemCategory category = type.getCategory();
+    public List<OwnershipDto> getSoldItems(User user) {
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        List<ResaleListing> listings = resaleListingRepository.findBySourceOwnershipUserIdAndSaleStatus(user.getId(), SaleStatus.SOLDOUT);
 
-                    return new OwnershipDto(
-                            o.getId(),
-                            new ItemDto(o.getItem(), category, type)
-                    );
-                }).toList();
+        return listings
+                .stream()
+                .map(ResaleListing::getSourceOwnership)
+                .map(StoreService::ownershipToOwnershipDto)
+                .toList();
+    }
+
+    private static OwnershipDto ownershipToOwnershipDto(Ownership o) {
+        TheItem item = o.getItem();
+        ItemType type = item.getType();
+        ItemCategory category = type.getCategory();
+
+        return new OwnershipDto(
+                o.getId(),
+                new ItemDto(item, category, type)
+        );
     }
 
 }

@@ -169,19 +169,13 @@ public class ResaleStoreService {
 
     public List<ListingDto> getListings(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<ResaleListing> listings = resaleListingRepository.findByUserId(userId);
+        List<ResaleListing> listings = resaleListingRepository.findBySourceOwnershipUserIdAndSaleStatus(userId, SaleStatus.ONSALE);
 
         List<ListingDto> listingDtos = new ArrayList<>();
 
-        List<ResaleListing> lsts = listings.stream()
-                .filter((l) ->
-                        l.getStatus()
-                        .equals(SaleStatus.ONSALE))
-                .toList();
-
-        for (ResaleListing lst : lsts) {
+        for (ResaleListing lst : listings) {
             TheItem item = theItemRepository.findById(
-                    lst.getSourceOwnership().getId()).orElseThrow(
+                    lst.getSourceOwnership().getItem().getId()).orElseThrow(
                     () -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
             ItemType type = item.getType();
             listingDtos.add(

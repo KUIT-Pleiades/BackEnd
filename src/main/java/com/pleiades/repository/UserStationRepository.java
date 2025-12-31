@@ -1,7 +1,6 @@
 package com.pleiades.repository;
 
 import com.pleiades.entity.Station;
-import com.pleiades.entity.StationReport;
 import com.pleiades.entity.User;
 import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.entity.User_Station.UserStationId;
@@ -48,6 +47,10 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
 
     @Query("SELECT us.station FROM UserStation us WHERE us.user = :user AND us.isAdmin = true")
     List<Station> findStationsWhereUserIsAdmin(@Param("user") User user);
+
+    @Modifying
+    @Query("UPDATE UserStation us SET us.todayReport = false")
+    void resetTodaysReportToFalse();
 
     void deleteAllByUser(User user);
 }
