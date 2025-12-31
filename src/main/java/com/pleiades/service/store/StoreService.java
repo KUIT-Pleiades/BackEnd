@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -38,65 +39,47 @@ public class StoreService {
     public OfficialAndRestoreThemesDto getThemes() {
         OfficialAndRestoreThemesDto themesDto = new OfficialAndRestoreThemesDto();
         themesDto.setOfficialThemes(getOfficialThemes());
-//        themesDto.setResaleThemes(getResaleThemes());
+        themesDto.setResaleThemes(getResaleThemes());
 
         return themesDto;
     }
 
     public ThemesDto getOfficialThemes() {
         List<Theme> themes = themeRepository.findAll();
-        ThemesDto themesDto = new ThemesDto();
 
-        List<String> face = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("face"))
-                .map((theme) -> theme.getName().replace("face ", "") ).toList();
+        List<String> face = new ArrayList<>();
+        List<String> fashion = new ArrayList<>();
+        List<String> background = new ArrayList<>();
 
-        List<String> fashion = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("fashion"))
-                .map((theme) -> theme.getName().replace("fashion ", "") ).toList();
+        for (Theme theme : themes) {
+            String name = theme.getName();
+            if (!itemThemeRepository.existsByThemeId(theme.getId())) continue;
 
-        List<String> background = themes.stream()
-                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-                .filter((theme) -> theme.getName().startsWith("bg"))
-                .map((theme) -> theme.getName().replace("bg ", "") ).toList();
+            if (name.startsWith("face ")) face.add(name.replace("face ", ""));
+            else if (name.startsWith("fashion ")) fashion.add(name.replace("fashion ", ""));
+            else if (name.startsWith("bg ")) background.add(name.replace("bg ", ""));
+        }
 
-        themesDto.setFace(face);
-        themesDto.setFashion(fashion);
-        themesDto.setBackground(background);
-
-        return themesDto;
+        return new ThemesDto(face, fashion, background);
     }
 
-//    public ThemesDto getResaleThemes() {
-//        List<Theme> themes = themeRepository.findAll();
-//        ThemesDto themesDto = new ThemesDto();
-//        List<Theme> existingThemes = themes.stream()
-//                .filter((t) -> resaleListingRepository.existsByItemTheme(t.getName()))
-//                .toList();
-//
-//        List<String> face = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("face"))
-//                .map((theme) -> theme.getName().replace("face ", "") ).toList();
-//
-//        List<String> fashion = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("fashion"))
-//                .map((theme) -> theme.getName().replace("fashion ", "") ).toList();
-//
-//        List<String> background = existingThemes.stream()
-//                .filter((theme -> itemThemeRepository.existsByThemeId(theme.getId())))
-//                .filter((theme) -> theme.getName().startsWith("bg"))
-//                .map((theme) -> theme.getName().replace("bg ", "") ).toList();
-//
-//        themesDto.setFace(face);
-//        themesDto.setFashion(fashion);
-//        themesDto.setBackground(background);
-//
-//        return themesDto;
-//    }
+    public ThemesDto getResaleThemes() {
+        List<Theme> themes = themeRepository.findThemesWithResaleListings();
+
+        List<String> face = new ArrayList<>();
+        List<String> fashion = new ArrayList<>();
+        List<String> background = new ArrayList<>();
+
+        for (Theme theme : themes) {
+            String name = theme.getName();
+
+            if (name.startsWith("face ")) face.add(name.replace("face ", ""));
+            else if (name.startsWith("fashion ")) fashion.add(name.replace("fashion ", ""));
+            else if (name.startsWith("bg ")) background.add(name.replace("bg ", ""));
+        }
+
+        return new ThemesDto(face, fashion, background);
+    }
 
     public List<OwnershipDto> getMyItems(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
