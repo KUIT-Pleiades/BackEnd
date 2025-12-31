@@ -142,4 +142,20 @@ public class OfficialStoreController {
         Long ownershipId = officialStoreService.buyItem(user.getId(), itemIdDto.getItemId());
         return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
     }
+
+    @Operation(summary = "공식몰 검색", description = "공식몰 아이템 검색")
+    @GetMapping
+    public ResponseEntity<OfficialStoreDto> searchOfficialStore(
+            HttpServletRequest request,
+            @RequestParam(required = false) String query
+    ) {
+        String email = (String) request.getAttribute("email");
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        OfficialStoreDto dto = officialStoreService.searchOfficialStore(query, user.getId());
+
+        return ResponseEntity.ok(dto);
+    }
+
 }

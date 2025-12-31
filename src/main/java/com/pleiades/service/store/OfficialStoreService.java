@@ -1,6 +1,7 @@
 package com.pleiades.service.store;
 
 import com.pleiades.dto.store.OfficialItemDto;
+import com.pleiades.dto.store.OfficialStoreDto;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.OfficialWishlist;
@@ -133,4 +134,20 @@ public class OfficialStoreService {
 
         return newOwnership.getId();
     }
+
+    // Official Item&Store Dto, itemToOfficialItemDto 기존꺼 재사용함
+    @Transactional
+    public OfficialStoreDto searchOfficialStore(String query, String userId) {
+
+        List<TheItem> items = itemRepository.searchOfficialItems(query);
+
+        List<OfficialItemDto> dtos = items.stream()
+                .map(this::itemToOfficialItemDto)
+                .toList();
+
+        List<Long> wishlist = officialWishlistRepository.findAllWishlistItemIds(userId);
+
+        return new OfficialStoreDto(dtos, wishlist);
+    }
+
 }
