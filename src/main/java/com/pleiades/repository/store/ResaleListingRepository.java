@@ -1,8 +1,8 @@
 package com.pleiades.repository.store;
 
-import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.ResaleListing;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.SaleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +22,10 @@ public interface ResaleListingRepository extends JpaRepository<ResaleListing, Lo
     Boolean existsBySourceOwnershipId(Long id);
 
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId")
-    List<ResaleListing> findByUserId(@Param("userId") String userId);
+    List<ResaleListing> findBySourceOwnershipUserId(@Param("userId") String userId);
+
+    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId AND i.status = :status")
+    List<ResaleListing> findBySourceOwnershipUserIdAndSaleStatus(@Param("userId") String userId,  @Param("status") SaleStatus status);
 
 //    @Query("""
 //        SELECT CASE WHEN COUNT(rl) > 0 THEN true ELSE false END
