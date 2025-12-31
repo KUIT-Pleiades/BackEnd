@@ -50,6 +50,8 @@ public class UserService {
 
     private final ModelMapper modelMapper;
 
+    private final Long STONE_CHARGE_AMOUNT = 10L;
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
@@ -329,11 +331,14 @@ public class UserService {
     }
 
     @Transactional
-    public void addStone(String email, Long stone) {
+    public void chargeStone(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Long currentStone = user.getStone();
-        user.setStone(currentStone + stone);
+        if (user.isStoneCharge()) throw new CustomException(ErrorCode.ALREADY_CHARGED_STONE);
+
+        user.addStone(STONE_CHARGE_AMOUNT);
+        user.setStoneCharge(true);
+
         userRepository.save(user);
     }
 

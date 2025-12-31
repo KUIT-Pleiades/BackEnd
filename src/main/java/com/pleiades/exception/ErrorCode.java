@@ -50,6 +50,9 @@ public enum ErrorCode {
     ALREADY_EXISTS(HttpStatus.CONFLICT, "Already exists"),
 
     NO_OWNERSHIP(HttpStatus.FORBIDDEN, "You don't own this item"),
+
+    ALREADY_CHARGED_STONE(HttpStatus.CONFLICT, "You already charged today's stone."),
+
     ;
 
     private final HttpStatus status;

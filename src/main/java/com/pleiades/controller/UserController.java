@@ -1,14 +1,13 @@
 package com.pleiades.controller;
 
 import com.pleiades.dto.SearchUserDto;
-import com.pleiades.dto.StoneDto;
-import com.pleiades.dto.store.ListingPriceDto;
-import com.pleiades.exception.CustomException;
 import com.pleiades.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -88,13 +87,10 @@ public class UserController {
 
     @Operation(summary = "", description = "")
     @PostMapping("/stone")
-    public ResponseEntity<Map<String, String>> addStone(HttpServletRequest request, @Valid @RequestBody StoneDto stoneDto) {
+    public ResponseEntity<Map<String, String>> addStone(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
+        userService.chargeStone(email);
 
-        Long stone = stoneDto.getAddAmount();
-
-        userService.addStone(email, stone);
-
-        return ResponseEntity.ok(Map.of("message", "Added amount = " + stone));
+        return ResponseEntity.ok(Map.of("message", "Added amount = 10"));
     }
 }

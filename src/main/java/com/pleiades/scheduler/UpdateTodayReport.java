@@ -1,7 +1,6 @@
 package com.pleiades.scheduler;
 
 import com.pleiades.entity.Report;
-import com.pleiades.entity.User_Station.UserStation;
 import com.pleiades.repository.ReportRepository;
 import com.pleiades.repository.UserStationRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +28,7 @@ public class UpdateTodayReport {
     }
 
     public void resetAllFields() {
-        List<UserStation> userStations = userStationRepository.findAll();
-        for (UserStation userStation : userStations) {
-            userStation.setTodayReport(false);
-            userStationRepository.save(userStation);
-        }
+        userStationRepository.resetTodaysReportToFalse();
         System.out.println("TodayReport: false");
     }
 }
