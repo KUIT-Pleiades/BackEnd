@@ -55,7 +55,8 @@ public class User implements Serializable {
     private Long stone;
 
     @Column
-    private boolean stoneCharge = false;
+    @ColumnDefault("0")
+    private boolean stoneCharge;
 
     public void addCoin(Long coin) {
         this.coin += coin;
