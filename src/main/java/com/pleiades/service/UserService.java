@@ -342,6 +342,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public boolean getStoneCharge(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return user.isStoneCharge();
+    }
+
     private CharacterFaceDto makeCharacterFaceDto(List<TheItem> items) {
         CharacterFaceDto dto = new CharacterFaceDto();
         items.forEach(item -> {
