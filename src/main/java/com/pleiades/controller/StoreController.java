@@ -31,7 +31,7 @@ public class StoreController {
 
     @Operation(summary = "테마 목록", description = "테마 목록 불러오기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = OfficialAndRestoreThemesDto.class))
     )
@@ -42,7 +42,7 @@ public class StoreController {
 
     @Operation(summary = "구매한 아이템", description = "내가 구매한 아이템 불러오기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = MyItemsResponseDto.class))
     )
@@ -59,7 +59,7 @@ public class StoreController {
 
     @Operation(summary = "판매한 아이템", description = "내가 판매한 아이템 불러오기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공: 비활성화된 소유권 반환",
             content = @Content(schema = @Schema(implementation = MyItemsResponseDto.class))
     )

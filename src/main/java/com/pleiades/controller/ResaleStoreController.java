@@ -131,7 +131,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "판매 시세 확인", description = "팔려고 하는 아이템의 시세 확인하기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = ListingPriceDto.class))
     )
@@ -143,7 +143,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "아이템 구매", description = "중고 아이템 구매하기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
     )
@@ -162,7 +162,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "매물 등록", description = "내 아이템을 매물로 등록하기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
     )
@@ -184,7 +184,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "매물 정보 수정", description = "내 아이템을 매물로 등록하기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
     )
@@ -206,7 +206,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "매물 내리기", description = "내가 올린 매물 내리기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(
                     mediaType = "application/json",
@@ -235,7 +235,7 @@ public class ResaleStoreController {
 
     @Operation(summary = "내 매물", description = "내가 올린 판매 중 상태인 매물 보기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = ListingsDto.class))
     )

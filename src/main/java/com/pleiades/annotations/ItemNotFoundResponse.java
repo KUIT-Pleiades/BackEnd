@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "404 NOT_FOUND",
+        responseCode = "404",
         description = "실패: 아이템을 찾을 수 없음",
         content = @Content(
                 mediaType = "application/json",

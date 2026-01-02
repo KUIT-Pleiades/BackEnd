@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "403 FORBIDDEN",
+        responseCode = "403",
         description = "실패: 내 것이 아닌 매물",
         content = @Content(
                 mediaType = "application/json",
