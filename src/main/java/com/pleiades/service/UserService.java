@@ -334,7 +334,7 @@ public class UserService {
     public void chargeStone(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (user.isStoneCharge()) throw new CustomException(ErrorCode.ALREADY_CHARGED_STONE);
+//        if (user.isStoneCharge()) throw new CustomException(ErrorCode.ALREADY_CHARGED_STONE);
 
         user.addStone(STONE_CHARGE_AMOUNT);
         user.setStoneCharge(true);

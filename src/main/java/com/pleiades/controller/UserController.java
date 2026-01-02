@@ -95,7 +95,7 @@ public class UserController {
     }
 
     @GetMapping("/stone-charge")
-    public ResponseEntity<Map<String, Boolean>> getStone(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Boolean>> getStoneCharge(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
         boolean isStoneCharged = userService.getStoneCharge(email);
 
