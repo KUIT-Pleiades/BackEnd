@@ -20,12 +20,12 @@ public class ResaleListing {
     private Long id;
 
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "source_ownership_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ownership sourceOwnership;
 
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn(name = "result_ownership_id", nullable = true)
     private Ownership resultOwnership;
 
     private Long price;
