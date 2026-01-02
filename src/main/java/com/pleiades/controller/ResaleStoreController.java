@@ -198,11 +198,11 @@ public class ResaleStoreController {
             )
     )
     @UserNotFoundResponse
+    @NotMyListingResponse
     @ItemNotFoundResponse
     @NotOnSaleResponse
-    @NotMyListingResponse
-    @DeleteMapping("/listings/{listing_id}")
-    public ResponseEntity<Map<String,String>> deleteListing(HttpServletRequest request, @RequestParam Long listingId) {
+    @DeleteMapping("/listings/{listingId}")
+    public ResponseEntity<Map<String,String>> deleteListing(HttpServletRequest request, @PathVariable Long listingId) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
