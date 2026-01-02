@@ -204,6 +204,19 @@ public class ResaleStoreService {
     }
 
     @Transactional
+    public Long updateListing(String userId, Long ownershipId, Long price) {
+        Ownership ownership = ownershipRepository.findById(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!ownership.getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+
+        ResaleListing listing = resaleListingRepository.findBySourceOwnershipId(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        listing.updatePrice(price);
+
+        return listing.getId();
+    }
+
+    @Transactional
     public void deleteListing(String userId, Long listingId) {
         // listing이 onsale일 때만 삭제
         // 내 listing인지 확인

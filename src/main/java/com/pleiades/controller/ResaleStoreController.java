@@ -171,11 +171,33 @@ public class ResaleStoreController {
     @ItemNotFoundResponse
     @AlreadyListedItemResponse
     @PostMapping("/listings")
-    public ResponseEntity<ListingIdDto> listings(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
+    public ResponseEntity<ListingIdDto> addListing(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Long listingId = resaleStoreService.addListing(user.getId(), addListingRequestDto.getOwnershipId(), addListingRequestDto.getPrice());
+
+        ListingIdDto listingIdDto = new ListingIdDto(listingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(listingIdDto);
+    }
+
+    @Operation(summary = "매물 정보 수정", description = "내 아이템을 매물로 등록하기")
+    @ApiResponse(
+            responseCode = "200 OK",
+            description = "성공",
+            content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
+    )
+    @NotMyItemResponse
+    @UserNotFoundResponse
+    @ItemNotFoundResponse
+    @AlreadyListedItemResponse
+    @PatchMapping("/listings")
+    public ResponseEntity<ListingIdDto> updateListing(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
+        String email = (String) request.getAttribute("email");
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long listingId = resaleStoreService.updateListing(user.getId(), addListingRequestDto.getOwnershipId(), addListingRequestDto.getPrice());
 
         ListingIdDto listingIdDto = new ListingIdDto(listingId);
 
