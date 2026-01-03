@@ -204,13 +204,12 @@ public class ResaleStoreService {
     }
 
     @Transactional
-    public Long updateListing(String userId, Long ownershipId, Long price) {
-        Ownership ownership = ownershipRepository.findById(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+    public Long updateListing(String userId, Long listingId, Long price) {
+        ResaleListing listing = resaleListingRepository.findById(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (!ownership.getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+        if (!listing.getSourceOwnership().getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
 
-        ResaleListing listing = resaleListingRepository.findBySourceOwnershipId(ownershipId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
         listing.updatePrice(price);
 
         return listing.getId();
