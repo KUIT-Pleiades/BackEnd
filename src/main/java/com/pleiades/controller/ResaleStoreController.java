@@ -164,7 +164,7 @@ public class ResaleStoreController {
     @ApiResponse(
             responseCode = "200",
             description = "성공",
-            content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
+            content = @Content(schema = @Schema(implementation = ListingIdDto.class))
     )
     @NotMyItemResponse
     @UserNotFoundResponse
@@ -186,18 +186,18 @@ public class ResaleStoreController {
     @ApiResponse(
             responseCode = "200",
             description = "성공",
-            content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
+            content = @Content(schema = @Schema(implementation = ListingIdDto.class))
     )
     @NotMyItemResponse
     @UserNotFoundResponse
     @ItemNotFoundResponse
     @AlreadyListedItemResponse
     @PatchMapping("/listings")
-    public ResponseEntity<ListingIdDto> updateListing(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
+    public ResponseEntity<ListingIdDto> updateListing(HttpServletRequest request, @RequestBody UpdateListingRequestDto updateListingRequestDto) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Long listingId = resaleStoreService.updateListing(user.getId(), addListingRequestDto.getOwnershipId(), addListingRequestDto.getPrice());
+        Long listingId = resaleStoreService.updateListing(user.getId(), updateListingRequestDto.getListingId(), updateListingRequestDto.getPrice());
 
         ListingIdDto listingIdDto = new ListingIdDto(listingId);
 
