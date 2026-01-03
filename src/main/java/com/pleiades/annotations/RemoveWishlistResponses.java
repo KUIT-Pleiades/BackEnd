@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses(value = {
         @ApiResponse(
-                responseCode = "200 OK",
+                responseCode = "200",
                 description = "성공",
                 content = @Content(
                         mediaType = "application/json",
@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
                 )
         ),
         @ApiResponse(
-                responseCode = "404 NOT_FOUND",
+                responseCode = "404",
                 description = "실패: 사용자를 또는 아이템을 찾을 수 없음",
                 content = @Content(
                         mediaType = "application/json",
@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
                 )
         ),
         @ApiResponse(
-                responseCode = "404 NOT_FOUND",
+                responseCode = "404",
                 description = "실패: 찜이 존재하지 않음",
                 content = @Content(
                         mediaType = "application/json",

@@ -127,7 +127,7 @@ public class OfficialStoreController {
 
     @Operation(summary = "아이템 구매", description = "아이템 구매하기")
     @ApiResponse(
-            responseCode = "200 OK",
+            responseCode = "200",
             description = "성공",
             content = @Content(schema = @Schema(implementation = PurchaseResponseDto.class))
     )

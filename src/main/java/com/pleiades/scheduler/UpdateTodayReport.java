@@ -6,6 +6,7 @@ import com.pleiades.repository.UserStationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class UpdateTodayReport {
     private final UserStationRepository userStationRepository;
     private final ReportRepository reportRepository;
 
+    @Transactional
     @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Seoul") // 매일 자정(00:00:00)에 실행
     public void eraseEmptyReport() {
         List<Report> reports = reportRepository.findAll();

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "409 CONFLICT",
+        responseCode = "409",
         description = "실패: 판매 중이 아닌 아이템",
         content = @Content(
                 mediaType = "application/json",

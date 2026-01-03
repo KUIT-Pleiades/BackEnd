@@ -16,12 +16,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)  // 런타임에 유지
 @ApiResponses(value = {
         @ApiResponse(
-                responseCode = "200 OK",
+                responseCode = "200",
                 description = "성공",
                 content = @Content(schema = @Schema(implementation = ResaleStoreDto.class))
         ),
         @ApiResponse(
-                responseCode = "404 NOT_FOUND",
+                responseCode = "404",
                 description = "실패: 사용자를 찾을 수 없음",
                 content = @Content(
                         mediaType = "application/json",
