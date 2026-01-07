@@ -24,6 +24,13 @@ public interface ResaleListingRepository extends JpaRepository<ResaleListing, Lo
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId")
     List<ResaleListing> findBySourceOwnershipUserId(@Param("userId") String userId);
 
-    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.user.id = :userId AND i.status = :status")
+    @Query("SELECT i FROM ResaleListing i " +
+            "WHERE i.sourceOwnership.user.id = :userId AND i.status = :status")
     List<ResaleListing> findBySourceOwnershipUserIdAndSaleStatus(@Param("userId") String userId,  @Param("status") SaleStatus status);
+
+    @Query("SELECT i FROM ResaleListing i " +
+            "JOIN FETCH i.resultOwnership ro " +
+            "JOIN FETCH ro.item " +
+            "WHERE i.sourceOwnership.user.id = :userId AND i.status = 'SOLDOUT'")
+    List<ResaleListing> findSoldListingsBySourceOwnershipUserIdWithResultOwnershipAndItem(@Param("userId") String userId);
 }

@@ -1,9 +1,6 @@
 package com.pleiades.service.store;
 
-import com.pleiades.dto.store.ItemDto;
-import com.pleiades.dto.store.OfficialAndRestoreThemesDto;
-import com.pleiades.dto.store.OwnershipDto;
-import com.pleiades.dto.store.ThemesDto;
+import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.Ownership;
@@ -17,14 +14,19 @@ import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemCategory;
+import com.pleiades.strings.ItemSource;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.SaleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -81,46 +83,75 @@ public class StoreService {
         return new ThemesDto(face, fashion, background);
     }
 
-    public List<OwnershipDto> getMyItems(String userId) {
+    public PurchasesCountResponseDto getMyItemsByDate(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<Ownership> items = ownershipRepository.findByUserId(userId);
+        List<Ownership> ownerships = ownershipRepository.findOwnershipByUserIdAndIsActiveGroupedByCreatedDate(userId, true);
+        Long count = (long) ownerships.size();
 
-        return items
+        Map<LocalDate, List<PurchaseOwnershipDto>> groupedByDate = ownerships
                 .stream()
-                .map(StoreService::ownershipToOwnershipDto)
-                .toList();
+                .collect(Collectors.groupingBy(
+                        o -> o.getPurchasedAt().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                StoreService::ownershipToPurchaseOwnershipDto,
+                                Collectors.toList()
+                        )
+                ));
+
+        return new PurchasesCountResponseDto(count,
+                    groupedByDate
+                            .entrySet()
+                            .stream()
+                            .map(e -> new PurchasesResponseDto(e.getKey(), e.getValue()))
+                            .toList()
+                );
     }
 
-    public List<OwnershipDto> getAvailableToSaleItems(User user) {
+    public SalesCountResponseDto getSoldItems(User user) {
         if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        List<Ownership> items = ownershipRepository.findByUserId(user.getId());
+        // 비활성화된 소유권을 찾을까 했는데, 다른 이유로 비활성화되는 경우도 있을 것 같아서 매물 기준으로 함
+        List<ResaleListing> listings = resaleListingRepository.findSoldListingsBySourceOwnershipUserIdWithResultOwnershipAndItem(user.getId());
+        Long count = (long) listings.size();
 
-        return items.stream()
-                .filter((o) -> !resaleListingRepository.existsBySourceOwnershipId(o.getId()))
-                .map(StoreService::ownershipToOwnershipDto)
-                .toList();
-    }
-
-    public List<OwnershipDto> getSoldItems(User user) {
-        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        List<ResaleListing> listings = resaleListingRepository.findBySourceOwnershipUserIdAndSaleStatus(user.getId(), SaleStatus.SOLDOUT);
-
-        return listings
+        Map<LocalDate, List<SaleOwnershipDto>> groupedByDate = listings
                 .stream()
-                .map(ResaleListing::getSourceOwnership)
-                .map(StoreService::ownershipToOwnershipDto)
-                .toList();
-    }
+                .collect(Collectors.groupingBy(
+                        l -> l.getResultOwnership().getPurchasedAt().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                StoreService::listingToSaleOwnershipDto,
+                                Collectors.toList()
+                        )
+                ));
 
-    private static OwnershipDto ownershipToOwnershipDto(Ownership o) {
-        TheItem item = o.getItem();
-        ItemType type = item.getType();
-        ItemCategory category = type.getCategory();
-
-        return new OwnershipDto(
-                o.getId(),
-                new ItemDto(item, category, type)
+        return new SalesCountResponseDto(count,
+                groupedByDate
+                        .entrySet()
+                        .stream()
+                        .map(e -> new SalesResponseDto(e.getKey(), e.getValue()))
+                        .toList()
         );
     }
 
+    private static PurchaseOwnershipDto ownershipToPurchaseOwnershipDto(Ownership o) {
+        TheItem item = o.getItem();
+
+        return new PurchaseOwnershipDto(
+                o.getId(),
+                o.getPurchasedPrice(),
+                o.getSource() == ItemSource.OFFICIAL,
+                new ItemBasicInfoDto(item)
+        );
+    }
+
+    private static SaleOwnershipDto listingToSaleOwnershipDto(ResaleListing l) {
+        TheItem item = l.getSourceOwnership().getItem();
+
+        return new SaleOwnershipDto(
+                l.getSourceOwnership().getId(),
+                l.getPrice(),
+                new ItemBasicInfoDto(item)
+        );
+    }
 }

@@ -18,4 +18,7 @@ public interface OwnershipRepository extends JpaRepository<Ownership, Long> {
 
     @Query("SELECT i FROM Ownership i WHERE i.user.id = :userId")
     List<Ownership> findByUserId(@Param("userId") String userId);
+
+    @Query("SELECT i FROM Ownership i WHERE i.user.id = :userId AND i.active = :isActive ORDER BY i.purchasedAt DESC")
+    List<Ownership> findOwnershipByUserIdAndIsActiveGroupedByCreatedDate(@Param("userId") String userId, @Param("isActive") boolean isActive);
 }

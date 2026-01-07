@@ -1,8 +1,7 @@
 package com.pleiades.controller;
 
 import com.pleiades.annotations.UserNotFoundResponse;
-import com.pleiades.dto.store.MyItemsResponseDto;
-import com.pleiades.dto.store.OfficialAndRestoreThemesDto;
+import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
@@ -44,33 +43,31 @@ public class StoreController {
     @ApiResponse(
             responseCode = "200",
             description = "성공",
-            content = @Content(schema = @Schema(implementation = MyItemsResponseDto.class))
+            content = @Content(schema = @Schema(implementation = PurchasesCountResponseDto.class))
     )
     @UserNotFoundResponse
     @GetMapping("/purchases")
-    public ResponseEntity<MyItemsResponseDto> getPurchases(HttpServletRequest request) {
+    public ResponseEntity<PurchasesCountResponseDto> getPurchases(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        MyItemsResponseDto myItemsResponseDto = new MyItemsResponseDto(storeService.getAvailableToSaleItems(user));
-
-        return new ResponseEntity<>(myItemsResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(storeService.getMyItemsByDate(user.getId()), HttpStatus.OK);
     }
 
     @Operation(summary = "판매한 아이템", description = "내가 판매한 아이템 불러오기")
     @ApiResponse(
             responseCode = "200",
-            description = "성공: 비활성화된 소유권 반환",
-            content = @Content(schema = @Schema(implementation = MyItemsResponseDto.class))
+            description = "성공: 판매된 내 매물 반환",
+            content = @Content(schema = @Schema(implementation = SalesResponseDto.class))
     )
     @UserNotFoundResponse
     @GetMapping("/sales")
-    public ResponseEntity<MyItemsResponseDto> getSales(HttpServletRequest request) {
+    public ResponseEntity<SalesCountResponseDto> getSales(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        MyItemsResponseDto myItemsResponseDto = new MyItemsResponseDto(storeService.getSoldItems(user));
+        SalesCountResponseDto purchasesResponseDto = storeService.getSoldItems(user);
 
-        return new ResponseEntity<>(myItemsResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(purchasesResponseDto, HttpStatus.OK);
     }
 }

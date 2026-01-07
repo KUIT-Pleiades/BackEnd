@@ -3,6 +3,7 @@ package com.pleiades.dto.store;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -10,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MyItemsResponseDto {
-    List<OwnershipDto> ownerships;
+public class PurchasesResponseDto {
+    LocalDate date;
+    List<PurchaseOwnershipDto> ownerships;
 }
