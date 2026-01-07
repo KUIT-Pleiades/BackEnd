@@ -100,16 +100,14 @@ public class ResaleStoreController {
 
     @Operation(summary = "찜 추가", description = "찜 추가하기")
     @AddWishlistResponses
+    @NotOnSaleResponse
     @PostMapping("/wishlist")
     public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        ValidationStatus validationStatus = resaleStoreService.addWishlist(user.get().getId(), wishlist.getId());
-
-        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Wishlist Already Existing"));
-        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+        resaleStoreService.addWishlist(user.get().getId(), wishlist.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
@@ -121,10 +119,7 @@ public class ResaleStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        ValidationStatus validationStatus = resaleStoreService.removeWishlist(user.getId(), wishlist.getId());
-
-        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Wishlist Not Found"));
-        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+        resaleStoreService.removeWishlist(user.getId(), wishlist.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
     }

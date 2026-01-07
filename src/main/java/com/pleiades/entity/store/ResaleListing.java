@@ -54,6 +54,10 @@ public class ResaleListing {
         this.status = SaleStatus.ONSALE;
     }
 
+    public boolean isOnSale() {
+        return status == SaleStatus.ONSALE;
+    }
+
     public void updatePrice(Long price) {
         this.price = price;
     }
