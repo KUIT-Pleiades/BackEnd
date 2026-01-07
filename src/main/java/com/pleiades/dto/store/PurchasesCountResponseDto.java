@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
+import java.util.List;
+
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OwnershipDto {
-    private Long id;
-    private ItemDto item;
+public class PurchasesCountResponseDto {
+    Long totalCount;
+    List<PurchasesResponseDto> purchases;
 }
