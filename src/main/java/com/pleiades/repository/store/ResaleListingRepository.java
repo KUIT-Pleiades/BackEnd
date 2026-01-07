@@ -14,8 +14,8 @@ import java.util.Optional;
 @Repository
 public interface ResaleListingRepository extends JpaRepository<ResaleListing, Long> {
 
-    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.item.type IN :types")
-    List<ResaleListing> findByTypes(@Param("types") List<ItemType> types);
+    @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.item.type IN :types AND i.status = 'ONSALE'")
+    List<ResaleListing> findListingsOnSaleByTypes(@Param("types") List<ItemType> types);
 
     Optional<ResaleListing> findBySourceOwnershipId(Long id);
 

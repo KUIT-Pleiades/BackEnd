@@ -40,7 +40,7 @@ public class ResaleStoreService {
     private final TheItemRepository theItemRepository;
 
     public List<ResaleItemDto> getItems(List<ItemType> types) {
-        List<ResaleListing> items = resaleListingRepository.findByTypes(types);
+        List<ResaleListing> items = resaleListingRepository.findListingsOnSaleByTypes(types);
 
         List<ResaleItemDto> dtos = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class ResaleStoreService {
     }
 
     public List<Long> getWishlistItems(List<ItemType> types, String userid) {
-        List<ResaleWishlist> wishlist = resaleWishlistRepository.findByTypesInWishlist(types, userid);
+        List<ResaleWishlist> wishlist = resaleWishlistRepository.findListingsOnSaleByTypesInWishlist(types, userid);
 
         List<Long> listingIds = new ArrayList<>();
 
@@ -83,45 +83,43 @@ public class ResaleStoreService {
     }
 
     @Transactional
-    public ValidationStatus addWishlist(String userId, Long itemId) {
+    public void addWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
-        if (resaleWishlistRepository.existsByUserIdAndResaleListingId(userId, itemId)) return ValidationStatus.DUPLICATE;
+        if (resaleWishlistRepository.existsByUserIdAndResaleListingId(userId, itemId)) throw new CustomException(ErrorCode.ALREADY_EXISTS);
 
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             ResaleListing item = resaleListingRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+            if (!item.isOnSale()) throw new CustomException(ErrorCode.NOT_ONSALE);
 
             ResaleWishlist newWishlist = ResaleWishlist.of(user, item);
 
             resaleWishlistRepository.save(newWishlist);
         } catch (CustomException e) {
             log.error(e.getMessage());
-            return ValidationStatus.NOT_VALID;
         }
-        return ValidationStatus.VALID;
     }
 
     @Transactional
-    public ValidationStatus removeWishlist(String userId, Long itemId) {
+    public void removeWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
-        Optional<ResaleWishlist> officialWishlist = resaleWishlistRepository.findByUserIdAndResaleListingId(userId, itemId);
-        if (officialWishlist.isEmpty()) return ValidationStatus.DUPLICATE;
+        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        ResaleWishlist officialWishlist = resaleWishlistRepository.findByUserIdAndResaleListingId(userId, itemId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
         try {
-            resaleWishlistRepository.delete(officialWishlist.get());
+            resaleWishlistRepository.delete(officialWishlist);
         } catch (CustomException e) {
             log.error(e.getMessage());
-            return ValidationStatus.NOT_VALID;
         }
-        return ValidationStatus.VALID;
     }
 
     public List<ListingPriceDto> getListingsPrice(Long itemId) {
         TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
         ItemType type = item.getType();
-        List<ResaleListing> resaleListings = resaleListingRepository.findByTypes(List.of(type));
+        List<ResaleListing> resaleListings = resaleListingRepository.findListingsOnSaleByTypes(List.of(type));
 
         List<ListingPriceDto> dtos = new ArrayList<>();
 

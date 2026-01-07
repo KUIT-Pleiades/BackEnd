@@ -12,8 +12,17 @@ import java.util.Optional;
 
 @Repository
 public interface ResaleWishlistRepository extends JpaRepository<ResaleWishlist, Long> {
-    @Query("SELECT i FROM ResaleWishlist i WHERE i.resaleListing.sourceOwnership.item.type IN :types AND i.user.id=:userid")
-    List<ResaleWishlist> findByTypesInWishlist(@Param("types") List<ItemType> types, @Param("userid") String userid);
+    @Query("SELECT i FROM ResaleWishlist i " +
+            "JOIN FETCH i.resaleListing rl " +
+            "JOIN FETCH rl.sourceOwnership so " +
+            "JOIN FETCH so.item it " +
+            "WHERE it.type IN :types " +
+            "AND rl.status='ONSALE' " +
+            "AND i.user.id=:userid "
+    )
+    List<ResaleWishlist> findListingsOnSaleByTypesInWishlist(@Param("types") List<ItemType> types, @Param("userid") String userid);
+
     Optional<ResaleWishlist> findByUserIdAndResaleListingId(String userId, Long resaleListingId);
+
     boolean existsByUserIdAndResaleListingId(String userId, Long resaleListingId);
 }
