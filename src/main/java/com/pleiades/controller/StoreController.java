@@ -58,7 +58,7 @@ public class StoreController {
     @ApiResponse(
             responseCode = "200",
             description = "성공: 판매된 내 매물 반환",
-            content = @Content(schema = @Schema(implementation = SalesResponseDto.class))
+            content = @Content(schema = @Schema(implementation = SalesCountResponseDto.class))
     )
     @UserNotFoundResponse
     @GetMapping("/sales")
