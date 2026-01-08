@@ -248,4 +248,21 @@ public class ResaleStoreController {
         return ResponseEntity.status(HttpStatus.OK).body(listingsDto);
     }
 
+    @Operation(
+            summary = "중고 상점 검색",
+            description = "중고몰 아이템 검색"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "검색 성공",
+            content = @Content(schema = @Schema(implementation = ResaleItemDto.class))
+    )
+    @GetMapping
+    public ResponseEntity<List<ResaleItemDto>> search(
+            @RequestParam String query
+    ) {
+        return ResponseEntity.ok(
+                resaleStoreService.search(query)
+        );
+    }
 }
