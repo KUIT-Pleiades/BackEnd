@@ -34,11 +34,9 @@ public class UserInfoDto {
     @JsonProperty("starBackground")
     private String backgroundName;
 
-    @Pattern(regexp = "^https://gateway\\.pinata\\.cloud/ipfs/.+$")
     @JsonProperty("profile")
     private String profile;
 
-    @Pattern(regexp = "^https://gateway\\.pinata\\.cloud/ipfs/.+$")
     @JsonProperty("character")
     private String character;
 
