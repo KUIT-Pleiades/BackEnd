@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,8 +77,8 @@ public class TodaysReportService {
         Report report = searchTodaysReport(email, stationPublicId);
         if (report == null) { return ValidationStatus.NONE; }
 
-        User user = userRepository.findByEmail(email).get();
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         report.setAnswer(answer);
         report.setModifiedAt(LocalDateTimeUtil.now());
@@ -85,10 +86,12 @@ public class TodaysReportService {
         reportRepository.save(report);
 
         UserStationId userStationId = new UserStationId(user.getId(), station.getId());
-        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+        UserStation userStation = userStationRepository.findById(userStationId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_IN_STATION));
 
-        userStation.get().setTodayReport(true);
-        userStationRepository.save(userStation.get());
+        userStation.setTodayReport(true);
+        userStationRepository.save(userStation);
+
+        station.updateRecentActivity(LocalDateTimeUtil.now());
 
         return ValidationStatus.VALID;
     }

@@ -159,6 +159,7 @@ public class StationService {
                         .orElseThrow(() -> new CustomException(ErrorCode.NO_OWNERSHIP))
         );
 
+        station.updateRecentActivity(LocalDateTimeUtil.now());
         stationRepository.save(station);
     }
 
@@ -170,6 +171,8 @@ public class StationService {
         station.setName(settingDto.getName());
         station.setIntro(settingDto.getIntro());
         station.setReportNoticeTime(settingDto.getReportNoticeTime());
+
+        station.updateRecentActivity(LocalDateTimeUtil.now());
 
         stationRepository.save(station);
     }

@@ -62,4 +62,8 @@ public class Station {
             publicId = UUID.randomUUID();
         }
     }
+
+    public void updateRecentActivity(LocalDateTime recentActivity) {
+        this.recentActivity = recentActivity;
+    }
 }
