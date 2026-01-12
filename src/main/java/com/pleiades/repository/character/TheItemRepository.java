@@ -17,8 +17,11 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
     // @Query 없어도 동작
     List<TheItem> findByType(ItemType type);
 
-    @Query("SELECT i FROM TheItem i WHERE i.type IN :types")
-    List<TheItem> findByTypes(@Param("types") List<ItemType> types);
+    @Query("SELECT i " +
+            "FROM TheItem i " +
+            "WHERE i.isBasic = false " +
+            "AND i.type IN :types ")
+    List<TheItem> findNotBasicItemsByTypes(@Param("types") List<ItemType> types);
 
     Optional<TheItem> findByTypeAndName(ItemType type, String name);
 
