@@ -54,6 +54,7 @@ public class ReportHistoryService {
         if (reportHistoryRepository.findByUser(user).size() > 10) deleteOldReportHistory(user);
     }
 
+    @Transactional
     protected void deleteOldReportHistory(User user) {
         log.info("deleteOldReportHistory");
         List<ReportHistory> reportHistories = reportHistoryRepository.findByUser(user);
@@ -68,6 +69,7 @@ public class ReportHistoryService {
         reportHistoryRepository.delete(oldestReportHistory);
     }
 
+    @Transactional
     public ResponseEntity<Map<String,Object>> deleteById(Long id) {
         Map<String, Object> body = new HashMap<>();
         Optional<ReportHistory> reportHistory = reportHistoryRepository.findById(id);

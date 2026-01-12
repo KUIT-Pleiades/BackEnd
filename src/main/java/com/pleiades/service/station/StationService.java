@@ -137,6 +137,7 @@ public class StationService {
         return code.toString();
     }
 
+    @Transactional
     public void setBackground(String stationPublicId, String backgroundName, String email) {
         log.info("setBackground");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
@@ -163,6 +164,7 @@ public class StationService {
         stationRepository.save(station);
     }
 
+    @Transactional
     public void stationSettings(String stationPublicId, StationSettingDto settingDto) {
         log.info("stationSettings");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
@@ -178,6 +180,7 @@ public class StationService {
     }
 
     // 정거장 코드 재발급
+    @Transactional
     public ValidationStatus reissueStationCode(String stationPublicId) {
         log.info("reissueStationCode");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))

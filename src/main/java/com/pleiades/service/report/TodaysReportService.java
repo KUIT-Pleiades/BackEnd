@@ -13,6 +13,7 @@ import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +37,7 @@ public class TodaysReportService {
     private final StationQuestionService stationQuestionService;
 
     // 투데이 리포트 생성 (생성만, 작성은 안 됨)
+    @Transactional
     public Report createTodaysReport(String email, String stationPublicId) {
         log.info("createReport");
 
@@ -70,6 +72,7 @@ public class TodaysReportService {
     }
 
     // 걍 업데이트랑 뭐가 다름? UserStation -> true 가 다름
+    @Transactional
     public ValidationStatus updateTodaysReport(String email, String stationPublicId, String answer) {
         log.info("updateTodaysReport");
 
@@ -97,6 +100,7 @@ public class TodaysReportService {
     }
 
     // 이 정거장에서 해당 사용자가 작성한 투데이 리포트 반환
+    @Transactional
     public Report searchTodaysReport(String email, String stationPublicId) {
         log.info("searchTodaysReport");
 
