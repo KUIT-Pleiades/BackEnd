@@ -38,7 +38,7 @@ public class OfficialStoreService {
     private final OwnershipRepository ownershipRepository;
 
     public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
-        List<TheItem> items = itemRepository.findByTypes(types);
+        List<TheItem> items = itemRepository.findNotBasicItemsByTypes(types);
 
         List<OfficialItemDto> dtos = new ArrayList<>();
 
