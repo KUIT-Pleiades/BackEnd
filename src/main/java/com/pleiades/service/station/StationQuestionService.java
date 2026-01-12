@@ -9,6 +9,7 @@ import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class StationQuestionService {
 
     // Station의 오늘의 질문을 가져옴
     // 없으면 생성: 외부에선 생성이 됐는지 신경 쓸 필요 없음. 없으면 서비스 내에서 생성해서 반환할 것임
+    @Transactional
     public Question todaysQuestion(Station station) {
         log.info("searchTodaysQuestion");
         List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());

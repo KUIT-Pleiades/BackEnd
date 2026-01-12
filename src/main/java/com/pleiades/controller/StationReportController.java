@@ -62,7 +62,7 @@ public class StationReportController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Today report is written"));
     }
 
-    @Operation(summary = "투데이리포트 작성", description = "정거장에서 투데이리포트 작성하기")
+    @Operation(summary = "투데이리포트 생성", description = "정거장에서 투데이리포트 생성하기")
     @GetMapping("/{stationId}/report/create")
     public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
         log.info("/stations/"+stationPublicId+"/report/create");

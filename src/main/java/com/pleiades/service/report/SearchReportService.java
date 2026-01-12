@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class SearchReportService {
     private final ReportRepository reportRepository;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public Set<ReportDto> searchResult(User user, String query) {
         log.info("Searching result for query {}", query);
         List<ReportDto> questions = searchByQuestion(user, query);

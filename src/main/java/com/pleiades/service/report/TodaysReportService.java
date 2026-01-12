@@ -13,7 +13,9 @@ import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,7 @@ public class TodaysReportService {
     private final StationQuestionService stationQuestionService;
 
     // 투데이 리포트 생성 (생성만, 작성은 안 됨)
+    @Transactional
     public Report createTodaysReport(String email, String stationPublicId) {
         log.info("createReport");
 
@@ -69,6 +72,7 @@ public class TodaysReportService {
     }
 
     // 걍 업데이트랑 뭐가 다름? UserStation -> true 가 다름
+    @Transactional
     public ValidationStatus updateTodaysReport(String email, String stationPublicId, String answer) {
         log.info("updateTodaysReport");
 
@@ -76,8 +80,8 @@ public class TodaysReportService {
         Report report = searchTodaysReport(email, stationPublicId);
         if (report == null) { return ValidationStatus.NONE; }
 
-        User user = userRepository.findByEmail(email).get();
-        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).get();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
 
         report.setAnswer(answer);
         report.setModifiedAt(LocalDateTimeUtil.now());
@@ -85,15 +89,18 @@ public class TodaysReportService {
         reportRepository.save(report);
 
         UserStationId userStationId = new UserStationId(user.getId(), station.getId());
-        Optional<UserStation> userStation = userStationRepository.findById(userStationId);
+        UserStation userStation = userStationRepository.findById(userStationId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_IN_STATION));
 
-        userStation.get().setTodayReport(true);
-        userStationRepository.save(userStation.get());
+        userStation.setTodayReport(true);
+        userStationRepository.save(userStation);
+
+        station.updateRecentActivity(LocalDateTimeUtil.now());
 
         return ValidationStatus.VALID;
     }
 
     // 이 정거장에서 해당 사용자가 작성한 투데이 리포트 반환
+    @Transactional
     public Report searchTodaysReport(String email, String stationPublicId) {
         log.info("searchTodaysReport");
 

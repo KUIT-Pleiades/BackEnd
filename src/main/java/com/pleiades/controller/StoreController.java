@@ -39,6 +39,21 @@ public class StoreController {
         return new ResponseEntity<>(storeService.getThemes(), HttpStatus.OK);
     }
 
+    @Operation(summary = "판매 가능한 내 아이템", description = "내가 구매한 아이템 중 매물로 올리지 않은 아이템들 불러오기")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(schema = @Schema(implementation = MyItemsDto.class))
+    )
+    @UserNotFoundResponse
+    @GetMapping("/sellable")
+    public ResponseEntity<MyItemsDto> getSellableItems(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return new ResponseEntity<>(storeService.getMySellableItems(user), HttpStatus.OK);
+    }
+
     @Operation(summary = "구매한 아이템", description = "내가 구매한 아이템 불러오기")
     @ApiResponse(
             responseCode = "200",
