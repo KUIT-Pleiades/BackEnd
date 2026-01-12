@@ -1,8 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-TRUNCATE TABLE questions;
+TRUNCATE TABLE question;
 
-INSERT INTO questions (questions) VALUES
+INSERT INTO question (question) VALUES
 ('최애와 1박 여행 콘텐츠를 찍게 됐다면 어디로 가고 싶나요?'),
 ('최애랑 하루만 바뀌어 살아야 할 때 "대신 절대 하면 안 되는 1가지"는 뭐로 정할까요?'),
 ('최애랑 갑자기 하루 동안 손목에 수갑으로 묶여서 지내야 한다면 뭐부터 할 건가요?'),
