@@ -125,6 +125,31 @@ public class TodaysReportService {
         return report;
     }
 
+    @Transactional
+    public Report searchTodaysReportByUserId(String userId, String stationPublicId) {
+        log.info("searchTodaysReport");
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Station station = stationRepository.findByPublicId(UUID.fromString(stationPublicId)).orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND));
+
+        List<StationQuestion> stationQuestions = stationQuestionRepository.findByStationId(station.getId());
+        if (stationQuestions.isEmpty()) { return null; }
+
+        Report report = null;
+
+        for (StationQuestion stationQuestion : stationQuestions) {
+            if (stationQuestion.getCreatedAt().equals(LocalDateTimeUtil.today())) {
+                Question question = questionRepository.findById(stationQuestion.getQuestion().getId()).orElseThrow(()->new CustomException(ErrorCode.NO_TODAYS_REPORT));
+                report = searchUserQuestion(user, question);
+                if (report == null) { return report; }
+                Optional<StationReport> stationReport = stationReportRepository.findByStationIdAndReportId(station.getId(), report.getId());
+                if (stationReport.isEmpty()) { return null; }
+            }
+        }
+
+        return report;
+    }
+
     // 해당 사용자가 헤당 질문에 대해 답변한 리포트 반환
     private Report searchUserQuestion(User user, Question question) {
         log.info("searchUserQuestion");
