@@ -211,6 +211,7 @@ public class UserStationService {
         return new StationListDto(stationDtos);
     }
 
+    @Transactional
     public ValidationStatus setStationFavorite(String stationPublicId, String email, boolean isFavorite) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

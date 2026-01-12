@@ -115,6 +115,7 @@ public class AuthService {
                 .body(body);
     }
 
+    @Transactional
     public ResponseEntity<Map<String, Object>> responseFriendInfo(User user, User friend) {
         log.info("AuthService responseFriendInfo");
 
@@ -149,6 +150,7 @@ public class AuthService {
                 .body(body);
     }
 
+    @Transactional
     public Cookie setRefreshToken(String refreshToken) {
         log.info("AuthService setRefreshToken");
         Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -160,6 +162,7 @@ public class AuthService {
         return cookie;
     }
 
+    @Transactional
     public ResponseCookie addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
@@ -173,6 +176,7 @@ public class AuthService {
         return cookie;
     }
 
+    @Transactional
     public ResponseEntity<Map<String, String>> responseAccessTokenStatus(String accessToken) {
         TokenValidateResult tokenStatus = TokenValidateResult.of(accessToken,  jwtUtil);
 
@@ -239,6 +243,7 @@ public class AuthService {
 
 
     // 회원가입 여부
+    @Transactional
     public ValidationStatus userValidation(String email) {
         log.info("AuthService userValidation");
 

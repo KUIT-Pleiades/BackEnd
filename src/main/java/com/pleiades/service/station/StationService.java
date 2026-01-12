@@ -137,6 +137,7 @@ public class StationService {
         return code.toString();
     }
 
+    @Transactional
     public void setBackground(String stationPublicId, String backgroundName, String email) {
         log.info("setBackground");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
@@ -159,9 +160,11 @@ public class StationService {
                         .orElseThrow(() -> new CustomException(ErrorCode.NO_OWNERSHIP))
         );
 
+        station.updateRecentActivity(LocalDateTimeUtil.now());
         stationRepository.save(station);
     }
 
+    @Transactional
     public void stationSettings(String stationPublicId, StationSettingDto settingDto) {
         log.info("stationSettings");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))
@@ -171,10 +174,13 @@ public class StationService {
         station.setIntro(settingDto.getIntro());
         station.setReportNoticeTime(settingDto.getReportNoticeTime());
 
+        station.updateRecentActivity(LocalDateTimeUtil.now());
+
         stationRepository.save(station);
     }
 
     // 정거장 코드 재발급
+    @Transactional
     public ValidationStatus reissueStationCode(String stationPublicId) {
         log.info("reissueStationCode");
         Station station  = stationRepository.findByPublicId(UUID.fromString(stationPublicId))

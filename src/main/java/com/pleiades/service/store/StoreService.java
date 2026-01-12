@@ -13,10 +13,7 @@ import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
-import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemSource;
-import com.pleiades.strings.ItemType;
-import com.pleiades.strings.SaleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,6 +82,18 @@ public class StoreService {
         return new ThemesDto(face, fashion, background);
     }
 
+    public MyItemsDto getMySellableItems(User user) {
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        List<Ownership> ownerships = ownershipRepository.findSellableItemsByUserId(user.getId());
+
+        List<MyItemOwnershipDto> myItem = ownerships
+                .stream()
+                .map(o -> new MyItemOwnershipDto(o.getId(), o.getItem()))
+                .toList();
+
+        return new MyItemsDto(myItem);
+    }
+
     public PurchasesCountResponseDto getMyItemsByDate(String userId) {
         userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<Ownership> ownerships = ownershipRepository.findOwnershipByUserIdAndIsActiveGroupedByCreatedDate(userId, true);
@@ -95,7 +106,7 @@ public class StoreService {
                         LinkedHashMap::new,
                         Collectors.mapping(
                                 StoreService::ownershipToPurchaseOwnershipDto,
-                                Collectors.toList()
+                                toList()
                         )
                 ));
 
@@ -121,7 +132,7 @@ public class StoreService {
                         LinkedHashMap::new,
                         Collectors.mapping(
                                 StoreService::listingToSaleOwnershipDto,
-                                Collectors.toList()
+                                toList()
                         )
                 ));
 
