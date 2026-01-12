@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 TRUNCATE TABLE questions;
 
 INSERT INTO questions (questions) VALUES
@@ -121,3 +123,5 @@ INSERT INTO questions (questions) VALUES
 ('나에게 완벽한 주말이란 어떤 모습인가요?'),
 ('연인이나 친구 사이에서 가장 중요하게 생각하는 가치는 무엇인가요?'),
 ('죽기 전에 꼭 해보고 싶은 버킷리스트가 있다면 무엇인가요?');
+
+SET FOREIGN_KEY_CHECKS = 1;
