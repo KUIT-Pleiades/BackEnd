@@ -63,6 +63,7 @@ public class ResaleStoreService {
         return listingIds;
     }
 
+    // TODO: toDTO method -> private 고려
     public ResaleItemDto itemToResaleItemDto(ResaleListing listing) {
         TheItem item = listing.getSourceOwnership().getItem();
         List<ItemTheme> itemThemes = itemThemeRepository.findByItemId(item.getId());
@@ -224,5 +225,20 @@ public class ResaleStoreService {
         if (!listing.getSourceOwnership().getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
 
         resaleListingRepository.delete(listing);
+    }
+
+    // itemToResaleItemDto 사용
+    @Transactional(readOnly = true)
+    public List<ResaleItemDto> search(String query) {
+        List<ResaleListing> listings =
+                resaleListingRepository.searchOnSale(query);
+
+        List<ResaleItemDto> result = new ArrayList<>();
+
+        for (ResaleListing listing : listings) {
+            result.add(itemToResaleItemDto(listing));
+        }
+
+        return result;
     }
 }
