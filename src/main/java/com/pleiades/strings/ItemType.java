@@ -5,34 +5,34 @@ import lombok.Getter;
 @Getter
 public enum ItemType {
     // face
-    SKIN_COLOR("skin", ItemCategory.FACE), 
-    HAIR("hair", ItemCategory.FACE),
-    EYES("eyes", ItemCategory.FACE), 
-    NOSE("nose", ItemCategory.FACE),
-    MOUTH("mouth", ItemCategory.FACE), 
-    MOLE("mole", ItemCategory.FACE),
+    SKIN_COLOR("SKIN", ItemCategory.FACE),
+    HAIR("HAIR", ItemCategory.FACE),
+    EYES("EYES", ItemCategory.FACE),
+    NOSE("NOSE", ItemCategory.FACE),
+    MOUTH("MOUTH", ItemCategory.FACE),
+    MOLE("MOLE", ItemCategory.FACE),
 
     // outfit
-    TOP("top", ItemCategory.FASHION), 
-    BOTTOM("bottom", ItemCategory.FASHION),
-    SET("set", ItemCategory.FASHION),
-    SHOES("shoes", ItemCategory.FASHION),
+    TOP("TOP", ItemCategory.FASHION),
+    BOTTOM("BOTTOM", ItemCategory.FASHION),
+    SET("SET", ItemCategory.FASHION),
+    SHOES("SHOES", ItemCategory.FASHION),
 
     // item (accessory)
-    HEAD("head", ItemCategory.FASHION), 
-    EYES_ITEM("eyesItem", ItemCategory.FASHION),
-    NECK("neck", ItemCategory.FASHION), 
-    EARS("ears", ItemCategory.FASHION),
-    LEFT_HAND("left_hand", ItemCategory.FASHION),
-    LEFT_WRIST("left_wrist", ItemCategory.FASHION),
-    RIGHT_HAND("right_hand", ItemCategory.FASHION),
-    RIGHT_WRIST("right_wrist", ItemCategory.FASHION),
+    HEAD("HEAD", ItemCategory.FASHION),
+    EYES_ITEM("EYES_ITEM", ItemCategory.FASHION),
+    NECK("NECK", ItemCategory.FASHION),
+    EARS("EARS", ItemCategory.FASHION),
+    LEFT_HAND("LEFT_HAND", ItemCategory.FASHION),
+    LEFT_WRIST("LEFT_WRIST", ItemCategory.FASHION),
+    RIGHT_HAND("RIGHT_HAND", ItemCategory.FASHION),
+    RIGHT_WRIST("RIGHT_WRIST", ItemCategory.FASHION),
 
     // bg
-    STAR_BG("star", ItemCategory.BG), 
-    STATION_BG("station", ItemCategory.BG),
+    STAR_BG("STAR", ItemCategory.BG),
+    STATION_BG("STATION", ItemCategory.BG),
 
-    DEFAULT("default", ItemCategory.DEFAULT);
+    DEFAULT("DEFAULT", ItemCategory.DEFAULT);
 
     private final String type;
     private final ItemCategory category;
