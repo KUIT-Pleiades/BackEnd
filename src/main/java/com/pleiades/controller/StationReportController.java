@@ -82,7 +82,7 @@ public class StationReportController {
     public ResponseEntity<Map<String,Object>> checkUserReport(@PathVariable("stationId") String stationPublicId, @PathVariable("userId") String userId, HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
 
-        Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
+        Report report = todaysReportService.searchTodaysReportByUserId(userId, stationPublicId);
 
         if (report == null) { return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of("message","User didn't responded today's report")); }
 
