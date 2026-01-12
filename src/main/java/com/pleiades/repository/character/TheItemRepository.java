@@ -27,6 +27,12 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     Optional<TheItem> findByName(String itemName);
 
+    @Query("SELECT i " +
+            "FROM TheItem i " +
+            "WHERE (i.isBasic = true AND i.type NOT IN ('STAR_BG', 'STATION_BG')) " +
+            "OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i)")
+    List<TheItem> findWearableItems(@Param("userId") String userId);
+
     // store 내 검색 query
     @Query("""
 select distinct i

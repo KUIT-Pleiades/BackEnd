@@ -10,9 +10,11 @@ import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.ThemeRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ public class StoreService {
     private final ThemeRepository themeRepository;
     private final ResaleListingRepository resaleListingRepository;
     private final ItemThemeRepository itemThemeRepository;
+    private final TheItemRepository theItemRepository;
 
     public OfficialAndRestoreThemesDto getThemes() {
         OfficialAndRestoreThemesDto themesDto = new OfficialAndRestoreThemesDto();
@@ -92,6 +95,28 @@ public class StoreService {
                 .toList();
 
         return new MyItemsDto(myItem);
+    }
+
+    public CharacterWearableItemsDto getWearableItems(User user) {
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        List<TheItem> items = theItemRepository.findWearableItems(user.getId());
+
+        List<WearableItemDto> face = new ArrayList<>();
+        List<WearableItemDto> fashion = new ArrayList<>();
+
+        items
+                .stream()
+                .map(i -> {
+                    if (i.getType().getCategory().equals(ItemCategory.FACE)) face.add(new WearableItemDto());
+                    else if (i.getType().getCategory().equals(ItemCategory.FASHION)) fashion.add(new WearableItemDto());
+                    return i;
+                });
+
+        CharacterWearableItemsDto characterWearableItemsDto = new CharacterWearableItemsDto();
+        characterWearableItemsDto.setFaceItems(face);
+        characterWearableItemsDto.setFashionItems(fashion);
+
+        return characterWearableItemsDto;
     }
 
     public PurchasesCountResponseDto getMyItemsByDate(String userId) {

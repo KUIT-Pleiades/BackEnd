@@ -85,4 +85,19 @@ public class StoreController {
 
         return new ResponseEntity<>(purchasesResponseDto, HttpStatus.OK);
     }
+
+    @Operation(summary = "착용 가능한 아이템", description = "기본 아이템과 내가 구매한 아이템 중 매물로 올리지 않은 아이템들")
+    @ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(schema = @Schema(implementation = CharacterWearableItemsDto.class))
+    )
+    @UserNotFoundResponse
+    @GetMapping("/wearable")
+    public ResponseEntity<CharacterWearableItemsDto> getWearableItems(HttpServletRequest request) {
+        String email = (String) request.getAttribute("email");
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return new ResponseEntity<>(storeService.getWearableItems(user), HttpStatus.OK);
+    }
 }
