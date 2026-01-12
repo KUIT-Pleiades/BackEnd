@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class StationHomeDto {
     private String stationId;
+    private String stationCode;
     private String adminUserId;
     private String name;
     private String intro;

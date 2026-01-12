@@ -144,6 +144,7 @@ public class UserStationService {
 
         return new StationHomeDto(
                 station.getPublicId().toString(),
+                station.getCode(),
                 station.getAdminUserId(),
                 station.getName(),
                 station.getIntro(),
