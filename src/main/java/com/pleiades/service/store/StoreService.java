@@ -21,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -97,9 +94,13 @@ public class StoreService {
         return new MyItemsDto(myItem);
     }
 
-    public CharacterWearableItemsDto getWearableItems(User user) {
-        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        List<TheItem> items = theItemRepository.findWearableItems(user.getId());
+    public CharacterWearableItemsDto getWearableItems(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        List<TheItem> items;
+
+        if (user.isEmpty()) items = theItemRepository.findWearableItems("");
+        else items = theItemRepository.findWearableItems(user.get().getId());
 
         List<WearableItemDto> face = new ArrayList<>();
         List<WearableItemDto> fashion = new ArrayList<>();
