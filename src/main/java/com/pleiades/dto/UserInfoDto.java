@@ -19,11 +19,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfoDto {
-    @Pattern(regexp = "^\\w+$", message = "영문자와 숫자만 입력 가능합니다.")
     @JsonProperty("userId")
     private String userId;
 
-    @Pattern(regexp = "^[\\w가-힣]+$", message = "한글, 영문, 숫자만 입력 가능합니다.")
     @JsonProperty("userName")
     private String userName;
 
