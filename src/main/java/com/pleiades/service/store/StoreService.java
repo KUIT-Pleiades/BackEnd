@@ -104,12 +104,9 @@ public class StoreService {
         List<WearableItemDto> face = new ArrayList<>();
         List<WearableItemDto> fashion = new ArrayList<>();
 
-        items
-                .stream()
-                .map(i -> {
+        items.forEach(i -> {
                     if (i.getType().getCategory().equals(ItemCategory.FACE)) face.add(new WearableItemDto());
                     else if (i.getType().getCategory().equals(ItemCategory.FASHION)) fashion.add(new WearableItemDto());
-                    return i;
                 });
 
         CharacterWearableItemsDto characterWearableItemsDto = new CharacterWearableItemsDto();
