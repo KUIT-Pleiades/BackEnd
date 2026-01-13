@@ -27,8 +27,8 @@ public class ItemController {
     private final ItemService itemService;
     private final UserRepository userRepository;
 
-    @Operation(summary = "배경 불러오기", description = "정거장/별 배경 불러오기. type 쿼리 파라미터 이용")
-    @GetMapping("/backgrounds/station")
+    @Operation(summary = "배경 불러오기", description = "정거장/별 배경 불러오기. type 쿼리 파라미터 이용 - station | star")
+    @GetMapping("/backgrounds")
     public ResponseEntity<List<ItemBasicInfoDto>> getStationBackground(HttpServletRequest request, @RequestParam String type) {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
