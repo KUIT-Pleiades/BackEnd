@@ -1,5 +1,6 @@
 package com.pleiades.repository.character;
 
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,12 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     // @Query 없어도 동작
     List<TheItem> findByType(ItemType type);
+
+    @Query("SELECT i " +
+            "FROM TheItem i " +
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user = :user AND o.item = i))" +
+            "AND i.type = :type")
+    List<TheItem> findByUserAndType(User user, ItemType type);
 
     @Query("SELECT i " +
             "FROM TheItem i " +
