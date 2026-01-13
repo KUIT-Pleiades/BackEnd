@@ -16,6 +16,7 @@ import com.pleiades.repository.character.CharacterItemRepository;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.service.UserService;
+import com.pleiades.service.station.UserStationService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
@@ -53,6 +54,8 @@ public class AuthService {
     private final NaverTokenRepository naverTokenRepository;
     private final KakaoTokenRepository kakaoTokenRepository;
     private final TheItemRepository theItemRepository;
+
+    private final UserStationService userStationService;
 
     private final JwtUtil jwtUtil;
 
@@ -219,6 +222,9 @@ public class AuthService {
         friendRepository.deleteAllBySenderOrReceiver(user, user);
         signalRepository.deleteAllByReceiver(user);
         signalRepository.deleteAllBySender(user);
+
+        // station 탈퇴
+        userStationService.leaveAllStations(user);
 
         // UserStation (isAdmin -> delete station)
         // user_station 먼저 지우기
