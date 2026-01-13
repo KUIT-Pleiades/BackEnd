@@ -21,6 +21,7 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
     List<UserStation> findByStationId(Long stationId);
     List<UserStation> findByStationPublicId(UUID stationPublicId);
     List<UserStation> findByStationCode(String stationCode);
+    List<UserStation> findByUser(User user);
 
     int countByStationId(Long stationId);
     int countByStationPublicId(UUID station_publicId);

@@ -66,4 +66,10 @@ public class Station {
     public void updateRecentActivity(LocalDateTime recentActivity) {
         this.recentActivity = recentActivity;
     }
+
+    public void decreaseNumberOfUsers() {
+        if (this.numberOfUsers > 0) {
+            this.numberOfUsers--;
+        }
+    }
 }
