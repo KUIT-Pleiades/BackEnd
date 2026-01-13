@@ -96,8 +96,7 @@ public class StoreController {
     @GetMapping("/wearable")
     public ResponseEntity<CharacterWearableItemsDto> getWearableItems(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return new ResponseEntity<>(storeService.getWearableItems(user), HttpStatus.OK);
+        return new ResponseEntity<>(storeService.getWearableItems(email), HttpStatus.OK);
     }
 }

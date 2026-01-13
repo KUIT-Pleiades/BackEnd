@@ -30,9 +30,8 @@ public class ItemController {
     @GetMapping("/backgrounds")
     public ResponseEntity<List<ItemBasicInfoDto>> getStationBackground(HttpServletRequest request, @RequestParam String type) {
         String email = (String) request.getAttribute("email");
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemBasicInfoDto> bgs = itemService.getBackgroundsByType(user, type);
+        List<ItemBasicInfoDto> bgs = itemService.getBackgroundsByType(email, type);
 
         return ResponseEntity.status(HttpStatus.OK).body(bgs);
     }
