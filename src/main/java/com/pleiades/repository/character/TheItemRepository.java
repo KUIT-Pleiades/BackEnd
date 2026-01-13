@@ -20,9 +20,9 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user = :user AND o.item = i))" +
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i))" +
             "AND i.type = :type")
-    List<TheItem> findByUserAndType(User user, ItemType type);
+    List<TheItem> findByUserIdAndType(@Param("userId") String userId, ItemType type);
 
     @Query("SELECT i " +
             "FROM TheItem i " +
