@@ -221,9 +221,12 @@ public class AuthService {
         signalRepository.deleteAllBySender(user);
 
         // UserStation (isAdmin -> delete station)
+        // user_station 먼저 지우기
+        userStationRepository.deleteAllByUser(user);
+
+        // 그리고 station 지우기
         List<Station> stationsToDelete = userStationRepository.findStationsWhereUserIsAdmin(user);
         stationRepository.deleteAll(stationsToDelete);
-        userStationRepository.deleteAllByUser(user);
 
         // UserHistory
         userHistoryRepository.deleteAllByCurrent(user);
