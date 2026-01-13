@@ -4,10 +4,8 @@ import com.pleiades.dto.store.ItemBasicInfoDto;
 import com.pleiades.entity.User;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.strings.ItemType;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
