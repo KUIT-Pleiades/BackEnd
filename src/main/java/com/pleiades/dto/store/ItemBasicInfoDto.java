@@ -24,5 +24,6 @@ public class ItemBasicInfoDto {
         this.id = item.getId();
         this.name = item.getName();
         this.description = item.getDescription();
+        this.price = item.getPrice();
     }
 }

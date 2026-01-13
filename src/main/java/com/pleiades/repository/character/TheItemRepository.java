@@ -1,5 +1,6 @@
 package com.pleiades.repository.character;
 
+import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,12 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user = :user AND o.item = i))" +
+            "AND i.type = :type")
+    List<TheItem> findByUserAndType(User user, ItemType type);
+
+    @Query("SELECT i " +
+            "FROM TheItem i " +
             "WHERE i.isBasic = false " +
             "AND i.type IN :types ")
     List<TheItem> findNotBasicItemsByTypes(@Param("types") List<ItemType> types);
@@ -29,8 +36,8 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true AND i.type NOT IN ('STAR_BG', 'STATION_BG')) " +
-            "OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i)")
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i)) " +
+            "AND i.type NOT IN ('STAR_BG', 'STATION_BG')")
     List<TheItem> findWearableItems(@Param("userId") String userId);
 
     // store 내 검색 query

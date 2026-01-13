@@ -10,6 +10,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.servlet.ServletContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,9 +29,13 @@ import java.util.List;
 )
 @Configuration
 public class SwaggerConfig {
+    @Value("${SERVER_DOMAIN}")
+    private String SERVER_DOMAIN;
+
     @Bean
     public OpenAPI getOpenAPI() {
         return new OpenAPI()
+                .servers(List.of(new Server().url(SERVER_DOMAIN).description("Production")))
                 .components(new Components())
                 .info(apiInfo());
     }
