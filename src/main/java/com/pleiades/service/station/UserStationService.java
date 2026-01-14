@@ -254,4 +254,27 @@ public class UserStationService {
     public boolean isMember(String stationId, String userId) {
         return userStationRepository.existsByStationPublicIdAndUserId(UUID.fromString(stationId), userId);
     }
+  
+    @Transactional
+    public void leaveStation(UserStation userStation) {
+        Station station = userStation.getStation();
+
+        // 관계 제거
+        userStationRepository.delete(userStation);
+
+        // station 사용자 수 감소
+        station.decreaseNumberOfUsers();
+    }
+
+    @Transactional
+    public void leaveAllStations(User user) {
+        List<UserStation> memberships =
+                userStationRepository.findByUser(user);
+
+        for (UserStation us : memberships) {
+            if (!us.isAdmin()) {
+                leaveStation(us);
+            }
+        }
+    }
 }

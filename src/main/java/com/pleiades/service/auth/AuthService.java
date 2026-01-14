@@ -16,6 +16,7 @@ import com.pleiades.repository.character.CharacterItemRepository;
 import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.service.UserService;
+import com.pleiades.service.station.UserStationService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
@@ -62,6 +63,7 @@ public class AuthService {
     private final SimpMessagingTemplate messagingTemplate;
     private final SocketSessionService sessionService;
     private final CharacterLockService lockService;
+    private final UserStationService userStationService;
 
     private final JwtUtil jwtUtil;
     private final RedisTemplate<Object, Object> redisTemplate;
@@ -246,6 +248,9 @@ public class AuthService {
         }
         // 잠금 해제
         lockService.releaseAllLocksByUser(userId);
+      
+        // station 탈퇴
+        userStationService.leaveAllStations(user);
 
         // UserStation (isAdmin -> delete station)
         // user_station 먼저 지우기
