@@ -9,6 +9,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.ResaleStoreService;
+import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +47,7 @@ public class ResaleStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FACE);
         List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
@@ -66,7 +67,7 @@ public class ResaleStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FASHION);
         List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
@@ -86,7 +87,7 @@ public class ResaleStoreController {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
-        List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.BG);
         List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
 
         List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());

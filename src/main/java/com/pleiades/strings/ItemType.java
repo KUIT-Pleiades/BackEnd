@@ -2,6 +2,9 @@ package com.pleiades.strings;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 public enum ItemType {
     // face
@@ -44,6 +47,13 @@ public enum ItemType {
 
     public ItemCategory getCategory() {
         return category;
+    }
+
+    public static List<ItemType> typesOfCategory(ItemCategory category) {
+        return Arrays
+                .stream(ItemType.values())
+                .filter((it -> it.getCategory().equals(category)))
+                .toList();
     }
 
     @Override
