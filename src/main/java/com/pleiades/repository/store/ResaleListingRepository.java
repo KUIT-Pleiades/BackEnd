@@ -17,6 +17,13 @@ public interface ResaleListingRepository extends JpaRepository<ResaleListing, Lo
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.item.type IN :types AND i.status = 'ONSALE'")
     List<ResaleListing> findListingsOnSaleByTypes(@Param("types") List<ItemType> types);
 
+    @Query("SELECT rl " +
+            "FROM ResaleListing rl " +
+            "JOIN FETCH Ownership o ON rl.sourceOwnership.id = o.id " +
+            "JOIN FETCH TheItem i ON o.item.id = i.id " +
+            "WHERE i.id = :itemId")
+    List<ResaleListing> findListingsOnSaleByItemId(@Param("itemId") Long itemId);
+
     Optional<ResaleListing> findBySourceOwnershipId(Long id);
 
     Boolean existsBySourceOwnershipId(Long id);

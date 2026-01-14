@@ -119,8 +119,7 @@ public class ResaleStoreService {
 
     public List<ListingPriceDto> getListingsPrice(Long itemId) {
         TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
-        ItemType type = item.getType();
-        List<ResaleListing> resaleListings = resaleListingRepository.findListingsOnSaleByTypes(List.of(type));
+        List<ResaleListing> resaleListings = resaleListingRepository.findListingsOnSaleByItemId(itemId);
 
         List<ListingPriceDto> dtos = new ArrayList<>();
 
