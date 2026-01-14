@@ -6,16 +6,14 @@ import com.pleiades.entity.User;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.OfficialStoreService;
+import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.ValidationStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Tag(name = "Official Store", description = "공식몰")
 @RequiredArgsConstructor
@@ -45,7 +41,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = List.of(ItemType.SKIN_COLOR, ItemType.HAIR, ItemType.EYES, ItemType.NOSE, ItemType.MOUTH, ItemType.MOLE);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FACE);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
@@ -64,7 +60,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = List.of(ItemType.TOP, ItemType.BOTTOM, ItemType.SET, ItemType.SHOES);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FASHION);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
@@ -83,7 +79,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = List.of(ItemType.STAR_BG, ItemType.STATION_BG);
+        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.BG);
         List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
 
         List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
