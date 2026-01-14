@@ -226,4 +226,8 @@ public class UserStationService {
         userStationRepository.save(userStation.get());
         return ValidationStatus.VALID;
     }
+
+    public boolean isMember(String stationId, String userId) {
+        return userStationRepository.existsByStationPublicIdAndUserId(UUID.fromString(stationId), userId);
+    }
 }

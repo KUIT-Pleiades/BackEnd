@@ -22,6 +22,8 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
     List<UserStation> findByStationPublicId(UUID stationPublicId);
     List<UserStation> findByStationCode(String stationCode);
 
+    boolean existsByStationPublicIdAndUserId(UUID stationPublicId, String userId);
+
     int countByStationId(Long stationId);
     int countByStationPublicId(UUID station_publicId);
 
@@ -53,4 +55,9 @@ public interface UserStationRepository extends JpaRepository<UserStation, UserSt
     void resetTodaysReportToFalse();
 
     void deleteAllByUser(User user);
+
+    @Query("SELECT us.station.publicId FROM UserStation us WHERE us.user.id = :userId")
+    List<UUID> findStationPublicIdsByUserId(@Param("userId") String userId);
+
+    void deleteByUserId(String userId);
 }
