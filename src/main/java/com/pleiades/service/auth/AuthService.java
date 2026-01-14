@@ -21,12 +21,17 @@ import com.pleiades.strings.JwtRole;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.HeaderUtil;
 import com.pleiades.util.JwtUtil;
+import com.pleiades.websocket.dto.MemberRemovedEvent;
+import com.pleiades.websocket.service.CharacterLockService;
+import com.pleiades.websocket.service.SocketSessionService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +59,12 @@ public class AuthService {
     private final KakaoTokenRepository kakaoTokenRepository;
     private final TheItemRepository theItemRepository;
 
+    private final SimpMessagingTemplate messagingTemplate;
+    private final SocketSessionService sessionService;
+    private final CharacterLockService lockService;
+
     private final JwtUtil jwtUtil;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
     @Transactional
     public ResponseEntity<Map<String, String>> responseRefreshTokenStatus(String refreshToken) {
@@ -208,6 +218,7 @@ public class AuthService {
     @Transactional
     public void withdraw(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() ->new CustomException(ErrorCode.USER_NOT_FOUND));
+        String userId = user.getId();
 
         // character, item
         characterRepository.findByUser(user).ifPresent(character -> {
@@ -219,6 +230,22 @@ public class AuthService {
         friendRepository.deleteAllBySenderOrReceiver(user, user);
         signalRepository.deleteAllByReceiver(user);
         signalRepository.deleteAllBySender(user);
+
+        // 위치 세션 삭제
+        List<UUID> stationIds = userStationRepository.findStationPublicIdsByUserId(userId);
+
+        for (UUID stationId : stationIds) {
+            // Redis에서 위치 삭제
+            redisTemplate.opsForHash().delete("station:" + stationId.toString() + ":positions", userId);
+
+            // 접속 중인 유저들에게 알림
+            messagingTemplate.convertAndSend(
+                    "/topic/station/" + stationId,
+                    new MemberRemovedEvent(userId)
+            );
+        }
+        // 잠금 해제
+        lockService.releaseAllLocksByUser(userId);
 
         // UserStation (isAdmin -> delete station)
         // user_station 먼저 지우기
@@ -242,8 +269,6 @@ public class AuthService {
 
         userRepository.delete(user);
     }
-
-
 
     // 회원가입 여부
     @Transactional
