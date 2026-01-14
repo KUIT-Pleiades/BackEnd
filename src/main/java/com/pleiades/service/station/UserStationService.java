@@ -18,8 +18,11 @@ import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
+import com.pleiades.websocket.dto.MemberAddedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,9 @@ public class UserStationService {
     private final UserService userService;
     private final TodaysReportService todaysReportService;
     private final UserRepository userRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public Map<String, String> setUserPosition(String email, String stationPublicId, String userId, UserPositionDto requestBody) {
@@ -109,7 +115,7 @@ public class UserStationService {
         }
 
         // 새 UserStation 추가 (멤버 등록)
-        addUserStation(user, station, false);
+        UserStation userStation = addUserStation(user, station, false);
 
         // 정거장 인원수 업데이트
         station.setNumberOfUsers(station.getNumberOfUsers() + 1);
@@ -117,6 +123,22 @@ public class UserStationService {
 
         Report report = todaysReportService.createTodaysReport(email, station.getPublicId().toString());
         log.info("새로운 리포트 생성 완료: {}", report.getQuestion());
+
+        // Redis에 위치 저장
+        String stationId = station.getPublicId().toString();
+        float initialX = userStation.getPositionX();
+        float initialY = userStation.getPositionY();
+        redisTemplate.opsForHash().put(
+                "station:" + stationId + ":positions",
+                user.getId(),
+                initialX + "," + initialY
+        );
+
+        // 접속 중인 유저들에게 알림
+        messagingTemplate.convertAndSend(
+                "/topic/station/" + stationId,
+                new MemberAddedEvent(user.getId(), initialX, initialY)
+        );
 
         return Map.of("stationId", station.getPublicId().toString());
     }
@@ -158,7 +180,7 @@ public class UserStationService {
 
     // 사용자 _ 우주 정거장 관계 테이블 객체 추가
     @Transactional
-    public void addUserStation(User user, Station station, boolean isAdmin) {
+    public UserStation addUserStation(User user, Station station, boolean isAdmin) {
 
         int currentMembers = userStationRepository.countByStationId(station.getId());
 
@@ -186,6 +208,8 @@ public class UserStationService {
 
         userStationRepository.save(userStation);
         log.info("사용자 정보 UserStation 에 저장 완료: {}", user.getUserName());
+
+        return userStation;
     }
 
     @Transactional
