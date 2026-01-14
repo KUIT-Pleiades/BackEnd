@@ -31,7 +31,7 @@ public class ItemService {
 
     private List<ItemBasicInfoDto> getStationBackgrounds(String userId) {
         return theItemRepository
-                .findByUserIdAndType(userId, ItemType.STATION_BG)
+                .findUsableBgs(userId, ItemType.STATION_BG)
                 .stream()
                 .map(ItemBasicInfoDto::new)
                 .toList();
@@ -39,7 +39,7 @@ public class ItemService {
 
     private List<ItemBasicInfoDto> getStarBackgrounds(String userId) {
         return theItemRepository
-                .findByUserIdAndType(userId, ItemType.STAR_BG)
+                .findUsableBgs(userId, ItemType.STAR_BG)
                 .stream()
                 .map(ItemBasicInfoDto::new)
                 .toList();

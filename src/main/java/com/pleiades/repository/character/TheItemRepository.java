@@ -20,9 +20,9 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i))" +
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i AND o.active = true)) " +
             "AND i.type = :type")
-    List<TheItem> findByUserIdAndType(@Param("userId") String userId, ItemType type);
+    List<TheItem> findUsableBgs(@Param("userId") String userId, @Param("type") ItemType type);
 
     @Query("SELECT i " +
             "FROM TheItem i " +
@@ -36,7 +36,7 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i)) " +
+            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i AND o.active = true)) " +
             "AND i.type NOT IN ('STAR_BG', 'STATION_BG')")
     List<TheItem> findWearableItems(@Param("userId") String userId);
 
