@@ -61,6 +61,7 @@ where
             "FROM TheItem i " +
             "WHERE i.isBasic = true " +
             "AND i.type = :type " +
-            "ORDER BY i.id ASC")
+            "ORDER BY i.id ASC " +
+            "LIMIT 1")
     TheItem findFirstBasicItemByType(@Param("type") ItemType type);
 }
