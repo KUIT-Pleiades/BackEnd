@@ -56,4 +56,11 @@ where
     )
 """)
     List<TheItem> searchOfficialItems(@Param("query") String query);
+
+    @Query("SELECT i " +
+            "FROM TheItem i " +
+            "WHERE i.isBasic = true " +
+            "AND i.type = :type " +
+            "ORDER BY i.id ASC")
+    TheItem findFirstBasicItemByType(@Param("type") ItemType type);
 }
