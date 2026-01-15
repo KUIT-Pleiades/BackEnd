@@ -220,7 +220,7 @@ public class ResaleStoreService {
             resetStationBackgrounds(user, item);
         } else if (item.getType() == ItemType.STAR_BG) {
             // 별 배경 설정
-            resetStarBackground(user);
+            resetStarBackground(user, item);
         }
 
         return listing.getId();
@@ -278,9 +278,11 @@ public class ResaleStoreService {
                 });
     }
 
-    private void resetStarBackground(User user) {
-        TheItem defaultBackground = itemRepository.findFirstBasicItemByType(ItemType.STAR_BG);
+    private void resetStarBackground(User user, TheItem item) {
         Star star = starRepository.findByUserId(user.getId()).orElseThrow(() -> new CustomException(ErrorCode.STAR_NOT_FOUND));
+        if (star.getBackground().equals(item)) return;
+        TheItem defaultBackground = itemRepository.findFirstBasicItemByType(ItemType.STAR_BG);
+
         star.setBackground(defaultBackground);
     }
 }
