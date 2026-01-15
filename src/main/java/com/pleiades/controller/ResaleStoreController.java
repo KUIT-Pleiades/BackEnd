@@ -166,6 +166,7 @@ public class ResaleStoreController {
     @UserNotFoundResponse
     @ItemNotFoundResponse
     @AlreadyListedItemResponse
+    @CantSellUsingItemResponse
     @PostMapping("/listings")
     public ResponseEntity<ListingIdDto> addListing(HttpServletRequest request, @RequestBody AddListingRequestDto addListingRequestDto) {
         String email = (String) request.getAttribute("email");

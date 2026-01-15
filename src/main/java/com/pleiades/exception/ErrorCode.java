@@ -53,6 +53,7 @@ public enum ErrorCode {
 
     ALREADY_CHARGED_STONE(HttpStatus.CONFLICT, "You already charged today's stone."),
 
+    CANT_SELL_USING_ITEM(HttpStatus.CONFLICT, "Can't sell using item"),
     ;
 
     private final HttpStatus status;

@@ -1,6 +1,8 @@
 package com.pleiades.service.store;
 
 import com.pleiades.dto.store.*;
+import com.pleiades.entity.Star;
+import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.entity.store.Ownership;
@@ -9,12 +11,18 @@ import com.pleiades.entity.store.ResaleWishlist;
 import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
+import com.pleiades.repository.StarRepository;
+import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
+import com.pleiades.repository.UserStationRepository;
+import com.pleiades.repository.character.CharacterItemRepository;
+import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.ResaleWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.SaleStatus;
 import com.pleiades.strings.ValidationStatus;
@@ -38,6 +46,11 @@ public class ResaleStoreService {
     private final TheItemRepository itemRepository;
     private final OwnershipRepository ownershipRepository;
     private final TheItemRepository theItemRepository;
+    private final StationRepository stationRepository;
+    private final UserStationRepository userStationRepository;
+    private final CharacterRepository characterRepository;
+    private final CharacterItemRepository characterItemRepository;
+    private final StarRepository starRepository;
 
     public List<ResaleItemDto> getItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findListingsOnSaleByTypes(types);
@@ -193,10 +206,22 @@ public class ResaleStoreService {
 
         if (!ownership.getUser().equals(user)) throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
 
+        TheItem item = ownership.getItem();
+
         resaleListingRepository.findBySourceOwnershipId(ownershipId).ifPresent((l) -> { throw new CustomException(ErrorCode.ALREADY_EXISTS); });
+        boolean isWearing = characterItemRepository.existsByUserAndItem(user, item);
+        if (isWearing) throw new CustomException(ErrorCode.CANT_SELL_USING_ITEM);
 
         ResaleListing listing = new ResaleListing(ownership, price);
         resaleListingRepository.save(listing);
+
+        // 사용자가 속한 정거장들 중, 사용자가 설정한 배경화면을 매물로 올렸다면 기본 배경화면으로 변경
+        if (item.getType() == ItemType.STATION_BG) {
+            resetStationBackgrounds(user, item);
+        } else if (item.getType() == ItemType.STAR_BG) {
+            // 별 배경 설정
+            resetStarBackground(user, item);
+        }
 
         return listing.getId();
     }
@@ -239,5 +264,25 @@ public class ResaleStoreService {
         }
 
         return result;
+    }
+
+    private void resetStationBackgrounds(User user, TheItem item) {
+        TheItem defaultBackground = itemRepository.findFirstBasicItemByType(ItemType.STATION_BG);
+        userStationRepository
+                .findByUser(user)
+                .stream()
+                .filter(us -> us.getStation().getBackground().equals(item) && us.getStation().getBackgroundOwner().equals(user))
+                .forEach(us -> {
+                    us.getStation().setBackgroundOwner(null);
+                    us.getStation().setBackground(defaultBackground);
+                });
+    }
+
+    private void resetStarBackground(User user, TheItem item) {
+        Star star = starRepository.findByUserId(user.getId()).orElseThrow(() -> new CustomException(ErrorCode.STAR_NOT_FOUND));
+        if (!star.getBackground().equals(item)) return;
+        TheItem defaultBackground = itemRepository.findFirstBasicItemByType(ItemType.STAR_BG);
+
+        star.setBackground(defaultBackground);
     }
 }
