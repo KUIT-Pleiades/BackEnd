@@ -56,6 +56,13 @@ public enum ItemType {
                 .toList();
     }
 
+    public static List<ItemType> typesOfCategories(ItemCategory category1, ItemCategory category2) {
+        return Arrays
+                .stream(ItemType.values())
+                .filter((it -> it.getCategory().equals(category1) || it.getCategory().equals(category2)))
+                .toList();
+    }
+
     @Override
     public String toString() {
         return type;

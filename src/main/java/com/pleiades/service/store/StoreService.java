@@ -16,6 +16,7 @@ import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
 import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemSource;
+import com.pleiades.strings.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -99,8 +100,8 @@ public class StoreService {
 
         List<TheItem> items;
 
-        if (user.isEmpty()) items = theItemRepository.findWearableItems("");
-        else items = theItemRepository.findWearableItems(user.get().getId());
+        if (user.isEmpty()) items = theItemRepository.findUsableItemsByTypes("", ItemType.typesOfCategories(ItemCategory.FASHION, ItemCategory.FACE));
+        else items = theItemRepository.findUsableItemsByTypes(user.get().getId(),  ItemType.typesOfCategories(ItemCategory.FASHION, ItemCategory.FACE));
 
         List<WearableItemDto> face = new ArrayList<>();
         List<WearableItemDto> fashion = new ArrayList<>();

@@ -9,6 +9,7 @@ import com.pleiades.strings.ItemType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class ItemService {
 
     private List<ItemBasicInfoDto> getStationBackgrounds(String userId) {
         return theItemRepository
-                .findUsableBgs(userId, ItemType.STATION_BG)
+                .findUsableItemsByTypes(userId, Collections.singletonList(ItemType.STATION_BG))
                 .stream()
                 .map(ItemBasicInfoDto::new)
                 .toList();
@@ -39,7 +40,7 @@ public class ItemService {
 
     private List<ItemBasicInfoDto> getStarBackgrounds(String userId) {
         return theItemRepository
-                .findUsableBgs(userId, ItemType.STAR_BG)
+                .findUsableItemsByTypes(userId, Collections.singletonList(ItemType.STAR_BG))
                 .stream()
                 .map(ItemBasicInfoDto::new)
                 .toList();

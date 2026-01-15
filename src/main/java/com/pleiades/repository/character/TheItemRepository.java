@@ -1,6 +1,5 @@
 package com.pleiades.repository.character;
 
-import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
 import com.pleiades.strings.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,12 +19,6 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i AND o.active = true)) " +
-            "AND i.type = :type")
-    List<TheItem> findUsableBgs(@Param("userId") String userId, @Param("type") ItemType type);
-
-    @Query("SELECT i " +
-            "FROM TheItem i " +
             "WHERE i.isBasic = false " +
             "AND i.type IN :types ")
     List<TheItem> findNotBasicItemsByTypes(@Param("types") List<ItemType> types);
@@ -36,9 +29,15 @@ public interface TheItemRepository extends JpaRepository<TheItem, Long> {
 
     @Query("SELECT i " +
             "FROM TheItem i " +
-            "WHERE (i.isBasic = true OR EXISTS (SELECT 1 FROM Ownership o WHERE o.user.id = :userId AND o.item = i AND o.active = true)) " +
-            "AND i.type NOT IN ('STAR_BG', 'STATION_BG')")
-    List<TheItem> findWearableItems(@Param("userId") String userId);
+            "WHERE i.type IN :types " +
+            "AND (i.isBasic = true " +
+            "       OR EXISTS (SELECT 1 FROM Ownership o " +
+            "                   WHERE o.user.id = :userId " +
+            "                   AND o.item = i " +
+            "                   AND o.active = true " +
+            "                   AND NOT EXISTS (SELECT 1 FROM ResaleListing rl " +
+            "                                        WHERE rl.sourceOwnership = o)))")
+    List<TheItem> findUsableItemsByTypes(@Param("userId") String userId, @Param("types") List<ItemType> types);
 
     // store 내 검색 query
     @Query("""
