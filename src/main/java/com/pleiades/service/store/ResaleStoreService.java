@@ -280,7 +280,7 @@ public class ResaleStoreService {
 
     private void resetStarBackground(User user, TheItem item) {
         Star star = starRepository.findByUserId(user.getId()).orElseThrow(() -> new CustomException(ErrorCode.STAR_NOT_FOUND));
-        if (star.getBackground().equals(item)) return;
+        if (!star.getBackground().equals(item)) return;
         TheItem defaultBackground = itemRepository.findFirstBasicItemByType(ItemType.STAR_BG);
 
         star.setBackground(defaultBackground);
