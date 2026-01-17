@@ -3,8 +3,12 @@ package com.pleiades.repository.store;
 import com.pleiades.entity.store.ResaleListing;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.SaleStatus;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +17,11 @@ import java.util.Optional;
 
 @Repository
 public interface ResaleListingRepository extends JpaRepository<ResaleListing, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "3000")})
+    @Query("SELECT rl from ResaleListing rl WHERE rl.id = :id")
+    Optional<ResaleListing> findByIdWithLock(@Param("id")  Long id);
 
     @Query("SELECT i FROM ResaleListing i WHERE i.sourceOwnership.item.type IN :types AND i.status = 'ONSALE'")
     List<ResaleListing> findListingsOnSaleByTypes(@Param("types") List<ItemType> types);

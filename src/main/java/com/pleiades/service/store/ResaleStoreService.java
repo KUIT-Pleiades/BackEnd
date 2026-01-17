@@ -150,11 +150,11 @@ public class ResaleStoreService {
 
     @Transactional
     public Long buyItem(String userId, Long listingId) {
-        // listing이 존재하는지
+        // listing이 존재하는지 - 락 걸음
         // listing 상태가 onsale인지
         // 해당 아이템을 이미 소유하고 있지 않은지 (해당 Listing의 source 소유권의 주인이 현재 user가 아닌지 - 포함되는 얘긴 듯)
         // 돈 있는지 ㅋ
-        ResaleListing listing = resaleListingRepository.findById(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        ResaleListing listing = resaleListingRepository.findByIdWithLock(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
         if (listing.getStatus() != SaleStatus.ONSALE) throw new CustomException(ErrorCode.NOT_ONSALE);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
