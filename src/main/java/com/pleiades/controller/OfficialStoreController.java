@@ -41,16 +41,12 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FACE);
-        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
-
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
-
-        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(officialStoreService
+                        .getOfficialItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.FACE), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "패션 목록", description = "상의/하의/세트/신발 목록 불러오기")
@@ -60,16 +56,12 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FASHION);
-        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
-
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
-
-        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(officialStoreService
+                        .getOfficialItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.FASHION), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "배경 목록", description = "별/정거장 배경 목록 불러오기")
@@ -79,16 +71,12 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.BG);
-        List<OfficialItemDto> dtos = officialStoreService.getOfficialItems(types);
-
-        List<Long> wishIds = officialStoreService.getWishlistItems(types, user.getId());
-
-        OfficialStoreDto dto = new OfficialStoreDto(dtos, wishIds);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(officialStoreService
+                        .getOfficialItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.BG), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "찜 추가", description = "찜 추가하기")
@@ -98,10 +86,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        ValidationStatus validationStatus = officialStoreService.addWishlist(user.getId(), wishlist.getId());
-
-        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Wishlist Already Existing"));
-        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+        officialStoreService.addWishlist(user.getId(), wishlist.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
@@ -113,10 +98,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        ValidationStatus validationStatus = officialStoreService.removeWishlist(user.getId(), wishlist.getId());
-
-        if (validationStatus == ValidationStatus.DUPLICATE) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Wishlist Not Found"));
-        if (validationStatus == ValidationStatus.NOT_VALID) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Item or User Not Found"));
+        officialStoreService.removeWishlist(user.getId(), wishlist.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Removed"));
     }
@@ -135,8 +117,7 @@ public class OfficialStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Long ownershipId = officialStoreService.buyItem(user.getId(), itemIdDto.getItemId());
-        return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(ownershipId));
+        return ResponseEntity.status(HttpStatus.OK).body(PurchaseResponseDto.successOf(officialStoreService.buyItem(user.getId(), itemIdDto.getItemId())));
     }
 
     @Operation(summary = "공식몰 검색", description = "공식몰 아이템 검색")
@@ -146,12 +127,9 @@ public class OfficialStoreController {
             @RequestParam(required = false) String query
     ) {
         String email = (String) request.getAttribute("email");
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        OfficialStoreDto dto = officialStoreService.searchOfficialStore(query, user.getId());
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(officialStoreService.searchOfficialStore(query, user.getId()));
     }
 
 }

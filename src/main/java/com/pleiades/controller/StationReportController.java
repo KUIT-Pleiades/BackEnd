@@ -32,7 +32,6 @@ public class StationReportController {
     @Operation(summary = "투데이리포트 조회", description = "정거장에서 작성한 해당 사용자의 투데이리포트 불러오기")
     @GetMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> checkReport(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
-        log.info("/stations/{}/report", stationPublicId);
         String email = (String) request.getAttribute("email");
 
         Report report = todaysReportService.searchTodaysReport(email, stationPublicId);
@@ -48,7 +47,6 @@ public class StationReportController {
     @Operation(summary = "투데이리포트 수정", description = "정거장에서 작성한 투데이리프토 수정하기")
     @PatchMapping("/{stationId}/report")
     public ResponseEntity<Map<String,Object>> updateReport(@PathVariable("stationId") String stationPublicId, HttpServletRequest request, @RequestBody Map<String, Object> body) {
-        log.info("PATCH /stations/{}/report", stationPublicId);
         String email = (String) request.getAttribute("email");
 
         String answer = body.get("answer").toString();
@@ -65,7 +63,6 @@ public class StationReportController {
     @Operation(summary = "투데이리포트 생성", description = "정거장에서 투데이리포트 생성하기")
     @GetMapping("/{stationId}/report/create")
     public ResponseEntity<Map<String, Object>> createReport(@PathVariable("stationId") String stationPublicId, HttpServletRequest request) {
-        log.info("/stations/"+stationPublicId+"/report/create");
         String email = (String) request.getAttribute("email");
 
         Report report = todaysReportService.createTodaysReport(email, stationPublicId);

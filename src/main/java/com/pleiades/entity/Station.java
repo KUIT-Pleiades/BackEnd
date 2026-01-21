@@ -56,6 +56,10 @@ public class Station {
     @JoinColumn(name = "bgOwner_id", nullable = true)
     User backgroundOwner;
 
+    // 낙관적 락
+    @Version
+    private Long version;
+
     @PrePersist
     protected void generateUuid() {
         if (publicId == null) {

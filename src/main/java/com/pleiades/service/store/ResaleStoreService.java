@@ -2,9 +2,9 @@ package com.pleiades.service.store;
 
 import com.pleiades.dto.store.*;
 import com.pleiades.entity.Star;
-import com.pleiades.entity.Station;
 import com.pleiades.entity.User;
 import com.pleiades.entity.character.TheItem;
+import com.pleiades.entity.store.OfficialWishlist;
 import com.pleiades.entity.store.Ownership;
 import com.pleiades.entity.store.ResaleListing;
 import com.pleiades.entity.store.ResaleWishlist;
@@ -12,20 +12,16 @@ import com.pleiades.entity.store.search.ItemTheme;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.StarRepository;
-import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
 import com.pleiades.repository.character.CharacterItemRepository;
-import com.pleiades.repository.character.CharacterRepository;
 import com.pleiades.repository.character.TheItemRepository;
 import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.ResaleWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
-import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
 import com.pleiades.strings.SaleStatus;
-import com.pleiades.strings.ValidationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -46,13 +41,18 @@ public class ResaleStoreService {
     private final TheItemRepository itemRepository;
     private final OwnershipRepository ownershipRepository;
     private final TheItemRepository theItemRepository;
-    private final StationRepository stationRepository;
     private final UserStationRepository userStationRepository;
-    private final CharacterRepository characterRepository;
     private final CharacterItemRepository characterItemRepository;
     private final StarRepository starRepository;
 
-    public List<ResaleItemDto> getItems(List<ItemType> types) {
+    public ResaleStoreDto getResaleItemsAndWishlist(List<ItemType> types, String userid) {
+        List<ResaleItemDto> dtos = getResaleItems(types);
+        List<Long> listingIds = getWishlistItems(types, userid);
+
+        return new ResaleStoreDto(dtos, listingIds);
+    }
+
+    private List<ResaleItemDto> getResaleItems(List<ItemType> types) {
         List<ResaleListing> items = resaleListingRepository.findListingsOnSaleByTypes(types);
 
         List<ResaleItemDto> dtos = new ArrayList<>();
@@ -62,7 +62,7 @@ public class ResaleStoreService {
         return dtos;
     }
 
-    public List<Long> getWishlistItems(List<ItemType> types, String userid) {
+    private List<Long> getWishlistItems(List<ItemType> types, String userid) {
         List<ResaleWishlist> wishlist = resaleWishlistRepository.findListingsOnSaleByTypesInWishlist(types, userid);
 
         List<Long> listingIds = new ArrayList<>();
@@ -150,11 +150,11 @@ public class ResaleStoreService {
 
     @Transactional
     public Long buyItem(String userId, Long listingId) {
-        // listing이 존재하는지
+        // listing이 존재하는지 - 락 걸음
         // listing 상태가 onsale인지
         // 해당 아이템을 이미 소유하고 있지 않은지 (해당 Listing의 source 소유권의 주인이 현재 user가 아닌지 - 포함되는 얘긴 듯)
         // 돈 있는지 ㅋ
-        ResaleListing listing = resaleListingRepository.findById(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        ResaleListing listing = resaleListingRepository.findByIdWithLock(listingId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
         if (listing.getStatus() != SaleStatus.ONSALE) throw new CustomException(ErrorCode.NOT_ONSALE);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

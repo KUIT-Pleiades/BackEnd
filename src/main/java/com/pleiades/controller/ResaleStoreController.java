@@ -3,21 +3,17 @@ package com.pleiades.controller;
 import com.pleiades.annotations.*;
 import com.pleiades.dto.store.*;
 import com.pleiades.entity.User;
-import com.pleiades.entity.store.Ownership;
 import com.pleiades.exception.CustomException;
 import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.UserRepository;
-import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.store.ResaleStoreService;
 import com.pleiades.strings.ItemCategory;
 import com.pleiades.strings.ItemType;
-import com.pleiades.strings.ValidationStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Tag(name = "Resale Store", description = "중고몰")
 @RequiredArgsConstructor
@@ -44,19 +39,15 @@ public class ResaleStoreController {
     @GetMapping("/face")
     public ResponseEntity<ResaleStoreDto> getFaceList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FACE);
-        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
-
-        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
-
-        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dto);
+                .body(resaleStoreService
+                        .getResaleItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.FACE), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "패션 목록", description = "상의/하의/세트/신발 목록 불러오기")
@@ -64,19 +55,15 @@ public class ResaleStoreController {
     @GetMapping("/fashion")
     public ResponseEntity<ResaleStoreDto> getFashionList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.FASHION);
-        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
-
-        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
-
-        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dto);
+                .body(resaleStoreService
+                        .getResaleItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.FASHION), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "배경 목록", description = "별/정거장 배경 목록 불러오기")
@@ -84,19 +71,15 @@ public class ResaleStoreController {
     @GetMapping("/bg")
     public ResponseEntity<ResaleStoreDto> getBgList(HttpServletRequest request) {
         String email = (String) request.getAttribute("email");
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-
-        List<ItemType> types = ItemType.typesOfCategory(ItemCategory.BG);
-        List<ResaleItemDto> dtos = resaleStoreService.getItems(types);
-
-        List<Long> wishIds = resaleStoreService.getWishlistItems(types, user.get().getId());
-
-        ResaleStoreDto dto = new ResaleStoreDto(dtos, wishIds);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dto);
+                .body(resaleStoreService
+                        .getResaleItemsAndWishlist(
+                                ItemType.typesOfCategory(ItemCategory.BG), user.getId()
+                        )
+                );
     }
 
     @Operation(summary = "찜 추가", description = "찜 추가하기")
@@ -105,10 +88,9 @@ public class ResaleStoreController {
     @PostMapping("/wishlist")
     public ResponseEntity<Map<String, String>> addWishlist(HttpServletRequest request, @RequestBody WishListDto wishlist) {
         String email = (String) request.getAttribute("email");
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        resaleStoreService.addWishlist(user.get().getId(), wishlist.getId());
+        resaleStoreService.addWishlist(user.getId(), wishlist.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Wishlist Added"));
     }
@@ -243,11 +225,9 @@ public class ResaleStoreController {
         String email = (String) request.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<ListingDto> ids = resaleStoreService.getListings(user.getId());
-
-        ListingsDto listingsDto = new ListingsDto(ids);
-
-        return ResponseEntity.status(HttpStatus.OK).body(listingsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ListingsDto(resaleStoreService.getListings(user.getId()))
+        );
     }
 
     @Operation(
@@ -263,8 +243,6 @@ public class ResaleStoreController {
     public ResponseEntity<List<ResaleItemDto>> search(
             @RequestParam String query
     ) {
-        return ResponseEntity.ok(
-                resaleStoreService.search(query)
-        );
+        return ResponseEntity.ok(resaleStoreService.search(query));
     }
 }

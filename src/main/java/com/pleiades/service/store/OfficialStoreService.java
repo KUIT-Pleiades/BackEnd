@@ -37,19 +37,23 @@ public class OfficialStoreService {
     private final UserRepository userRepository;
     private final OwnershipRepository ownershipRepository;
 
-    public List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
+    public OfficialStoreDto getOfficialItemsAndWishlist(List<ItemType> types, String userid) {
+        List<OfficialItemDto> items = getOfficialItems(types);
+        List<Long> wishIds = getWishlistItems(types, userid);
+
+        return new OfficialStoreDto(items, wishIds);
+    }
+
+    private List<OfficialItemDto> getOfficialItems(List<ItemType> types) {
         List<TheItem> items = itemRepository.findNotBasicItemsByTypes(types);
-
         List<OfficialItemDto> dtos = new ArrayList<>();
-
         for (TheItem item : items) dtos.add(itemToOfficialItemDto(item));
 
         return dtos;
     }
 
-    public List<Long> getWishlistItems(List<ItemType> types, String userid) {
+    private List<Long> getWishlistItems(List<ItemType> types, String userid) {
         List<OfficialWishlist> wishlist = officialWishlistRepository.findByTypesInWishlist(types, userid);
-
         List<TheItem> items = new ArrayList<>();
 
         for (OfficialWishlist w : wishlist) {
@@ -84,39 +88,24 @@ public class OfficialStoreService {
     }
 
     @Transactional
-    public ValidationStatus addWishlist(String userId, Long itemId) {
+    public void addWishlist(String userId, Long itemId) {
         log.info("itemId: " + itemId + " userId: " + userId);
 
-        if (officialWishlistRepository.existsByUserIdAndItemId(userId, itemId)) return ValidationStatus.DUPLICATE;
+        if (officialWishlistRepository.existsByUserIdAndItemId(userId, itemId)) throw new CustomException(ErrorCode.ALREADY_EXISTS);
 
-        try {
-            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-            TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        TheItem item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-            OfficialWishlist newWishlist = OfficialWishlist.of(user, item);
+        OfficialWishlist newWishlist = OfficialWishlist.of(user, item);
 
-            officialWishlistRepository.save(newWishlist);
-        } catch (CustomException e) {
-            log.error(e.getMessage());
-            return ValidationStatus.NOT_VALID;
-        }
-        return ValidationStatus.VALID;
+        officialWishlistRepository.save(newWishlist);
     }
 
     @Transactional
-    public ValidationStatus removeWishlist(String userId, Long itemId) {
-        log.info("itemId: " + itemId + " userId: " + userId);
+    public void removeWishlist(String userId, Long itemId) {
+        OfficialWishlist officialWishlist = officialWishlistRepository.findByUserIdAndItemId(userId, itemId).orElseThrow(() -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-        Optional<OfficialWishlist> officialWishlist = officialWishlistRepository.findByUserIdAndItemId(userId, itemId);
-        if (officialWishlist.isEmpty()) return ValidationStatus.DUPLICATE;
-
-        try {
-            officialWishlistRepository.delete(officialWishlist.get());
-        } catch (CustomException e) {
-            log.error(e.getMessage());
-            return ValidationStatus.NOT_VALID;
-        }
-        return ValidationStatus.VALID;
+        officialWishlistRepository.delete(officialWishlist);
     }
 
     @Transactional
