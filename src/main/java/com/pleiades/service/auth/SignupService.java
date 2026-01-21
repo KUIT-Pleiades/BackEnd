@@ -78,7 +78,7 @@ public class SignupService {
                 .profileUrl(userInfoDto.getProfile())
                 .characterUrl(userInfoDto.getCharacter())
                 .coin(0L)
-                .stone(100L)
+                .stone(200L)
                 .build();
         userRepository.save(user);
         log.info("User 저장 완료 - id: {}", user.getId());
