@@ -20,7 +20,9 @@ import com.pleiades.repository.store.OwnershipRepository;
 import com.pleiades.repository.store.ResaleListingRepository;
 import com.pleiades.repository.store.ResaleWishlistRepository;
 import com.pleiades.repository.store.search.ItemThemeRepository;
+import com.pleiades.service.FcmService;
 import com.pleiades.strings.ItemType;
+import com.pleiades.strings.NotificationType;
 import com.pleiades.strings.SaleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ResaleStoreService {
+    private final FcmService fcmService;
     private final ResaleListingRepository resaleListingRepository;
     private final ResaleWishlistRepository resaleWishlistRepository;
     private final ItemThemeRepository itemThemeRepository;
@@ -173,7 +176,9 @@ public class ResaleStoreService {
         ownershipRepository.save(ownership);
 
         // 상대 자금 추가
-        listing.getSourceOwnership().getUser().addStone(listing.getPrice());
+        User seller = listing.getSourceOwnership().getUser();
+        seller.addStone(listing.getPrice());
+        fcmService.send(seller, NotificationType.ITEM_SOLD, listing.getId());
 
         return ownership.getId();
     }
