@@ -32,8 +32,16 @@ com.pleiades
 └── util/           JwtUtil, HeaderUtil 등
 ```
 
-## 상세 규칙
+## 규칙 (.claude/rules/)
+
+코딩 컨벤션, 아키텍처 등 전역 규칙
 
 - @rules/api.md — API 설계 및 인증 규칙
 - @rules/entity.md — 엔티티 설계 규칙
 - @rules/exception.md — 예외 처리 규칙
+
+## 기능 (.claude/features/)
+
+기능별 요구사항 및 설계
+
+- @features/fcm.md — FCM 푸시 알림

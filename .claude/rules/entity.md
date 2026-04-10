@@ -21,6 +21,11 @@ User (1) ─── (1) Characters
 
 > FCM 토큰은 User에 직접 추가하지 않음 — 멀티 기기 지원을 위해 별도 `FcmToken` 엔티티 사용
 
+## 네이밍 규칙
+
+- **클래스명:** 단수 (예: `FcmToken`, `Notification`)
+- **테이블명:** 복수, `@Table(name = "fcm_tokens")` 명시
+
 ## 엔티티 작성 규칙
 
 - PK: `@GeneratedValue(strategy = GenerationType.IDENTITY)` + `Long id` (User만 `String id` 예외)
