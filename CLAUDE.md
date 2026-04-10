@@ -51,3 +51,4 @@ com.pleiades
 버그 및 보안 취약점
 
 - @fixes/security.md — 인증/보안 취약점 목록
+- @fixes/refactor.md — 리팩토링 목록
