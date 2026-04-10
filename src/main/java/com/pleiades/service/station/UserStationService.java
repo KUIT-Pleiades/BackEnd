@@ -13,9 +13,11 @@ import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.StationRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.repository.UserStationRepository;
+import com.pleiades.service.FcmService;
 import com.pleiades.service.UserService;
 import com.pleiades.service.report.TodaysReportService;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.strings.NotificationType;
 import com.pleiades.strings.ValidationStatus;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class UserStationService {
     private final UserService userService;
     private final TodaysReportService todaysReportService;
     private final UserRepository userRepository;
+    private final FcmService fcmService;
 
     @Transactional
     public Map<String, String> setUserPosition(String email, String stationPublicId, String userId, UserPositionDto requestBody) {
@@ -186,6 +189,12 @@ public class UserStationService {
 
         userStationRepository.save(userStation);
         log.info("사용자 정보 UserStation 에 저장 완료: {}", user.getUserName());
+
+        if (!isAdmin) {
+            userRepository.findById(station.getAdminUserId()).ifPresent(admin ->
+                    fcmService.send(admin, NotificationType.STATION_JOIN, station.getId(), user.getUserName())
+            );
+        }
     }
 
     @Transactional

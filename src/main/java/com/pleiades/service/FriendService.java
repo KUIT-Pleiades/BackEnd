@@ -8,6 +8,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.strings.NotificationType;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class FriendService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+    private final FcmService fcmService;
 
     // 받은 친구 요청 목록
     @Transactional
@@ -134,6 +136,7 @@ public class FriendService {
                 .build();
 
         friendRepository.save(friend);
+        fcmService.send(receiver, NotificationType.FRIEND_REQUEST, friend.getId(), sender.getUserName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message","Friend request sent successfully"));
 
@@ -161,6 +164,7 @@ public class FriendService {
 
             // response
             if(newStatus.equals(FriendStatus.ACCEPTED)){
+                fcmService.send(friendUser, NotificationType.FRIEND_ACCEPT, friend.getId(), currentUser.getUserName());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(Map.of("message","Friend request accepted"));
             }

@@ -1,5 +1,6 @@
 package com.pleiades.controller;
 
+import com.pleiades.dto.FcmTokenRequestDto;
 import com.pleiades.dto.UserInfoDto;
 import com.pleiades.entity.*;
 import com.pleiades.exception.CustomException;
@@ -7,6 +8,7 @@ import com.pleiades.exception.ErrorCode;
 import com.pleiades.exception.CustomException;
 import com.pleiades.model.TokenValidateResult;
 import com.pleiades.repository.*;
+import com.pleiades.service.FcmTokenService;
 import com.pleiades.service.auth.AuthService;
 import com.pleiades.service.DuplicationService;
 import com.pleiades.service.auth.SignupService;
@@ -37,6 +39,7 @@ public class AuthController {
 
     private final SignupService signupService;
     private final AuthService authService;
+    private final FcmTokenService fcmTokenService;
 
     @Operation(summary = "로그인", description = "로그인")
     @GetMapping("")
@@ -96,12 +99,26 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "FCM 토큰 등록", description = "로그인 후 FCM 토큰 upsert")
+    @PostMapping("/fcm-token")
+    public ResponseEntity<Void> registerFcmToken(HttpServletRequest request, @RequestBody FcmTokenRequestDto dto) {
+        log.info("/auth/fcm-token");
+        String email = request.getAttribute("email").toString();
+        fcmTokenService.upsert(email, dto.getToken(), dto.getDeviceType());
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, @CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request,
+                                                      @CookieValue("refreshToken") String refreshToken,
+                                                      @RequestBody(required = false) FcmTokenRequestDto dto) {
         log.info("/auth/logout");
         String email = request.getAttribute("email").toString();
 
+        if (dto != null && dto.getToken() != null) {
+            fcmTokenService.delete(dto.getToken());
+        }
         authService.logout(email);
 
         return ResponseEntity.status(HttpStatus.OK).build();
