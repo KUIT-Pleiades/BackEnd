@@ -45,3 +45,9 @@ com.pleiades
 기능별 요구사항 및 설계
 
 - @features/fcm.md — FCM 푸시 알림
+
+## 수정 필요 (.claude/fixes/)
+
+버그 및 보안 취약점
+
+- @fixes/security.md — 인증/보안 취약점 목록
