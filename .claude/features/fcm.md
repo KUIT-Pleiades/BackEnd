@@ -77,6 +77,6 @@ Firebase Admin SDK로 각 토큰에 발송 요청 (sendEachForMulticast)
 - ✅ Step 4. FCM 발송 공통 서비스 (`FcmService.java`, `NotificationType` enum에 템플릿 포함)
 - ✅ Step 5. FcmToken 관리 API (`POST /auth/fcm-token` upsert, `POST /auth/logout` 시 토큰 삭제 연동)
 - ✅ Step 6. 이벤트별 FCM 발송 연동 (`FriendService`, `SignalService`, `ResaleStoreService`, `UserStationService`)
-- Step 7. 리포트 알림 스케줄러 신규 구현
+- ✅ Step 7. 리포트 알림 스케줄러 신규 구현 (`ReportNoticeScheduler.java`, 매분 실행)
 - Step 8. 공지사항 API (`/admin/notice`)
 - Step 9. NotificationSetting API (조회/수정)
