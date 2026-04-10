@@ -45,20 +45,38 @@ Firebase Admin SDK로 각 토큰에 발송 요청 (sendEachForMulticast)
 - 인앱 알림함 + FCM 발송 이력
 - 필드: `id`, `receiver` (User), `type` (NotificationType enum), `title`, `body`, `isRead`, `createdAt`, `relatedId` (연관 엔티티 ID, nullable)
 
-## 작업 목록
-
-- ✅ Step 1. Firebase 초기화 설정 (`FirebaseConfig.java`)
-- ✅ Step 2. 엔티티 + Flyway 마이그레이션 (`FcmToken`, `Notification`, `NotificationSetting`, `V4__create_fcm_tables.sql`)
-- ✅ Step 3. Repository (`FcmTokenRepository`, `NotificationRepository`, `NotificationSettingRepository`)
-- Step 4. FCM 발송 공통 서비스 (`FcmService.java`)
-- Step 5. FcmToken 관리 API (로그인 시 upsert, 로그아웃 시 삭제)
-- Step 6. 이벤트별 FCM 발송 연동 (`FriendService`, `SignalService`, `ResaleStoreService`, `UserStationService`)
-- Step 7. 리포트 알림 스케줄러 신규 구현
-- Step 8. 공지사항 API (`/admin/notice`)
-- Step 9. NotificationSetting API (조회/수정)
 
 ### NotificationSetting
 - User 1:1 NotificationSetting
 - 필드: `id`, `user`, `friendRequestEnabled`, `signalEnabled`, `reportReminderEnabled`, `itemSoldEnabled`, `stationJoinEnabled`, `noticeEnabled`
 - 기본값 전부 `true`
 - 알림 전체 ON/OFF 기능 존재 (별도 필드 없이 클라이언트에서 관리)
+
+
+## 알림 메시지 템플릿
+
+`NotificationType` enum에서 title/body 템플릿 관리 (DB 저장 X)
+
+| 타입 | title | body 템플릿 |
+|------|-------|------------|
+| `FRIEND_REQUEST` | 친구 신청 | `%s님이 친구 신청을 보냈습니다.` |
+| `FRIEND_ACCEPT` | 친구 수락 | `%s님이 친구 신청을 수락했습니다.` |
+| `SIGNAL` | 시그널 | `%s님이 시그널을 보냈습니다.` |
+| `ITEM_SOLD` | 판매 완료 | `내 매물이 판매되었습니다.` |
+| `REPORT_REMINDER` | 리포트 알림 | `%s 정거장 리포트를 작성할 시간입니다.` |
+| `STATION_JOIN` | 새 멤버 | `%s님이 정거장에 합류했습니다.` |
+| `NOTICE` | 공지사항 | `%s` |
+
+호출 방식: `fcmService.send(receiver, NotificationType.SIGNAL, relatedId, sender.getUserName())`
+
+## 작업 목록
+
+- ✅ Step 1. Firebase 초기화 설정 (`FirebaseConfig.java`)
+- ✅ Step 2. 엔티티 + Flyway 마이그레이션 (`FcmToken`, `Notification`, `NotificationSetting`, `V4__create_fcm_tables.sql`)
+- ✅ Step 3. Repository (`FcmTokenRepository`, `NotificationRepository`, `NotificationSettingRepository`)
+- ✅ Step 4. FCM 발송 공통 서비스 (`FcmService.java`, `NotificationType` enum에 템플릿 포함)
+- Step 5. FcmToken 관리 API (로그인 시 upsert, 로그아웃 시 삭제)
+- Step 6. 이벤트별 FCM 발송 연동 (`FriendService`, `SignalService`, `ResaleStoreService`, `UserStationService`)
+- Step 7. 리포트 알림 스케줄러 신규 구현
+- Step 8. 공지사항 API (`/admin/notice`)
+- Step 9. NotificationSetting API (조회/수정)
