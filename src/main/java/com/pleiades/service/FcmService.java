@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -91,6 +92,42 @@ public class FcmService {
         } catch (FirebaseMessagingException e) {
             log.error("FCM 발송 실패: {}", e.getMessage());
         }
+    }
+
+    @Transactional
+    public void broadcast(String body) {
+        String title = NotificationType.NOTICE.getTitle();
+        String formattedBody = NotificationType.NOTICE.formatBody(body);
+
+        List<FcmToken> allTokens = fcmTokenRepository.findAll();
+        if (allTokens.isEmpty()) return;
+
+        // FCM multicast 최대 500개 제한 → 배치 처리
+        int batchSize = 500;
+        for (int i = 0; i < allTokens.size(); i += batchSize) {
+            List<FcmToken> batch = allTokens.subList(i, Math.min(i + batchSize, allTokens.size()));
+            List<String> tokenValues = batch.stream().map(FcmToken::getToken).toList();
+
+            MulticastMessage message = MulticastMessage.builder()
+                    .setNotification(com.google.firebase.messaging.Notification.builder()
+                            .setTitle(title)
+                            .setBody(formattedBody)
+                            .build())
+                    .addAllTokens(tokenValues)
+                    .build();
+
+            try {
+                BatchResponse response = FirebaseMessaging.getInstance().sendEachForMulticast(message);
+                removeInvalidTokens(batch, response);
+                log.info("공지 발송 배치 {}/{}: 성공={}, 실패={}",
+                        (i / batchSize) + 1, (int) Math.ceil((double) allTokens.size() / batchSize),
+                        response.getSuccessCount(), response.getFailureCount());
+            } catch (FirebaseMessagingException e) {
+                log.error("공지 FCM 발송 실패: {}", e.getMessage());
+            }
+        }
+
+        // 공지는 전체 발송이라 Notification 저장 생략 (수신자가 전체 유저)
     }
 
     private void removeInvalidTokens(List<FcmToken> tokens, BatchResponse response) {
