@@ -45,6 +45,18 @@ Firebase Admin SDK로 각 토큰에 발송 요청 (sendEachForMulticast)
 - 인앱 알림함 + FCM 발송 이력
 - 필드: `id`, `receiver` (User), `type` (NotificationType enum), `title`, `body`, `isRead`, `createdAt`, `relatedId` (연관 엔티티 ID, nullable)
 
+## 작업 목록
+
+- ✅ Step 1. Firebase 초기화 설정 (`FirebaseConfig.java`)
+- ✅ Step 2. 엔티티 + Flyway 마이그레이션 (`FcmToken`, `Notification`, `NotificationSetting`, `V4__create_fcm_tables.sql`)
+- ✅ Step 3. Repository (`FcmTokenRepository`, `NotificationRepository`, `NotificationSettingRepository`)
+- Step 4. FCM 발송 공통 서비스 (`FcmService.java`)
+- Step 5. FcmToken 관리 API (로그인 시 upsert, 로그아웃 시 삭제)
+- Step 6. 이벤트별 FCM 발송 연동 (`FriendService`, `SignalService`, `ResaleStoreService`, `UserStationService`)
+- Step 7. 리포트 알림 스케줄러 신규 구현
+- Step 8. 공지사항 API (`/admin/notice`)
+- Step 9. NotificationSetting API (조회/수정)
+
 ### NotificationSetting
 - User 1:1 NotificationSetting
 - 필드: `id`, `user`, `friendRequestEnabled`, `signalEnabled`, `reportReminderEnabled`, `itemSoldEnabled`, `stationJoinEnabled`, `noticeEnabled`
