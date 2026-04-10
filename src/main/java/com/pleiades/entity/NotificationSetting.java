@@ -45,4 +45,14 @@ public class NotificationSetting {
     @Builder.Default
     @Column(nullable = false)
     private boolean noticeEnabled = true;
+
+    public void update(boolean friendRequestEnabled, boolean signalEnabled, boolean reportReminderEnabled,
+                       boolean itemSoldEnabled, boolean stationJoinEnabled, boolean noticeEnabled) {
+        this.friendRequestEnabled = friendRequestEnabled;
+        this.signalEnabled = signalEnabled;
+        this.reportReminderEnabled = reportReminderEnabled;
+        this.itemSoldEnabled = itemSoldEnabled;
+        this.stationJoinEnabled = stationJoinEnabled;
+        this.noticeEnabled = noticeEnabled;
+    }
 }
