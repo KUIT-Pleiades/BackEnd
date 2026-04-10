@@ -29,6 +29,7 @@ User (1) ─── (1) Characters
 ## 엔티티 작성 규칙
 
 - PK: `@GeneratedValue(strategy = GenerationType.IDENTITY)` + `Long id` (User만 `String id` 예외)
+- Enum 필드: `@Enumerated(EnumType.STRING)` 사용 (ORDINAL 금지)
 - Fetch: 연관관계는 기본 `FetchType.LAZY`
 - 복합 PK: `@EmbeddedId` + `@Embeddable` (예: `UserStationId`)
 - 낙관적 락 필요 시: `@Version Long version` (예: `Station`)
