@@ -4,31 +4,31 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${FIREBASE_SERVICE_ACCOUNT_JSON}")
-    private String firebaseServiceAccountJson;
+    @Value("${FIREBASE_SERVICE_ACCOUNT_JSON_BASE64}")
+    private String firebaseServiceAccountJsonBase64;
 
-    @PostConstruct
-    public void init() throws IOException {
+    @Bean
+    public FirebaseApp firebaseApp() throws IOException {
+        byte[] decoded = Base64.getDecoder().decode(firebaseServiceAccountJsonBase64);
+        ByteArrayInputStream serviceAccount = new ByteArrayInputStream(decoded);
+
+        FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build();
+
         if (FirebaseApp.getApps().isEmpty()) {
-            GoogleCredentials credentials = GoogleCredentials.fromStream(
-                    new ByteArrayInputStream(firebaseServiceAccountJson.getBytes(StandardCharsets.UTF_8))
-            );
-
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(credentials)
-                    .build();
-
-            FirebaseApp.initializeApp(options);
+            return FirebaseApp.initializeApp(options);
         }
+        return FirebaseApp.getInstance();
     }
 }
