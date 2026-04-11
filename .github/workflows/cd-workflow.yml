@@ -39,6 +39,8 @@ jobs:
 
       - name: 🚀 deploy to server
         uses: appleboy/ssh-action@master
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         with:
           host: ${{ secrets.EC2_HOST }}
           envs: GITHUB_REF,IMAGE_TAG
@@ -69,7 +71,7 @@ jobs:
                 -e IPFS_URL=${{ secrets.IPFS_URL }} \
                 -e SERVER_DOMAIN=${{ secrets.TEST_SERVER_DOMAIN }} \
                 -e GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64 }} \
-                -e FIREBASE_SERVICE_ACCOUNT_JSON=${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }} \
+                -e FIREBASE_SERVICE_ACCOUNT_JSON="$FIREBASE_SERVICE_ACCOUNT_JSON" \
                 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
 
               echo "✅ DEV deploy complete (http://<EC2 IP>:8008)"
