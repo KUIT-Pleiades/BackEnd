@@ -9,6 +9,7 @@ import com.pleiades.repository.FriendRepository;
 import com.pleiades.repository.SignalRepository;
 import com.pleiades.repository.UserRepository;
 import com.pleiades.strings.FriendStatus;
+import com.pleiades.strings.NotificationType;
 import com.pleiades.util.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class SignalService {
     private final SignalRepository signalRepository;
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+    private final FcmService fcmService;
 
     @Transactional
     public ResponseEntity<Map<String, String>> sendSignal(String email, String receiverId, int imageIndex) {
@@ -54,6 +56,7 @@ public class SignalService {
                 .build();
 
         signalRepository.save(signal);
+        fcmService.send(receiver, NotificationType.SIGNAL, signal.getId(), sender.getUserName());
         return ResponseEntity.ok(Map.of("message", "Signal sent successfully"));
     }
 
