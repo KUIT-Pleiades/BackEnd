@@ -136,7 +136,7 @@ public class FriendService {
                 .build();
 
         friendRepository.save(friend);
-        fcmService.send(receiver, NotificationType.FRIEND_REQUEST, friend.getId(), sender.getUserName());
+        fcmService.send(receiver, NotificationType.FRIEND_REQUEST, friend.getId(), sender.getId(), sender.getUserName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message","Friend request sent successfully"));
 
@@ -164,7 +164,7 @@ public class FriendService {
 
             // response
             if(newStatus.equals(FriendStatus.ACCEPTED)){
-                fcmService.send(friendUser, NotificationType.FRIEND_ACCEPT, friend.getId(), currentUser.getUserName());
+                fcmService.send(friendUser, NotificationType.FRIEND_ACCEPT, friend.getId(), currentUser.getId(), currentUser.getUserName());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(Map.of("message","Friend request accepted"));
             }

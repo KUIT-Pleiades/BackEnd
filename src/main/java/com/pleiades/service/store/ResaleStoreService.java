@@ -178,7 +178,7 @@ public class ResaleStoreService {
         // 상대 자금 추가
         User seller = listing.getSourceOwnership().getUser();
         seller.addStone(listing.getPrice());
-        fcmService.send(seller, NotificationType.ITEM_SOLD, listing.getId());
+        fcmService.send(seller, NotificationType.ITEM_SOLD, listing.getId(), null);
 
         return ownership.getId();
     }

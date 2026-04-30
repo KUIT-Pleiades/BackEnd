@@ -192,7 +192,7 @@ public class UserStationService {
 
         if (!isAdmin) {
             userRepository.findById(station.getAdminUserId()).ifPresent(admin ->
-                    fcmService.send(admin, NotificationType.STATION_JOIN, station.getId(), user.getUserName())
+                    fcmService.send(admin, NotificationType.STATION_JOIN, station.getId(), station.getPublicId().toString(), user.getUserName())
             );
         }
     }
