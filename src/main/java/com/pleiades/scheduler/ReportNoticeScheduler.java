@@ -39,7 +39,7 @@ public class ReportNoticeScheduler {
                     .toList();
 
             for (User member : members) {
-                fcmService.send(member, NotificationType.REPORT_REMINDER, station.getId(), station.getName());
+                fcmService.send(member, NotificationType.REPORT_REMINDER, station.getId(), station.getPublicId().toString(), station.getName());
             }
 
             log.info("리포트 알림 발송: 정거장={}, 멤버 수={}", station.getName(), members.size());

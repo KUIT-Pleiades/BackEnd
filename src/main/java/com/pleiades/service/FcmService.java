@@ -28,7 +28,7 @@ public class FcmService {
     private final NotificationSettingRepository notificationSettingRepository;
 
     @Transactional
-    public void send(User receiver, NotificationType type, Long relatedId, Object... args) {
+    public void send(User receiver, NotificationType type, Long relatedId, String relatedRef, Object... args) {
         if (!isEnabled(receiver, type)) {
             return;
         }
@@ -37,7 +37,7 @@ public class FcmService {
         String body = type.formatBody(args);
 
         saveNotification(receiver, type, title, body, relatedId);
-        sendToAllDevices(receiver, title, body);
+        sendToAllDevices(receiver, title, body, type.name(), relatedRef);
     }
 
     private boolean isEnabled(User receiver, NotificationType type) {
@@ -70,7 +70,7 @@ public class FcmService {
                 .build());
     }
 
-    private void sendToAllDevices(User receiver, String title, String body) {
+    private void sendToAllDevices(User receiver, String title, String body, String type, String relatedRef) {
         List<FcmToken> tokens = fcmTokenRepository.findAllByUser(receiver);
         if (tokens.isEmpty()) {
             return;
@@ -78,13 +78,19 @@ public class FcmService {
 
         List<String> tokenValues = tokens.stream().map(FcmToken::getToken).toList();
 
-        MulticastMessage message = MulticastMessage.builder()
+        MulticastMessage.Builder builder = MulticastMessage.builder()
                 .setNotification(com.google.firebase.messaging.Notification.builder()
                         .setTitle(title)
                         .setBody(body)
                         .build())
-                .addAllTokens(tokenValues)
-                .build();
+                .putData("type", type)
+                .addAllTokens(tokenValues);
+
+        if (relatedRef != null) {
+            builder.putData("relatedRef", relatedRef);
+        }
+
+        MulticastMessage message = builder.build();
 
         try {
             BatchResponse response = FirebaseMessaging.getInstance().sendEachForMulticast(message);

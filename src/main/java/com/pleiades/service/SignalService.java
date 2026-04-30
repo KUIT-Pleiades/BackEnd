@@ -56,7 +56,7 @@ public class SignalService {
                 .build();
 
         signalRepository.save(signal);
-        fcmService.send(receiver, NotificationType.SIGNAL, signal.getId(), sender.getUserName());
+        fcmService.send(receiver, NotificationType.SIGNAL, signal.getId(), sender.getId(), sender.getUserName());
         return ResponseEntity.ok(Map.of("message", "Signal sent successfully"));
     }
 
